@@ -1,46 +1,66 @@
 document.addEventListener("DOMContentLoaded", function() {
-    const fileUploadForm = document.getElementById("file_upload_form");
+    // Hide all progress indicators initially
+    document.querySelectorAll('.progress-backdrop').forEach(backdrop => {
+        backdrop.style.display = 'none';
+    });
     
+    const fileUploadForm = document.getElementById("file_upload_form");
     if (fileUploadForm) {        
         fileUploadForm.addEventListener("submit", function(e) {
             // Only show progress if a file is selected
             const fileInput = this.querySelector('input[type="file"]');
             if (fileInput && fileInput.files.length > 0) {
-                showProgressBar();
-                simulateProgress();
+                showUploadProgress();
             }
         });
     }
     
-    // Setup preview form auto-hide loading
-    const previewForm = document.getElementById("open_file_form");
-    if (previewForm) {
-        previewForm.addEventListener("submit", function() {
-            // Ensure loading overlay is hidden after a timeout
-            setTimeout(function() {
-                hideProgressBar();
-            }, 15000); // 15 seconds should be enough for most files to start downloading
+    // Setup delete form auto-hide loading
+    const deleteForm = document.getElementById("delete_file_form");
+    if (deleteForm) {
+        deleteForm.addEventListener("submit", function() {
+            const deletePhrase = this.querySelector('input[name="delete_phrase"]');
+            if (deletePhrase && deletePhrase.value.toUpperCase() === "DELETE") {
+                showDeleteProgress();
+            }
         });
     }
 });
 
-// Function to show the progress bar
-function showProgressBar() {
-    const container = document.getElementById("progressBackdrop");
-    const bar = document.getElementById("progressBar");
+// Function to show the upload progress
+function showUploadProgress() {
+    const container = document.getElementById("uploadProgressBackdrop");
+    const bar = document.getElementById("uploadProgressBar");
     
     if (container && bar) {
         bar.style.width = "0%";
         bar.classList.remove("indeterminate");
         // Show container
         container.style.display = "block";
+        
+        // Start simulating progress
+        simulateProgress(bar);
+    }
+}
+
+// Function to show the delete progress
+function showDeleteProgress() {
+    const container = document.getElementById("deleteProgressBackdrop");
+    const bar = document.getElementById("deleteProgressBar");
+    
+    if (container && bar) {
+        bar.style.width = "0%";
+        bar.classList.remove("indeterminate");
+        // Show container
+        container.style.display = "block";
+        
+        // Start simulating progress
+        simulateProgress(bar);
     }
 }
 
 // Function to update progress percentage
-function updateProgress(percentage) {
-    const bar = document.getElementById("progressBar");
-    
+function updateProgress(bar, percentage) {
     if (bar) {
         if (percentage < 0) {
             bar.classList.add("indeterminate");
@@ -51,31 +71,24 @@ function updateProgress(percentage) {
     }
 }
 
-// Function to hide the progress bar
-function hideProgressBar() {
-    const container = document.getElementById("progressContainer");
-    
-    if (container) {
-        container.style.display = "none";
-        container.classList.remove("active");
-    }
+// Function to hide all progress bars
+function hideAllProgress() {
+    document.querySelectorAll('.progress-backdrop').forEach(backdrop => {
+        backdrop.style.display = 'none';
+    });
     
     // Clear any pending progress bar timeouts
     if (window.progressTimeout) {
         clearTimeout(window.progressTimeout);
     }
-    if (window.previewTimeout) {
-        clearTimeout(window.previewTimeout);
-    }
 }
 
 // Function to simulate progress for user experience
-function simulateProgress() {
-    updateProgress(-1);
+function simulateProgress(bar) {
+    updateProgress(bar, -1);
     
     // Store reference to timeout for potential cleanup
     window.progressTimeout = setTimeout(() => {
-        const bar = document.getElementById("progressBar");
         if (bar) {
             bar.classList.remove("indeterminate");
         }
@@ -93,13 +106,12 @@ function simulateProgress() {
                 clearInterval(interval);
                 progress = 90;
             }
-            updateProgress(progress);
+            updateProgress(bar, progress);
         }, 300);
     }, 500);
 }
 
 // Make functions available globally
-window.showProgressBar = showProgressBar;
-window.updateProgress = updateProgress;
-window.hideProgressBar = hideProgressBar;
-window.simulateProgress = simulateProgress;
+window.showUploadProgress = showUploadProgress;
+window.showDeleteProgress = showDeleteProgress;
+window.hideAllProgress = hideAllProgress;

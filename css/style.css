@@ -802,7 +802,8 @@ nav button,
 
 
 
-#progressContainer {
+#uploadProgressContainer,
+#deleteProgressContainer {
     position: absolute;
     top: 50%;
     left: 50%;
@@ -841,8 +842,8 @@ nav button,
     transition: width 0.2s ease;
 }
 
-#progressContainer.active {
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+.delete-progress .progress-bar {
+    background-color: red;
 }
 
 .progress-bar.indeterminate {

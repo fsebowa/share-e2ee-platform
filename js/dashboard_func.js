@@ -88,20 +88,31 @@ document.addEventListener("DOMContentLoaded", () => {
                         form.appendChild(fileIdInput);
                     }
                     fileIdInput.value = fileId;
-                    
+
+                    // Add file name to form for server-side processing
+                    if (actionName === 'Delete') {
+                        let fileNameInput = form.querySelector('input[name="file_name"]');
+                        if (!fileNameInput) {
+                            fileNameInput = document.createElement('input');
+                            fileNameInput.type = 'hidden';
+                            fileNameInput.name = 'file_name';
+                            form.appendChild(fileNameInput);
+                        }
+                        fileNameInput.value = fileName;
+                    }
                     // Clear any previous user input values
                     const userInput = form.querySelector(inputSelector);
                     if (userInput) {
                         userInput.value = '';
                     }
                 }
+                
             });
         });
     }
 
     // function to show popup and errors
     function showPopupErrors(errorFlag, popupId, formId) {
-        // Only proceed if there are errors and a popup ID is provided
         if (typeof errorFlag !== 'undefined' && errorFlag === true && popupId) {
             // Get the popup element by ID
             const popupElement = document.getElementById(popupId);
@@ -319,28 +330,27 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 
-
 function onSubmit(token) {
     const fileInput = document.querySelector('input[type="file"]');
     if (fileInput && fileInput.files.length > 0) {
-        showProgressBar();
-        simulateProgress();
+        showUploadProgress();
     }
     document.getElementById("file_upload_form").submit();
 }
 
 // Function for the preview form submission
 function onSubmitPreview(token) {
-    if (typeof showLoadingOverlay === 'function') {
+    const keyInput = document.querySelector('#open_file_form input[name="key"]');
+    if (typeof showLoadingOverlay === 'function' && keyInput && keyInput.value.length > 0) {
         showLoadingOverlay("Decrypting file...");
     }
-    // Submit the form
     document.getElementById("open_file_form").submit();
 }
 
 function onSubmitDelete(token) {
-    if (typeof showLoadingOverlay === 'function') {
-        showLoadingOverlay("Deleting file...");
+    const deleteInput = document.querySelector('#delete_file_form input[name="delete_phrase"]');
+    if (deleteInput && deleteInput.value.toUpperCase() === "DELETE") {
+        showDeleteProgress();
     }
     document.getElementById("delete_file_form").submit();
 }

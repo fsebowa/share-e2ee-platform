@@ -49,3 +49,15 @@ function check_upload_success_messages() {
         unset($_SESSION['success_file']);
     }
 }
+
+function check_delete_success_messages() {
+    if (isset($_SESSION["success_file_delete"])) {
+        $success = $_SESSION["success_file_delete"];
+        echo '<div class="success-messages" id="successMessage">';
+        foreach ($success as $suc) {
+            echo '<p class="success-message">' . $suc . '</p>';
+        }
+        echo '</div>';
+        unset($_SESSION['success_file_delete']);
+    }
+}

@@ -144,13 +144,26 @@
                     check_file_upload_errors(); 
                     check_file_preview_errors();
                     check_file_delete_errors();
+                    check_delete_success_messages();
                 ?>
             </div>
-            <div class="progress-backdrop" id="progressBackdrop">
-                <div id="progressContainer">
+            
+            <!-- Upload progress -->
+            <div class="progress-backdrop" id="uploadProgressBackdrop">
+                <div id="uploadProgressContainer">
                     <div class="progress-container">
-                        <div class="progress-bar" id="progressBar"></div>
+                        <div class="progress-bar" id="uploadProgressBar"></div>
                         <p>Uploading file...</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Delete progress -->
+            <div class="progress-backdrop delete-progress" id="deleteProgressBackdrop">
+                <div id="deleteProgressContainer">
+                    <div class="progress-container">
+                        <div class="progress-bar" id="deleteProgressBar"></div>
+                        <p>Deleting file...</p>
                     </div>
                 </div>
             </div>
@@ -204,7 +217,7 @@
             <div class="file-ellipse-popup" id="deleteFile">
                 <form action="/includes/file_management/file_delete.inc.php" method="post" id="delete_file_form">
                     <h2></h2> <!-- File name will be inserted here dynamically-->
-                    <p class="caption-text">This will permanently delete the file and cannot be undone.</p>
+                    <p class="error-danger">This will permanently delete the file and cannot be undone.</p>
                     <div class="form-inputs">
                         <input type="text" id="delete_phrase" name="delete_phrase" placeholder="Type “DELETE” to complete the action">
                         <input type="hidden" name="csrf_token" value="<?php echo $token ?? ''; ?>"> 

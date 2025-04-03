@@ -144,7 +144,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                             die();
                         }
                     } catch (Exception $e) {
-                        $errors["send_otp_error"] = "Error sending OTP.<br>Try again!";
+                        $errors["send_otp_error"] = "Error sending upload confirmation email.<br>Try again!";
                         $errors["mailer_error"] = "Mailer Error: ". $mail->ErrorInfo;
                     }
                 }
