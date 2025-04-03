@@ -1,0 +1,443 @@
+--- Upload attempt started: 2025-03-28 01:04:57 ---
+Request method: POST
+POST data: Array
+(
+    [file_name] => Test File
+    [key] => 12345678901234567890123456789012
+    [g-recaptcha-response] => test_response
+)
+
+FILES data: Array
+(
+    [file] => Array
+        (
+            [name] => Final Report Strucutre.pdf
+            [full_path] => Final Report Strucutre.pdf
+            [type] => application/pdf
+            [tmp_name] => /Applications/XAMPP/xamppfiles/temp/phpxMWnBg
+            [error] => 0
+            [size] => 979845
+        )
+
+)
+
+Creating temporary upload directory
+Attempting to move file to: ../temp_uploads/1743109497_Final Report Strucutre.pdf
+Move result: SUCCESS
+File successfully moved to temporary location
+--- Upload processing completed ---
+
+--- Upload attempt started: 2025-03-28 01:08:46 ---
+Request method: POST
+POST data: Array
+(
+    [file_name] => 
+    [key] => 
+    [g-recaptcha-response] => 03AFcWeA6fEvZfNE42vqnkRe77zbzLI3_cfoSbb8sZYftCyzjip1V23SbAOHaA0WgsCOUWW4c_w6inL-q7Qd79ETZczekQ1b7gFn96aqM05m-tdjLnR-lzu9yL6AIYu2PgcklgUZRnlplJYHiuep4fXYyMyD6mpFYkTMYmeU6al2x4c_L9atEykwJ4veJPh8z4vdMVOej4iNwTmFRsM2lRo3yig2n4R3Z-kCNXODDzrbXMpAlwCgo5KF5I1Lbe6V7rNERlC30wp11UJDebr7RfR8x7clJNsRDOo7QfxwePIrux9D9in9pq0ZSDFRkePrr8FupUIbIB9PLFqKwemQ2w3j9NtDEXMrDe-NMgH1ayorQl7j1iAxaKMOoHziZxN5P3TyBv0hZzD3Q3mw5Yz7wf_2GfUPnQMoTl64m-Bh_Nn2u1XWRaUs-A0scnW4T-2f3hxZIMVgEmHgePEiqsjWeGU3Gn7XDyMOCRRHUdx5_DLqQDZC-NP6Pb2Vb1aZFLoA_HIMvvcJoLSE5iw9fdRd8p0RaMSwo8s2wEJy8nmkW5pAGGPVU10wxxWHxJguOhuSr0Xs2Nd35huGs90jrx6M2dAuqCFSdlAxzjIHZK2Y2gkkh2xj3XrCNMDz0eyVb9sGUnlvF6oMfKf5_FnFimOPmt7FZZ1MvwgCBM8CP5dKK6uhFZ5qH7fuiqOI53qqAmGtmb6mr3BF4os9CBW89HS9Tq2byTIRIAgnT3HS-ykTCGlWx8Q4Yneh303J7FUYtyp2Y2vk0QU-JbaPBMbhUlMp02Sk9Wn0x5o4wQgaF0ec5CytMOIg4Y_DcXVDY9UEKkd1GVCnzAugPTpyFhSmdPmeaHQodn_cHDqvif597qYW6tgjOjrXs7rJwzEF_3xrwArS4OAIRQeuiCVBrKCKanohEpDOARTp3KZmezP_2u9LvGNiQp3FrKp7ryt8r8QY9BiUNxWqkHgW2A2snYPCSNAUBxsd97YvI1HWxue8byOP1_r3WdimSzv_UTW7HBUwcvS72T_B7Dx5tlR3EGWUXolcgNbv9fqVVGF-zDuiLcIEJpVw8ANQ2RpG5xoOb8bHLxSgIZ4CqEDiUCiOvJl2pQpcqK4UEOjPBC7wy-kh7LhMBkBFkynYdeo9rDUg1H-Or5iCAslsO35kt4DGJIhZ9A3EU7whqdeDJv7KCpWWGvqP-Tf21eMfiH4TIZ6GzJVDi7iO92WuNw4R8gV13n7M3Tzvfs-xoicJFxAmcIsrKeN8iqQJfAZn42ySQ7gWPGMv8RSiZsbuGoc-TfBAeYhD_e-0-9WCnl1KrDTGSpV2UYj1yFXgZlYquBpQpnVGBUFhWMz3VH2Ru957fGhupm7M7VqdNu1ER5uFLfd2fNHhAG5IpIaHhx5zs0BZ-QDY5uN_1J-fh_QixkwcOE2RnIeu5TyRVBOxVeDfwI4S1q2XaZ0UXZ8HPL4bVm_84r4kPMvm8eHDTq3a3EeuCG0EbFVhOhd3l10ri-SgasCYjvCECKsti2x_hnUeoRjh5bBVYu-tl7-fGxo9mTnriVfgMNrn80pQzwSOLxuiVz9uM7LmmaGiuYNoM5oR9MBbQaejSeRoede2MCjuUwWxB5Qi9b0I_7txhrTHyQCpqN_q-evYwnUUDWDlxxgs-uZnL0zXgzmQsEnHLVcHqW2zr0X1vCSdt_A72nKIE1DFum8yoKQogtHWu4kviJJeX-zHAMzMYiL_uAJcFeoT7EF_pCkV2QCL1pDrDXrm48nG3pJpboOdisjp3X47VdSL_GKdoay7mQxEZkGbcZSY4IaAti3SqX3Vro9PJuwrzhfqB14OUTvAx1BUJoqfMgo8paDpGLiTYj1foed1dViuaCs2lm538p4nDW4RPFbSaLh78gzazwt2i38eAtAV2P9dyva968GEV-ub99UK4HBYlGT8E8Dw9MCCbdOzXhY7_84D05nHd9PxE5SMxOSqPU7AZJByfc2J7C-hlcbTRbLpVOYBWAFyNyTkdwQrOHl7NqaiRXaQnDFH3mPOtgSQZ_9yqyrlQStJ4
+)
+
+FILES data: Array
+(
+    [file] => Array
+        (
+            [name] => 
+            [full_path] => 
+            [type] => 
+            [tmp_name] => 
+            [error] => 4
+            [size] => 0
+        )
+
+)
+
+User not logged in
+--- Upload attempt started: 2025-03-28 01:09:06 ---
+Request method: POST
+POST data: Array
+(
+    [file_name] => Hey
+    [key] => 10100011111101111100001011011001
+    [g-recaptcha-response] => 03AFcWeA5QH8slrX3uyRrf4Ic0WeqnKQ0Rfw-1VKt9ZEUJzv2ThV76NkqmV2QjDXFnJXb_LvBU1KabztIwEo8pTWB_k9MvAOBNKAY_vgI3nbSuoOxYjHL25wVBEXRZgLdPgWnW_BCBzoo0A3dX8bQ9o5cQozAhOqixT-mVycntHIeX6rBIfp7VjwVSu4umBrgS9k_sWvyU8QvWBYHbNjaf0sD7xysgy_veuzc4sVLcmc8CW3MkmLmjCudCjqNLzohec_fHI-P0tDJWKs6jAfcK-3o6vJMNm0QB3J6-aq22voRl0FPV96b_pcdD3LNIKFCx-PJx89ilIf1ov-lSZYnFG13FWtHyABpo4ZFcOOPSzgZHgvEQNRwFoWdmAO-x3fRgPztwMFxyp-gQHejNy55eYoTe1vaQTjGzRmstk8ekhAaNs3TguHxG5JOiNIo7n6P6I_IzP4U7sbLTf5R0Vti5xCbBbC2dlhY8soKxDqFBsnbpZPUa60NnD7f-slUxl7McRDvBTZZndtMokcL1M6tUbHzR8u063g8Tjxqk-bPKRYN7JImuor4WZP5evgv9hEo9QVvWwBU3qSKJQ6yoeBTfaZSeSQVfxN57qo8ejCMeST1iqAPCsRSs7MKlQoF5ZVfFZ5JbZUFyGg_kNq3JhxrKVPi9YjqvSrJwjW2VLZnLEwqczRi9Nzj68YbRATvCsTi65GTC2ifJ6CNaAUMez8y88Q5mO5Vh2RNwLqGhXIgF9ne2KriTkzGOvQ6FV-YN0kilns1OgL3XE5_HhASnnPfAuLBLanNru2AVa5wcmOOAvQiJnN5JtqSbFsjyikmbmZibyql1Slx9uOHZr4e9vGi3sIrqjtdDPOi4ibY8qBffXWBZsEE6Cjhr8buNyaA7nG87VfXY1Yk8rLZ2GW_RXiuYmpIZrYekG3yIF5o59d5YiITlekFs3mHQ3tZZK4gw4q6nm7XniJ1fz9JhXb8oQKwXrYnAMSDTPy0FjI4OoIApqI2VyEbz-Ce7pLzajWIdopXGHhr-LNYAHMmsFUSgDdASt4d7u1TTHr14hT10dGoxLjTwjccSZQ4HDuWGiwH0gZs3BCUOZ4MqU7OqhFrBLUdjba3oWVhb_1uz3RJrcwzj4KY9mQ9Eh342rQgT-WFh6c52LVNiKjHobAX9fUb7Z3C_2ZONxL0cEz-Dw20k335KoOHvfbVDdn5N_M7Ea_NHLteJg6xnIuqGM82BQo7HR3gnjWomtPhxy7aTXNiuPl96poNVz_SxdL-bwvGIZzWSOKHNeho50vodHoI0MpD4yeq_Z-gA06sjKj6XNsErswCzecDI3Fn1vpu7jIDJN7rkkNgdcKRFfMj6LScotof1ya_5eI-AVSmozQV704krbJybAwLtitXKMenllP3K6BbV6voT0uWeThIJx6FEWcOmQWUAEUrXeEt6r3xYlsGBYueL9d5Vla-4RQoSMmU2EtxxE-JWE3VY3CWwUYIH0PZRbf_8UP3cSnUqxqZld9CD_rMsPyoB9Duc5aL9zSLh6qBANejpU5GEwE76akVrlfEXC_fx2DZWRVvdvbJGtO03YL8b24RFt1CD-5G3pPfKFV6tbpxQuLc4-gwQ-K5KnbvqXN-Zqps3A1DaUG2f3XEKOMmFqy9J0n6i7tTmEZpn7nbKcOJWrSGs8uHs1wGDQGQ9wT_BRjhsiUJtGW5aQJQCr6I4x71GH61WW03s7uN8zgDptiAaIXHQqD5h1xi9DovzUVwybPaHhDi6xIKUGStLvbfaybyY03xmmtcdUmabO6WM5rOJ_VSz6g_ZqdJ5XqV4dmm2Tn8Edcyksa9yqILpZVbLdLmeoHAzfilQFuuFDMwJcImzrzSGqDUd644PeOa2oqoD7qCMsQK07UdOHpi6yj4Jbpc56O6DvcILlZ16U1EwR5L0Bq78MwIGIyoOp_OmuZIJpISThc-zIBu2yqrGYiwRq3NSFGLBOdHiMSreCFsiqjvpLmzx9JZYcoRvuh0kJErvJkLgHWvWhCLiUeVmgR-SBMJhYUvQrxPbnuQN7eRoOG_-CazhFzxw88b0mryz5kqcw4unGFu_75ZhNQ
+)
+
+FILES data: Array
+(
+    [file] => Array
+        (
+            [name] => Notes.docx
+            [full_path] => Notes.docx
+            [type] => application/vnd.openxmlformats-officedocument.wordprocessingml.document
+            [tmp_name] => /Applications/XAMPP/xamppfiles/temp/phpo9iAng
+            [error] => 0
+            [size] => 17982
+        )
+
+)
+
+User not logged in
+--- Upload attempt started: 2025-03-28 01:11:09 ---
+Including session configuration files
+--- Upload attempt started: 2025-03-28 01:12:03 ---
+Including session configuration files
+--- Upload attempt started: 2025-03-28 01:14:49 ---
+Session started directly
+Session ID: 0eq9ij0t6eptkfouamhlo780ic
+SESSION data: Array
+(
+    [test] => Session Test
+    [errors_file_upload] => Array
+        (
+            [0] => File upload error: 4
+        )
+
+    [success_message] => File uploaded to temporary location
+)
+
+POST data: Array
+(
+    [file_name] => Hey
+    [key] => 10100011111101111100001011011001
+    [g-recaptcha-response] => 03AFcWeA6aphItz8zoazzkl3S3Hng9LCUZvbyWGRHbbtO4H9jHbWHpSyQXEplcpA4_z23zy9Jv1LObnwRE39pVqpQRUZUAEvK-5R_BFexInNUBVb72KYxen2jlqbLq4kBWZt7acN0v73BUcvJ9NCa_9GBGaMHQixkkb7aOezkx2dBSbcqQ_a_9VcwKiayHvelHM26AGOrBt0IxBl2rSMNAq3jLYwG4EzWY-_79xIRBXvNjtuG01NFQeFxKsqPqZ4bYamfeppkFyHhTXzIKMXzv2K1SOPGTPaa6Ij_EKEB-GGW0Qsp4ytRR_RWNDdQkUOO-jndWVKfCvcpklpF0gCKygsJS_1nx2Zkyl-usnWltSYnbN0CJmKMpMBXiC6Rzd9wAFtgHJqdtMxQTKWfsW5LlDNnKByLas24pznAyJDdOIJoH_JKXqkuxIZYGD68P_jCDgXWD0oOwEc7zQfj3U6R-Q9tYweJtQ3ddKOR-QXhUpybAJtpH3S7mqa7Grt0yxqcTCEwvT0jDkm0PbA-_3CtTLF5efRwFtKvgchIDDhjbRIT9j0lAAAXaJXtNnE-XBhZ2UTH-__ibx3IPigpXHm20J2wjppXKLQ_B5H0ketL62B8A2TWcP2NRlrBuE-xPEGBUBcwFuG3-WEPWioxMxpoo1sbcAgoNOwNIIcowDvz5OkcmNrw0OEH7hQV05Z9GcNsjVMlHkdT83qDeu9-kZSiR8SfJFEB9hN0JOVEPG6kKYcdLfejgk4OuB74OEEJARew6x6ZnHiHJVDxk2O7-ckTON_kQ5fdLVlhbCk9XueNCiR8-9WPfq9lAAqWLgeHoBmfl7GkBKaG05QEr7oKe1bkybZCifx1uXFMeDdRrysEJQruuD8dmQp0IINCF7zvEGBWFZ14gRNnWkgtv0UZL2dxyu-U1w-mI0mggxJhAJ-1WtUHAmErSfOMEzdOlYEkAU1ncwYz2KA43HR_z21_YJRfILcSdn-BVC4S5FgaH3X3IeT3DbPvPeknZOf2z2BgwCXbTCBjHb_5NKEHIVlKTpXzU5Rw-j8rqN7iW2u-ot0N9c2fcbyK7u3oBecCst7u1_UZqsR_VULUThoe6g051rBbYTKWFO3oDSSqA-NhGUbFWtaEPr3-1-ckeUnvylPyGjMCp05DuFo_KHOKzv66lGIj2nOX16hJu7UVQy618GPegN7nF4Lx4eFaK34seyrJ9DNW6w0m_75ZC2c-d2-RfR02k_4NOEa3w39OPPf_jhy1nkfVdaU76CgE2zgh1x3GS1GOFGAfO_Mak23ll2UFzlqv5Cb5n_GrKsfYr2Vo25t0b4ycFyfmmfNg_jiU2EP73CJfbIsUKIq_vX5jF6WMGRumNDx4rCmaBt4TeyOZxqMZ0GO4NrITHruppMR090Wn8GiXpCmHgTpUMWy3uz_eVrwj_81nqbzgIJKsg1X6sfGomK_9mTdAyPhM_fcD6UJ8RU8S50NS7LNoaX3t29LRrUO9nEg1j1jjaMckjmvxS3qc1Ft5iV8bX64GVhPQGJa8_na8s75-GzV6e3yZ5wn9rQ1QCcS4KbaQ7W-QFhdOc4MkO7tXO84nqdB8zdH23ZC9NCtBbMmVr-d5z_kYt2JquKkmxqg7urD3LsKDdfqSNFxkdhTzJPVUsdEt6Y2f70kEgvOJwwDdddLTZnuArEyLOpjDcCAYKXSTQzpMqZMzoZtydiA3zbIKovATtv8dxQC05Y5ue0AAAtZ1yEyr825q7Sifi8ftDIKPzNTPS9XKxWYDMl2nvO2DJT36woXKYfvMdDJU0LFjGEU6KIrRCXQFH91GE5gl0FdRJZZ83EG9lXg7iEgyrOp-hlCi_xt1l55lpCDvFWf2ZaTcuwRFe3p1IPocuYv46jgl0wFBPQbBhOf5HTJLnmGvjQfGNwswwOLhSAtfIfhxT3IrNqxEGQQeawqHEtLpgVRqdIreoaOawy5M2MXH7D9QzI1BfV86OfZ0QN1n6iLOmtigHO-4hTrWO5Q1_zdB6TBsKXNt3j-hFZp7uT8MLsBURZw-iEFFDmCmFOFnRTsy_5DbFeIKU
+)
+
+FILES data: Array
+(
+    [file] => Array
+        (
+            [name] => Final Report Strucutre.pdf
+            [full_path] => Final Report Strucutre.pdf
+            [type] => application/pdf
+            [tmp_name] => /Applications/XAMPP/xamppfiles/temp/phphPqOpG
+            [error] => 0
+            [size] => 979845
+        )
+
+)
+
+User not logged in (user_id missing in session)
+Available session keys: test, errors_file_upload, success_message
+--- Upload attempt started: 2025-03-28 01:14:58 ---
+Session started directly
+Session ID: 0eq9ij0t6eptkfouamhlo780ic
+SESSION data: Array
+(
+    [test] => Session Test
+    [errors_file_upload] => Array
+        (
+            [0] => File upload error: 4
+        )
+
+    [success_message] => File uploaded to temporary location
+)
+
+POST data: Array
+(
+    [file_name] => 
+    [key] => 
+    [g-recaptcha-response] => 03AFcWeA6FyOw5Dke6SSt5E4qZ0op3G6qdIHeW-v4REZniDaXdC6DgtLBNVcUOnsIB0gnBC993l5U9CnXxHLwwsGbLdYhnac1ywhZ6U53NriNHFgotDmQHuU1OAeG7RaCtNgHjEsnbumC5l4L4z73b9V2pIgKLbuAcFatJ3uJB4jxKthKyh38em1xuwzgjsqs74HbtL2vUS0zGplG6J6Znv2reyUtxphCuFQwI3G8KG5i3vK5zoBnNcvV_KShgSedGpTYPiesn4r4BfFizjfaABQRddGWX1Ol0Ay3E2lMly1Idf31tkEhFB4VLS0jU2TjeLXsPp1UTy03ljMo3iVIbp0TS2lcVmMYjzzEMcdH4-V2zKmiZ8KCBBvfk4tcq5qcrTzJyP2Wwwuv8gl4p8HuxTXrKPU9xQFat94aT1e7WwLh95MdLbyja_rpuKwd58lwMxdNbasQX-0DZfC7c2OtQGiuOtvj-Ns_H7lpL7IBeIyVslJ13vuivtr29w7gPP49JBhPasmTtzS1I9R70YsRCjaMB9yuxsM6AwoQADeuPl2KItrTFZEOm7sMv-tEt9KguLHj3H_jhr_JmTp2mX7EriDhoCxFWBYFwVmrBRU7rAhrkzQOWHezK8tM-DN3hPnJUPudVc0THnE_Bfloq850GERjm2mW67BmxrMuxF-pLZX5mbsaOkgJYOMYHsMhvyGfPf-48Rpz1ngY-o1HLhR2SZksA0tdJtSvbEeToRxJsdNo7hqNcaD2iROsWCK7k9LtaaokT2JoMA37h7i-06BygEX6yJFp7e1GSfFWiQeAbtD-WhRPheuO02UcCkxwW9DVEJk9tQeBCxGceV0D4mhriAb4mbw4RIT5dXR4k1wMdpiN2jsHrp9V0QrN-yNEkGC9anstb0UjBjTZwTZdYFzGBnMf25_1iUAPrffUmEctgqx3ypVA6zHERFbuwYIlf0bxsLktmyrXVWeYfZ17cFJmftv9mys6DsB62xkiKnjixYojU3rMp_xvmzyXTS4QZLYPEMxqyRr2zoiY8UrRtxYjL8Kn5X9i5yXrqsSz57xUkMvuKaXOm1BMu2FMLWKkMLG_Yy96AW0-2sip68ti4g1PrlLLsoISqFac5nJJruYiJVfU9U5hOK6t1X9tiYiLGNbRnHhZdSz0cccxItn5QN0S43uKwpyLYcgM20jOKc5kDrqXqMBH9ouDpBGu-r4vvgoa_lGEWvzkeswnSmjz_hDYP6EsA9ln6bwa2nm9tjyJd4RiPjyYveowP1aWk2BfIqbH5DmP-9ah3PgNfiq7jvnws3CGi8G8dTXjcsUecmIt06RZHSxIjjcVD26Yox0HZbWfEDPus8Y5Te6D8MPxI8hQk1Avs0oZ-piTZI-WUgrTk5vJoo0CYRdiE5PAvliLFLomDEpIlrLLKoO8x_DGl0NPHMj7evgZ2h6Pt8gnr8v8uYwsqFJEaNRB-C4u0fV11BgxzN66hef0wrEqA6EAfep2dwaRL4IQVpsLYa02UZRAG8U6VJq769OdW343a4_ExAslx8DDDghuUIU2VaF15ITzA7xDLBiLyWBgcIko8Hi9ksMu4Qic9G1e7W5Whg8Din53HiKNAFCC8IkeX-CwjA6aQ_3d4fbDJvJPKJCV5FjMUc5su4IjBGKT-TmWKUzjlrwcDJ-43BFQHVB6lVQWJtx5pdIKlTFimScCJjcHFD5LNrt8EbeKv8SxQt8lXZS_D8djBm4uZFgsz-5HxM_VoPRBhAvT5PWeJ7DcEMQpZ70i4FzyIa4PEeZzcgZGblcH4XwbFjiGjaz6AF7meqkVn88B0UUPV_vr8ROkS9R2ToK9sCfnRY44qJb2NTgzGLvVJml-agex5URH7zX-etCHiMd75lholBUGhAG3sYVtv4fKkErJrwejIdP5wXjKvUA7nJIufWKNWLopVjVG7vonUDUQrU6Gi8xM7Fvb_ZxV6eioieaCiM5VF9L2V_V69a-LcNrY5bvrZiv88PThIfGL8Wv4JLqqtrARIiHXNvpVZEDyYM2YXAFAYV0r0BDM
+)
+
+FILES data: Array
+(
+    [file] => Array
+        (
+            [name] => 
+            [full_path] => 
+            [type] => 
+            [tmp_name] => 
+            [error] => 4
+            [size] => 0
+        )
+
+)
+
+User not logged in (user_id missing in session)
+Available session keys: test, errors_file_upload, success_message
+--- Upload attempt started: 2025-03-28 01:15:16 ---
+Session started directly
+Session ID: 0eq9ij0t6eptkfouamhlo780ic
+SESSION data: Array
+(
+    [test] => Session Test
+    [errors_file_upload] => Array
+        (
+            [0] => File upload error: 4
+        )
+
+    [success_message] => File uploaded to temporary location
+)
+
+POST data: Array
+(
+    [file_name] => Hey
+    [key] => 10100011111101111100001011011001
+    [g-recaptcha-response] => 03AFcWeA7dNxZW3Ft_XStC9-Cq9knWIpHrn3F6F4gRzDwMIifb8k9G9IbiPlwv0w2HsnQC1_I6XgFF1EJ6zEtnF36Q71POIger_-3vnWrxVXaoYdkbmq5epkjXrSpyCyJcTwPcpcxGVYnRD0ClpK4WQUaTRHf9Gj3pQpg76E3ggrR5OUGQDuApkUC6GnsyYz-9Rfn2glmjjWJ6Fm0dksnU2cuQcvG2X0nw4Hp7Q9yAMetnwUmm9209K1jaCem9L5Pn7QJbp0FWaOlcG7bCPHCEIlEQKQc5VTL0dsdei-dzGYRYT1ztmEfDLi9uYrxonUmdzNaUWkdTsXmH2SKsOK1vXKUd5eeIuYYuP9kbPSTkbwPC_zdY4b3vyqJLGrgDmG__XebcnibrJd6J1Tj9B_VlJlsWGE3uD1QjWg0fMjccn715kSgsyd5nMT6oVi5qEfPkg-2N20ChwVXw2uVTr5tQpsOdCNDpexPVAvZdWFMSNFtSVh3znzYLPcAY4wVIT1OcMVQiPj1B38Ddtpx2yupTk94FkFjxFoXSVuAaky3o8--LIYALI0iAREEmrjDcW96C6WHpqWyDP8kKqKPeg5gYm20sg6Ftw00MKODqk60L0AbvhbzBBCFos0aJeTwo3jbfdhWDJx9iGraGuuJ3fbkfHwHZFp8eptM75hxxiQ3PYvkJsG0PELH7_c5fkMfadKFvfA5qWqSqK7CvCRq8l1fveN5-EGmvXvGTVJUJCM4-ZmKH5kD_oBV-uFfiudO6OglAuAIftgHi2du76_vYbsFV5IKY4bDoP5Sl0FW57s2amraS0P9XU23jIGegMvRhmTc_Mss1_9dt9G0hcy6-cUo8c6VLA_pV5p2KOzOaNJmkV08uRhJMFFuzEhj1BFeLf31Zn210rro8lu4Dc1YaQHLLSzqQ2A0HPvnCn4mF2ECKB54HZocjPhIwSPvtTJhyR3KHqToq3HVR3tyIKbLg9eF4FaJgD3_bmKVM-oUM0xk6pwheg46MZtPLi-S9dRP2nqkDR1fLmtQkXJCx_PKtCwlSov2rKs2euTIdc25AgtzmqRtLMWyi9l8amryvDBGQXR49hLAjATVsKa9AZuyqqDxikkS8q-Xk3RpnF2RNjTPH1mROKXS2E692nXbErfkndJYEk3zDNlv03P7c0yyENqr1_CF-4sNuw074uvDSNwlVtRfJd0BkJG03oCrYTPPwS7B6tSZ2P2PQoYA8WhjjpCsZBMA5iVFPAXVSnRlP_hxHvjwSAEbiRlPgJkm_XRSqgqJgdq1Lq73oRoEUEJv7hTGkC7DpcngE_DhOyL5bY3HRDNBPHcbyRI0T-eRGmfD5Q9k75NQo5JeTfOpHsKHqoXSsPQu5iz91NOpdyCwUnDH0M2nFlCScwcVR63xlGIfhfnSYP55WPhSopCmDJOH9SZSMvqtlHxefsx7ciFRWz9pvFC3CFAjKQYA2UbxLQhG9ETdFuD4b0elvErqMCEXtaE7UopuYJkXU9G0oO3mDjyHnc5USWeV1kLrCiXkSHUyRmstYcwP2qJTO9Y7Ux1v0oR2WD2dtplMpIZy2vgvygWb3lQMSh4FcG82223TOxjUuy4oOjD5RAHs2SCdK1qN_wQhQ2lhWlHDWBrRLPnJHznvOerlniqEe6wWMOsJtsG-wMZuow6n_bmfLQWg3OV9ACbfeVEr3uYH9A1tcj8hm36ErxGQVYWZflJhi74Pt7UVg924ujB0B7VmWgqmnrd6HUVUdtVpzKeNbtfnjf3S_Zc4N01Ou9W1rxOQ6DXTw9va3vdDMsvqj2I4WdSnebVRt5H5VRskVp20z_hmU1hwoC1nS9FFrMfEPXlV_M6AWIcdsWO6A_nVfnlzy869QvNn_35bGdQ8bRYjeBCx7RpgvucPSqHuRee0YhRLz00HGnjRiLwsRxUxbRggq9FIosizeoBu94FLTvInyi-iuPrsMcNXVTMHE8wvAVfXIdXKS4oqCDi2aAvyu5G4iARkqGxiQUFZv6CUD2Fm7F-bcNkcipaKLUSSjgR7tjjLJKF4-O8JeAdUBYNUnd3xaT39_
+)
+
+FILES data: Array
+(
+    [file] => Array
+        (
+            [name] => CST3590 - Report Template (MRU).zip
+            [full_path] => CST3590 - Report Template (MRU).zip
+            [type] => application/zip
+            [tmp_name] => /Applications/XAMPP/xamppfiles/temp/phpPkU64f
+            [error] => 0
+            [size] => 1715433
+        )
+
+)
+
+User not logged in (user_id missing in session)
+Available session keys: test, errors_file_upload, success_message
+--- Upload attempt started: 2025-03-28 01:15:59 ---
+Session started directly
+Session ID: 0eq9ij0t6eptkfouamhlo780ic
+SESSION data: Array
+(
+    [test] => Session Test
+    [errors_file_upload] => Array
+        (
+            [0] => File upload error: 4
+        )
+
+    [success_message] => File uploaded to temporary location
+)
+
+POST data: Array
+(
+    [file_name] => Test File
+    [key] => 12345678901234567890123456789012
+    [g-recaptcha-response] => 03AFcWeA76DC1pL6MIFj09Z4PbxtLHU3q7zwQlphrEbKEBTdDdXmpTKeEvqvq7IUxoSCDNwnJyA-XAYiKxDglJQRsWd2LYHriTBWQ7pkq-JfuGSNVm9S_mOyAv_1SzpbOkQ3dfYcivYsuf9yfBgrKgrQkGj9K2H_l6A6DfEtb5O9oR2JMKCW5VLtZQmkTNQ4ncuCR50SUreFfpBf7mc0-D_taLPdx25OsYugc-qG5KRHffSRN0pOaRGOfJ-Wpg1UNdr6JKvCQUNFKfsFuo2IA5YZlnTIklYfAEUVRcOwrm3FMt3uZ-OLBd5klBVjY6BnI7Fznx4RD3rewxyWs3aM8_1LC5u7F3ETeHpsnCdOQFkH1vjOMfS4pIGz7Tw6zEzw8lI4kx_RmE7cwG1o-86jK884EF7lYEuyTynJY05du7W_jcjXRc4yqqE8WdBcfDTChVFhwKJz2N7S8K0V1c7QLrFzJgIBpiJJgBBP_HTBMSFOC8TUNzgqcvJooX0uxMTGwku5HDj1oai6hYecxiCnUD10BpwEKxxlGG30qN9Ou8VrO8OukJDDXAXQ-0JizzOI1q5DcAeQ_9U2fKYwsXMM-SujCaTRy_alpw4DZ6mJOwbpDNOXJFyzgLaXnwm0DwUd0AJtXJ-D2Jm4k3SR6vccFxC5gDJtPa2uRQY4cj3dDtu06aX_alH5XTIHQA4-ZOY90IfSrf6gFTyLL-qiEaJiAanObwFZAP6_6vn4j8iIk8DHOvUK2ALWPNbZx8r6Q-XeUXQtINffMpqsbqMb7j6CQOs6QhbfazeCCYNrrizZXuKzsQPpZZxovHHI8-6lNFOxdk8-rQvcDTWBDt1OtbvSM9HqJV2Y1tRX6R9Ulmsmbn0ni_X2gCFokXOMuhl4thyh0Y1e7qkqZmmRL3MdHER8_0znH4wBVFHCSJeC5vm5sV0QCXXglT2qaYv9ap1HoKWnuM6F1-lvWDvsDq7Zlwro0b3MIrWP3EYhdwNXKq11Vj-RglFnwqJTsaT9H_pt6J9j3D4vvIwDn-OgOVSTBKVpn8R8lYh87BWd8_iRijcH-iwsi72OnqcM52sMXEhJbDeKHJ6a-ChKCz7IOJePujnc_T_PUOcHF5uqAn6U1ztn-Ez951dDcojJtssDN5wjgFxAq1cf0S5y5K-yXCnpWm06ikluPE1sS7zp2zeLYdjdP-yYf1RQTV9A8-W-C1_cM6vZ0f3JifxpvQMW6UfMxp8aMQanBxvoQMyjxZ_C0XrAAf_kHuU94JPUFlsm8_AoSZnCG5o8FOW4107Xm6cBjRm1FhyuLc50lD2v8aN0KdTX_i85w7AZPWgcwdaaGZ75ku2ltKLU4N0hwySiStfct95r4VOppZty3-6YTMqGZvzJpf69vtstfenzb0N0-zm9OW8fRQ-wksrSGbX55L7ZXZsKDwKYywPAWSjAxcpA1Zp7x8lwFhDsL0xU31K2GLmT3aRtpGV5kzxC5cEOg1CaL-kcajaDLe4W-trUB9bha5HaZZMQ6EcJjBjoE14RRcWFMNqe3dUQeV3Z_kVz4SzRSDA6AGAuBK1mnnjYiP-yiFV9qWpmzfHBQ5s0axukcBeuiVepQyVFugGrHCIYnewqSes0J12972yvmvEiSeLaJn3TolnGCk3EOne0D3v3GMj03TgAGm1MxJk8YoZpqidTCQ5JNIqKEKfKYDSy4nlBJ5SaJX5rOKrx155p8-kBgFQH3DC7HPtqdg4dkCLjUr00VdfZtU_fzY3YDijmv82nZUZyG2VzuCt5XDyI5PFW43iGRLXX3b-vLZSPXLqkNl4tAPSwgxcTD9B3tDAqqF8SL2uw0_8o-39_OP4T22FMDV1he5EIIhUFiHRxfRoivIgKujqsDfBngrxCRI-OQN5Z5icqUrnOy4HwjJJhRgI2ElA6BTHL7-BfJO_Z8Njv50kTM_lIrGzz-qVn9FuYgTbobyHHXYWXnzC4w0jiibU0-1UOG0nBURpccdksjISwsVyrKHOBBxvn300l4rEHmVgYRYKv85aeUY6iW_9mzaH5o7CqcXhtF_u6PG5-fDv9Nza9irHvNrGNNmjdgbkYaLEQ
+)
+
+FILES data: Array
+(
+    [file] => Array
+        (
+            [name] => 
+            [full_path] => 
+            [type] => 
+            [tmp_name] => 
+            [error] => 4
+            [size] => 0
+        )
+
+)
+
+User not logged in (user_id missing in session)
+Available session keys: test, errors_file_upload, success_message
+--- Upload attempt started: 2025-03-28 01:16:19 ---
+Session started directly
+Session ID: 0eq9ij0t6eptkfouamhlo780ic
+SESSION data: Array
+(
+    [test] => Session Test
+    [errors_file_upload] => Array
+        (
+            [0] => File upload error: 4
+        )
+
+    [success_message] => File uploaded to temporary location
+)
+
+POST data: Array
+(
+    [file_name] => Test File
+    [key] => 12345678901234567890123456789012
+    [g-recaptcha-response] => 03AFcWeA7LpxiTx1YFLkRr3M8XPwWwITEl9Ra4IgngC5Wtvpk86ScWV2Vw2dzMLspdoPoG3zvhEx2ddfHXIi9c_jLPWAdbXiaM77JB7nLbRJRRROwihbZVhYQKTtvcU9HY_W7jyxwRWGSDelmREpUNHubtoifn0oTab6nVQo8ytXQhh3Nmgk5zHNgG0AA3BbscLolNWe3KZMZe4Ij4lP2w_tuKrRVvuZHF0ZHfFggW3oxquyGbJCe8sCkd23unPoy_pe51w1HhYXMIOWKn_n0LqCP3yilkxuv5n5nbc5wPmHoPHuB2cbC6_gn3tYClES2OWAhVuamJyDWyzFIVRehaqLJeL72FS8jjqyb1lBWCY4cJUuUIfzoGqKMvOa2TDzpPSTb7PbTBpFmFd3mm9jNJrHRr7vycRhXqaJqTWa6gNFR_1ZjhJT6NxWJXbH9zzw90i8CRUit8yuwLr4e2IHAy7WcYrzQ3KJQ3Ked6_-b9FU2ZEcnIzPs8h9ex4sIF9R_OBd8uC0CDb-HNrjOsGMwfbKmN5Dy4gAu_UNLTy_RQKzzDZWiBu_SK81ztHmB0XB_s3NF9-wiorpoCjHaQGPaO4gTLZ925jAzwn_TS3wuldBSCh7aovRFJsFfxiG5tBQAWmsw9Dq0QZ2Onl8D4Kcwoqd1aRAsrCxbv-NqRX83nJ1x28vt0nzaY0p6LovK2P2rYtoVGkndyL4BBBEApfSJ-iPL5fZPbr419ITvHNk09Tbh0a6oQjG75FQv_9yeTT3f_aIv-R5geo2XHCJbnxojzxp7d7Xx8xJfxHIHVynQHH2JhKTGlISFUYNU9zMpcyW6tb4Uh3-YpmRAeISPZv0mBLiu8UpgrSIgx4Hu2jofgfdtyAHDrkiwjCz3L6bCcgUeH71sgQxb1Stmv19FVibYJnNesvwqnRRBFpggRESvXo7xsL0TkbM4mONTSNND65YI31cWnvgTlEpsSNahmzsdhj8i46l08BEbhJ5A8V3a1wDAuRRcA_SBAV63ZpSYWfPhrAl0n5Oa6MKxBo8ho4Zm47qvRjbzcIfaoYCr6qIIvO41InRVCNX3J1ODnmpks6mpFS31gdT56PHzyaq16QNRWIFih9P_AJ0ZFPylbW9o2Gm4AEvFGYt9GeWwndoTDof-1Mom_9uSdrU9VY-zybk6HxnxosDcAzubA_PXBlKbW0OVpHbtj9YRWJgrzX3XQ5svrTN5Yr9Mempju4RNBlB5m9R9dIyfCHi2StfKXG1gSqCY_vYY0qK2xr6KCAXEDDxF0IkJNPQMuLj-Vw5op2r14hnnABkuZnbVO0sI28c3YM5EjNSu9Nf5v28ffWzFv3KOQ_KYqjHJuO4T_SGL26fmF6KLm7DxJLvxZHJgPzSkNDCQuJrCMcS6PvuEnNP9BO34nQXg0SnoC52UotUwpRjRsS_s0hxDwjUbin44MnmvaJAYOYhn4RZ-qChtFKJXq1pzqAQUvgNimtiKe9-Vm0aZyWPcZJOWFOJL_3TQrkdB2dXAXy-qcduBP4VtzRp7uho9hXy4chFKnSBZ69p_EZbOQUi08hkeprYxMSnmw73tihwydPs88OMjKORZi1YJsakmY4Qa12EFuYVlJVKnCkSl1GBgygeOo6M4WVi6E5Epad5nijXUy30z_YzI_p4m_PDrV6PnodXbd29zm73rgtTJnkMUgRtgKfr9pBuzXLXjdMpCFkcxENkQdGD8CijwFlDmokgey856Ywo6wIOurqkf4Hk1YT420Qw9aplZAw8PxLARcPTnXaqCnnnOTRQ0Ss4AtoqM1fuLbO-XRYD3DfPvGwn92-GKQ_EzoW7Q-6MM54xnEF_a42-WNF2YsAM71dlvVpzm_3fuE_Bf-j0JYja4WSo4czaFQa8IfcLoMxYtIAzkfdaa38sNLPj6V0GVYjwxtSsB2_tvcy4DtVCMo8NfA3NrYD9Cqaqa3XBNtOjBo8wDqJoka2EZT1T4k-AxWNUxuxEYoq-AU_nvF458efVwjWDyKpK8SPeFvwBVuOTZdx-mKcvGEBn4zh-0
+)
+
+FILES data: Array
+(
+    [file] => Array
+        (
+            [name] => CST3590 Individual Cyber Security Projects 2024-2025.pdf
+            [full_path] => CST3590 Individual Cyber Security Projects 2024-2025.pdf
+            [type] => application/pdf
+            [tmp_name] => /Applications/XAMPP/xamppfiles/temp/phpxizpsi
+            [error] => 0
+            [size] => 116149
+        )
+
+)
+
+User not logged in (user_id missing in session)
+Available session keys: test, errors_file_upload, success_message
+--- Upload attempt started: 2025-03-28 01:22:00 ---
+Session started
+Session ID: 0eq9ij0t6eptkfouamhlo780ic
+SESSION data: Array
+(
+    [test] => Session Test
+    [errors_file_upload] => Array
+        (
+            [0] => File upload error: 4
+        )
+
+    [success_message] => File uploaded to temporary location
+    [user_id] => 999
+)
+
+POST data: Array
+(
+    [file_name] => Hey
+    [key] => 12345678901234567890123456789012
+    [g-recaptcha-response] => 03AFcWeA49WOddjuLcfYYNCDth9mRJXNk4TA1P3odR-kgey1ZTyEkvF1Trmz53EWySW93LANmotwvbbek8qImrR_klhFA2xlH0Xo1t44Mo4rSh9qwWRFxxfsfY4JD6xvexQAMZ37odxds1RcE3FwbjCSwjFO3bgivDsNUYMXVcRSngYOjlR14x45k4mSziVblUq0J05XgQqsNAIvMyHkkkBrbKm8vujfI7aHALZBWtJUOeiBfxzI2nJUdjrzd8afj9YGBD7PKpcX3Xm7EvQSR5xppY35NiTwAb7mG9IdC_R3O4TFVJCPQyU0_2a4MApGtA95W3A1YChlj5N-ZCQztjOCzbOIT9LpydiduZphtlBYOI_oV6X5fcgWLEKA8btJ7vUZz0xkKbRiw6E0F-72f6hbI5_pfgkVllYfYKiwhsfbvkjDp5DsC4RyWAn0LUnZkpi5f5wf61AqzTOi6LwMTbeBHbHZstHPe1BcQccgzIpuSzcrzLTl3JzaGNkQqmzyp2NJYBWaalGdg0YhrW7k_J0Mwogc-lnKoKAqk2yxy-L5HabDvRxOZnXy04MnmuDwlMdtGn5ECrtBE-QSQNfOSxs62nar5EsEMF1ytushRywgiB6ULHJzaL_PxULu0-ob7PO0gUzhQKPyFEQJhNdUunjp6gfrDzp-8avTKzsXYb-ryti9WJoX0GF_A5LLs68i5UCzlKCelOrYaD4_KgKMjFNXxPSRGZjbBINQymXtArTeW2e3SK3KjqXw-9Kjh074O4edx4PwxJG4xpUhBNYE9dY1vAxFTlMeGYsjVregST2I-BXT62K1etjtqq40_0Ye4SK_G47Qqau2NoEVlBNDh81Eg9ex-tYbHd9AbO5hXLahsovjLoLH78ypNBk_nhKIfob6powolxrZLO_VqmMLcZDS21aP7W55tQ9WHKXTQFRnQinHfvOnJ2fDrHNnuJqwo2dPMDucHhmjiIuDq_43sBLrZPhTcFhvOZVp44zKx9TgPshzmJz3eonMA6CfEMJxMLH5jnSXCymxk03z_ifSNIZzwVcsb5EowWLOgx06rCU3_QovRjKN23gclQ3NApCyiuiwth4AqZ7J38-b8vr49GJaCLXIFlXXgmPIoMhM0mRaCoqoEnLb0Pm1RpCXAtFzaGIvDf-8-XUOKZ7OQVEuqqoOWnoSMVseQCFk9mQuThJJ1-fVh9OSykCWUw3mDyfOhLhPrd3hF0Dr_JGz_hTr_jkYpuaGzPhUk_q-5bQ8ljzAFpQM9EnPGwJaRDmLz4I7t3koAiWPwkPzYHV6_N2SGy3caXwDN3tOyQT-3gPPgar4i3uw6HYteEENZmEjLGCFblP6lrOAXKUgxJhT2zMyOfU1muy6a0-QYro1f9lAM-5bCG_MJRF2vl6X2VGdLFo_ghvdKWfaptfaL-ri5w672OkmtIJYTHcYAPPJzylbkSM-BwWHP2CLgYqiw_ZnqBA1g0-M4PXNV_HUWdNo94QF81-aYWFXpKv23jEjB-_LtDEOyS_x8GGfAl59CiFrU_nfkK8y4UwXJFW0H1YcfC8g7urm1ECSUfZ0bO5-X8PmKzBi3KQ9ZT4q25yv_2EaUcHokVv3HeW5GDxEkEE-wVY6ANHkc_sq1Jwthe2w7mt1uk9HCQ18quQIFbyWp_U3Svm9g9ic-wQ3BKwkSp75lFSa4Ngj7NTMLOPo5h8SX3Hs0jq4uDw_dLfAYV1AwOPV0JqmigCU_-PvR6gpT9sUiMWfuMLijuVdfNhiK2yrzFvy0Mgz7oNQTC1hwXWB4DFcVF6kGoSIC2vKcTncDu8y71symjI2mFaJHMDUH_PzE1e6BtnswuxbEZRWcCrMyusv_Bg5lQdtxTLAY1Cl8d28RXi2DW04eS2BHmyzE3cUawOrapUdT348eeCjasEbynJx5QhJYoNgV1MYWBJr_xcJbsQiqJF-xr5ZT_2kLjxD5A6MAC6CHa72FCGRIfQK8jJ2LCuCBJgX7QhzBW-ONz1wrI8VC5wiyNuvwFQs0GsNJMyGsJzeUENSDmaSrNzKE
+)
+
+FILES data: Array
+(
+    [file] => Array
+        (
+            [name] => CST3590 - Report Template (MRU).zip
+            [full_path] => CST3590 - Report Template (MRU).zip
+            [type] => application/zip
+            [tmp_name] => /Applications/XAMPP/xamppfiles/temp/phpLXJC0a
+            [error] => 0
+            [size] => 1715433
+        )
+
+)
+
+User ID (possibly from bypass): 999
+Creating user upload directory
+Attempting to move file to: ../uploads/999/1743110520_CST3590 - Report Template (MRU).zip
+Move result: SUCCESS
+File moved successfully, now trying database
+Database connection included
+Preparing statement
+Executing statement
+Database error: SQLSTATE[23000]: Integrity constraint violation: 1452 Cannot add or update a child row: a foreign key constraint fails (`share`.`file_uploads`, CONSTRAINT `file_uploads_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE)
+--- Upload attempt started: 2025-03-28 01:24:43 ---
+Session started
+Session ID: 0eq9ij0t6eptkfouamhlo780ic
+SESSION data: Array
+(
+    [test] => Session Test
+    [errors_file_upload] => Array
+        (
+            [0] => Database error: SQLSTATE[23000]: Integrity constraint violation: 1452 Cannot add or update a child row: a foreign key constraint fails (`share`.`file_uploads`, CONSTRAINT `file_uploads_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE)
+        )
+
+    [success_message] => File uploaded to temporary location
+    [user_id] => 999
+)
+
+POST data: Array
+(
+    [file_name] => Test File
+    [key] => 12345678901234567890123456789012
+    [g-recaptcha-response] => 03AFcWeA4yVY5IRYaA6tf_ftFnaXOUgFJLnjfWtfavX-vXg_RXGTW_JdKPJwdCwZEoZaNyOU49ERN8uhloVDgTzL1TrQr5Xd8-IzWjyUshAWje0EwUGzJjpKNAy16JCh1vRIXEDiKDLrRdNA3lyrdy8N7b88s4GXESZeDuwKvgxsDNmjBpVvHcTyH2CCkezt0cvZwF1URPPwVHryZOZsVDwKD6NA_eGt6a10nHUiSP3aF0g5Tfqr4rpklZ5l9uBV4FdkMBxS_hWAn4-3BZ726DSq5vLNSYtQBmWiISstxeNZ5ZJJ1J6RLTK8Wbi1Px7_Si8bObr_AZBSu0EGufvE-7TFvsyU-ftcPGpW9qmUmGg4X3cMCvLonbSkdEClfRIze_h_tgR_HhyMeKBzVBcGeAdLe4Zq_GsB2u6yqXvr27wq2Molt1sedH4mZZPas_ZgohX_wkq3rhwFRr9TeO7whNSYs_wpIab7E6BTtzT3SxZ7TqFmkiNHiKesD-7daC0Bp_jucCY6HiIAPNu_MfqfH3QW_JY_djFsv2LL7yGt1w1TQsg9ycnbtpcmrXFgkTGhqmIOmKYH-dZ-4tjCfnWS0qBUVH15H3mCBaW60rkL4TfFx3LKO6pYMZ1OL_6NU1g6WfMSQ8TEImtMGCfu3NCXbi4TOLq4eZ3D_LuZo-2dW_fOYy6aZmjZ2ftvoeXIwYJr-vOmJBI0jaFLqGIJaIw-q5eVoFXFG1si6rffmifLka9-5kDAopeZTciZNb35Rmsr30NiYP5zC5H3q78njWdBX4RKxiNYBP2EAmG_z7-4xx_-T-a-EbrmAI5IMV2vLe0tUNAF5eMzSlSSViZpnfTXk6MATux8vU39L0qDnHtXOuYQiPbgVnRQJpming_2hMdhhTqCElRXgLixsKzoiKTDHD2cY05tmvNDLpJ8KXSBNIoBmoo6Erasg6JAqI49Z8WAUOn2dMPpppU8ZCKWrLawNOcObTVtCV0CBwHA9CkMum3mOZx9ZRJYfEVpkWXDSrW-CUxGjVJpu_pHaB_TgK0Nac7WBjWCaXyPMkn61xV2llYJpfM2SxzN3ppXkQLqRpMqtu0E-lgBEpcWF7pXLgpGq9U_WcHTolhLihrwpN7sSvyxT5YYmOXCQ4zECeHEz2q4R7tNhy5vCc0bezVhhmMbPJ_D5RyJ64gKF9CsVMa4bOlb-H4djeg_cLm7wEJn4kFs-AhmtemmTVn_igUkFQ96Ii35_WFM-ODEODXqRChtG0C03xdT-8ZBTPgXb8KA7-kSdvWq9pWn_0lCVGcigOBqVwE1SHPunYuLZ5Irl4P2MO8gpYhfIiMivsokSamRdF1T5t-zApQ4nXBCqwGJU7h-_rHkTe87ZPptV8QWPdPHcYqBQgYUps6wihPpIzuL9Do-Cxnj_t0mozqCBgldbqHMXKhLzCTDjRYTqfa8Xmm4A5Ch-JqKmbW-GZW2Mjg8ME9JfLp7MH36NZw8OVfft3Uqxd9-ffqAttlCy1nbJhJTVOTIRAPnMHdZZJOwEXhMYDbc_lCqHmuzHAYr1hVFRTUf6yhgv395CxUgQVMKMQdbrHVgXQziUKOfcqshVAsTMp4pZW_-fE0M2n4PSTmeeLMPupd-AnEC_GDpFZUh2Bg6mUTHKDM9xNp9RuVemYMXqCfE-TbLVYzvFjCEDRxFMPBIzXX8rDGcMzGofxouUtYQ0VMIoY6KsshQzWb7N-dF760WSOqR0qRhStIXOpadW0HVUuVmeVJbDelzJOq6X5YOrCnhOcGZIXdIvCv4TrpqH4K5WKB4ZKO2CohdNAORovQbi32y3sgx8IS3rePbuMcNmWAWVvz9udWndBWFYZNEJpWazcu-ASP6nwPOToxxFNom0by2gKYrFDjeTp1477TJZodRCwfwhigZdxUW4GWo4OcU7ZcG-BW-_92GEGN7n7_le81Ux9HqE2ncUNM7IKjFipAMDVN-9eoOIQaNSXnqxlfOaTdfG5b1nsS9vbSVNPUQwiOsGBR130c5G-rBvrep9LgiQx5xsZqAknSgd7yQ3wqVkAWuTA38-MQMEb
+)
+
+FILES data: Array
+(
+    [file] => Array
+        (
+            [name] => Final Report Strucutre.pdf
+            [full_path] => Final Report Strucutre.pdf
+            [type] => application/pdf
+            [tmp_name] => /Applications/XAMPP/xamppfiles/temp/phpbiPpJU
+            [error] => 0
+            [size] => 979845
+        )
+
+)
+
+Found user_id in session: 999
+Moving file to: ../uploads/999/1743110683_Final Report Strucutre.pdf
+File moved successfully, now saving to database
+Database error: SQLSTATE[23000]: Integrity constraint violation: 1452 Cannot add or update a child row: a foreign key constraint fails (`share`.`file_uploads`, CONSTRAINT `file_uploads_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE)
+--- Upload processing completed ---
+
+--- Upload attempt started: 2025-03-28 01:27:38 ---
+Session started
+POST data: Array
+(
+    [file_name] => Test File
+    [key] => 12345678901234567890123456789012
+    [g-recaptcha-response] => 03AFcWeA67rz5dil1c238-WwJwTofw_EeRQXhHgoFb00Y3CUMljUPxpZ1VvfKH9WKt7riyByR0kAz197DB0HNzimmjIgt9OOS_PmW51Q05ZWH-DTeQOGZslvMy4D7eibHROkEGyrLVP5hsexwG0cu__jgXvHAyYy_fiiwVZS3GBX93kgwo7xBgh2oPCspc1_zrqR4v9Ny7HS7_2C-I5lMCOq_3XnWWIgLIJYfP8hiye7DSyAYITEBnmBmEN-IQhwjSNCday70uKTcyPrVeKASrCrcN9s1wOO9dE4ASmzlky3HuJORjjQ0DeZysYJyQ3DejjUr9_Elpep_SgrbdTj-UMBIk3r3bmAu7imCx2XIhoSg8YTvnlAn1EQe-8fBi6R6F_4X-Xhkb5FSctLpWLV0Sd64jkBHWNWzcak3mzJwRkZKmVvLdYYR91hnx8cZeRhOEJ99S1leHsw_rKrQj3Jw1E3Wt5-dM1qpnOGaoQzVZOaPTM4ayLu9VTh3054ZA-zq-wdAN3ulWH0tR9j2b2bLG8vV16eK7PAmL2W_PT3lkQeBt4v2nh84xHqs7TmKrAJN1Te_QzLPXFR2Mmq3r1eP6DjrSjJf4kN7qSZWPX6iEf2KKlyvOixmP5kUVy44E0o5AyPX2WtBklkNkpaTaAC7Ng3-xdTSjNQ5RAmsRN-IyLj1AVO6X7J9VgMAmQY-r1KLBl1Je0SVRxaaLKQ_-TeZpgZl6skAIVhXRbl9BwdsF_uX4kIEkmQpgM6k8DJg5aktr3FqDR_der36GHY_zgWqkfiqIwB2zHGTdGUOpso5qEtDLGD8nARzYanReXg4O4K-WOQe5KenxJPvSS99EW36A9XWJDh9LqBGUTaqqF9YZyVl3qSjb8KtR_yYcrGReGNqprTDQrJ_e6CW1IJMZcVEUQ9Cd4mumrfisjPu7XNmBV3Dsn_RDzfZ-2WrmGGZs0Tv-Eg5RPfHkAqQxo1jeXL-E1wHTYm5JYjDXXF3n_WiQaKuXkFiDUPU-InFMBSK1S2amxLSgd-Z7fVDkJJrs4tO1qWJBMAM6_K28t5yRrmcIH5JuJaQbWwjFRxVTYmWPGiJ6VXZwlr_s3TYr_VdiKAPVi1ByVUiEixEY0-h3SVqQcm2Cl5PrzFyDu58xBx4VoDzcnrMqtLpv1pJTAWx6ADWkp7HUKTAH7iuhXxIl6DSoTdi8uNfmBKs-eu7nXMBvjnGU2_qzrI2Kx05gyogsVrIb1E4gqJ3aAW9lGdRAfctkYbYwiTsmM_KwCNU9D1CyZYzrhXgUX6Fye_x4H5F5VcO9KEt20D_Fvb98CTOPao24f7DyOAHu70R3AaOEHP_5zSHnL4hdpF_y4YhBuAjrP_7XVbZN3VazgdU53QxPAdDhfabUyHwFB49xOxvKQfQGmHA5DRB4ZgJS9myYmcqiJHXf-Id5_0ncJhPjc3SNFRO5SEqbzQ9Ks-pxOd37mrc7cK_hSxLF7zO3OJKsbsICghmoCWLxlXJPhg80A6Xyk0paS5ys-hPBQo3bu7DuHU1ztqF0blOFzzL-nr4Klp1Oz47iQXIiZO8PEqmu2bmtJ7bB-8Yfouml64GO9tpqyp_v1jQPWJ69PD09oIhC2O1nHqfudYU70Tzs5sWszOALmUUfiZa2BH7uERJw_-rYFPBPj-JQjQ9ZkBuFFUUimtq6Mcj47HMfXUet4aS8TjsW9wNQsusqxK5pcOvwRYrwV73cwAPN-V0ysYpEj9_FeI3sF-mFEBM8k65HWx3hKx8HBQuc0coxzBLSTt_IiJ3DDzT1DRlzPgMGdy1paNlYV7B3bS3IM5MM4x0-mOG8x9iQucyIKNLBwgzX85y9y4xpvQmNKUYlhuJ8tZhIQaDk0nW_3FxpNlvK9wqYRWIYctXqwSlUJO85e508iVgCQSV0IND7BRvASK37PIwGQUa4mQzlytFj-fYZ2BQwii1QgPQkf6DaOF7feCm4YuaRLBhLfkEV-SmvR6WV2euBQiDsIfPFv8esty_3RHfndHsfCQjsUMehsCM-biLZzqeFX8U
+)
+
+FILES data: Array
+(
+    [file] => Array
+        (
+            [name] => Final Report Strucutre.pdf
+            [full_path] => Final Report Strucutre.pdf
+            [type] => application/pdf
+            [tmp_name] => /Applications/XAMPP/xamppfiles/temp/phpEmXAEl
+            [error] => 0
+            [size] => 979845
+        )
+
+)
+
+Using valid user ID from database: 13
+Creating user upload directory: ../uploads/13/
+Moving file to: ../uploads/13/1743110858_Final Report Strucutre.pdf
+File moved successfully, now saving to database
+Database insert successful
+--- Upload processing completed ---
+
+--- Enhanced upload started: 2025-03-28 01:42:53 ---
+Session started
+POST data: Array
+(
+    [file_name] => 
+    [key] => 
+    [g-recaptcha-response] => 03AFcWeA528GL37FQikSBoYjKQ9n05thNvlkVB8E-x3lu-Sa7kyOhb8cuvpvUskuLn2cCdVjSBNuRYAyHppWBJKhFWQymY6SVbnja7dub9p-7-mA66zW0r2Y4oSWjfbnh7ecNnDDBOlTaCnNe3KuvukYAOozoecahtzV9Ii6DUWFEVP5AN85DdeeTWFOYQVmHcOZhfUlEFidBMjOYqTNM_nJ9O1eOrBBgDuUQzxUvZG0EQ-lX6chYb7M9sKC3G9MzcIj_r8ULkUMK4KPvXMSY1rmX858Q05SJKFD4C7rfUy5CvkS6ulZ1GGIdfTzAFxP4ACjbOBqyBLagiwQ7QqSvetpFbULrye7kLnNOf6A8SvHunfhC0U37R1bt1pl1Ui0jXzbF_uo1LbiXYqb_7LN9aE8EQqUgJIOmmd7TdTfIguVnHlcNNOhvdTwW25sm6A9RWaoyVB5Ogkc35oEO_Z8VG69DZA09nXqKYopx_xeH9ANlwZf1X4EW04PmfsNmgQw9SCCDw5IexhOMH_1VGEuuEoyK65h83t1uFWF7VAAOslyhDEJsXoWibYg2eZSoXXn4gpSxG3Ru1JtpxXlwC6UgsheX-Pgt-gVd_ZtS92VKnodDzH32xuGQTzvjdWkx26I7DPhG7RgLoD1QRcRyedpRoe0Ekm7vpi3SGkda8GELjTmDV_M8KGatBwGFrrbJJVx-Yo1FEkBSk9skf-35IklN-wIMlzGLclTEfA2dAB3i7e61d_8vaOjyXpEbPgHSOssnj6X4nSe9HMSicRR8g0AWr2vGnbjbrT5yGCEoyjZye_4F_fzoQwbK1WiX-vmtzlunGoSHBEIDRYEu_RNhToAYLsggFwG7LOP4K_eBOrdrzs-UW755RT-wKmSVbG6gpcxqDDz02iyXxl_KxdOQodl14zgKBQD2tXn2xUzKIkQNfSszoPtF2vnzoO8GKMfxJaGpnazm6D1L6P1cIl-OE-vqMDYTkDq8UFIY7n-rieYwwjuL7WwtEmI_LTnSHin_I-2_lsbGwq3eORT9UoUpquu821tPDqgoOfxgiCbULw77hDFxmr4JaqKwHFUB65ryV9uRjCZWgJ8mlsz--t9p-wSCArUlhWL8y2jnAgUuhV0bCHVZkEZePLWqMrFS4oBpL2zxnxCDIPcS1zwp9kRnj73bF9-ZPJfHAKfYnzCNCZbGNiqtOhDjtLUd39cpmzF69qA2DgBehD0cYSaqcfmTEuIMbgxC4912WlQLuBgmJuBiHUN8tdkNDOPsdlZb1w34rlZnNXY1J-QvUZTbNHn1IiPDvF4lsy4hjn_jHhxrpjCVsRFwTSewCdGribu7k1E9dNSedLr2j5jJQfZh-00_37AWvVtt8hgWxGI0QayWcojyZhIf-1-KCkBJZgbaatSjWQXFBMvESw5MDlzIq9s2ws255p47IV5bJp71QrU1gRWs1kIrQhu5sKFC2tGdEirD36CsWPeZ9noY_COqnAG7ShMQZ7NhWkRBAmpm7NeDLbLg41kmv21wSEBB9I_Juci5YZE9gmThSPVHJWzicDtts3lKVEeC3w4O_SGy3GOsm9F4LZ75WEpUX1oy3vhQDaSE88eE2fR31mcXojXgh-2SDNaM68QUk01hgpXL6Q7TUPxor_1Oq4NeFZFyy0n8JMm6t41JF7Y360rcKa4UJni1nAig_guilmE__MDz-ZSo8-tCEtkFi_oKZCEjfd3Sy1TAplgu2K4s9n3Vr-0I7kfUsq45dgf8Mwy8bs3Z_YjQlIvKOiMkdK8qARvct6SBbVW3hGmQvCNjDL4BZwjvqS1ybP3hSzQmctOFek6yESP7HCQbyB3ZZ0lB1S9_r-FhWrXc0T84Ch1-0a-O-7uFJoYvjx0Fh2U11_ESySv7UKokQkBWKrgSJgPZOBhrEuED0ULrlWV0kSHzPiWNPWDMNrP1QmUcfCU1snTLKLOqOvpi_qdwtQvg6DdWZtPYLPvCVf-vcfSjVlu8l1pCxKUzPxTc0zrwqgFivYU_SOUauxpidrODiCj_bmX3j4azTUUw
+)
+
+FILES data: Array
+(
+    [file] => Array
+        (
+            [name] => 
+            [full_path] => 
+            [type] => 
+            [tmp_name] => 
+            [error] => 4
+            [size] => 0
+        )
+
+)
+
+File upload error: 4
+--- Enhanced upload started: 2025-03-28 01:43:16 ---
+Session started
+POST data: Array
+(
+    [file_name] => Test File3
+    [key] => 12345678901234567890123456789012
+    [g-recaptcha-response] => 03AFcWeA4MR3xnGIyk7vgbKWQy1ZF_KGse3_MosHAsFHrQ7ncIwbONt4ieh6qf2yLLwn2VITy5_hoGZbzzEOGjO_1EdYbtzvXcclAAPq0CwetGgZYXoN7T6J5O1Ev53wMF4Urs6unkloih5gV9Bn943n2YUWyLHaJHMTGCZMf8s3V0ohcFDNPNiyv2Iyp2L4ekML6V19MF4_9f5Rh23SR3ttMshCon3uVgvgir_-5oFwDpz5ZipagyahzYZoWjzX893LuV55XI1KiLu2oXGqmXlGeeK8U_63xDv6I00bFCNrNit2BbeufCC-lJovh1ZwrkRR6O5QDS5n-MLtKccNJVLmwJdUil1hCe6_W_ExLvDWTnRm8fKLSwKH_eyLohsyxLt93PKaiIikyOUnCp327eq3xvczFvEb9fxJ-MKN1nsz_ZTeVEsRn4J_Th9z55oXzsaVIX0X0B_yAcXzajer_qscxGV0w-oNZsQ6rET21eHaTWSkmscs4VQxijxB_E_S6UgaHNSQdZ9FEAg33NCTQd56ooy6fhh5jw4uiELIDuiVH4THkkf4SIqqeFXINb4MkGc2GVyiuJYxRQvHGNIDTOeUagrOSvD_Cc5hpSZaLFB17JfnDHMm8yS4OGLQLNfeQUQRFBcP67Vn0BTPSXaYuRQGswrRgJwbIZ9254gKgpWhmg0wd8h2UA19IIsIV13qTDEiOxvW-9OlXKz1iqC_WlfiJCLr1od69wdZOBO3K1yl2rmGUNeCGSH-P4Mk3azVPd4FDKQeuV59JxUpj2BbENjGe5ngdTUPr3hjVYolboi96qElzUtx_vtcRJQbjszUWTZavpNEzW_8NUUu3cHZl1abrV1Z-jrbDO_0wodDKBDhT5gZ0rJjR4iI6HUz9dDTw7Ts0LkwomRlpab5o1N8CDS_ORo1VPeXTxBCIuPUTZKT2tLqsHjVjrW8jdwBAph2-xs4ykEVcTrnrCJ3lMhroIM2EpUCSkwvMckW3PXpU13wBkWHtMfdDGkyyn-guCAodxhcUZeDeTC9g48dsSPuOMj1AzFncNHixs9UE4CJ_QjyUU7yef_AVaYieznPt9leak83WnNBAWhDjrUU5CAe-LTlGCd0vk77ed6-j0pGXtrcjoXcjwH0FuXgyplxmdHcKZBmT5tdUI7Oa19LLXqnKmV7YJ0oxFkGF3UmPt1kA_2XZqQjoF8Hv7PY3I1Ocydrl_cckccCg3U2pq1obgEuKdVMvpUqLsjpuMNu2jnraRKWIkMenH71JGAv0peXX1wGIV8yBaDCQImwwCeF_Xyb5n7sEgLg2HnkVN_bMsq8u_YMMw0iBkPrwFIVWCEvkfM1PGF7yFREGo-E4wS23UJwt-OAreX_PZAwQFhE8ujvW4X_jBMax83uZFkotfkAsXzTQtbnayOubfz1-41srOEyCS0tHjJJZo7ZV7Ya8pO51xwBxggeY9kK9M_a543NZSadrXdZeqs9U0xM7v_YOT9PxRmCXPXhHLoTlwgKwWHBCwmznjfOyduZGD__rZD8_SxCUE-qUeDigzyNLOBoa9yesYy8kWaTmJoyaT2hG_HG_ORabVEhYHVXRn4Syliwks9i2HAu00pBbkVyukrRYkNVtEw_61j3X_f2bpE_rC3fH1ktch_osaq3ewJNzbz-qFKD0u5oRWEuvrY07zDbVrtdMLDPh9-dgna4f5x341SeEtoG-QzLwIRmPe3O2VH9FzjkUvbIgvNsi0cfSXf7XlPV4V1-RD19WHl-LO1DKCFV_F6kVo796BhViPBMG940v57uQ3gQ-Tjhte9gZUr7TcfJlh9_knanxkZCNBnu1db-1mE5qWtdw_o7LzV3Kx-nC_TBe_tE1gvgoSNuE1EQ9VJIZLv9W7iQtLfi9C6Ee_6QMxTBdimbK66Ds7F_feeFMXvBQak6XJqc3EJvPC7Rl5zveyra-nZA1rgziYKKGjzZ0NOiiqdEvg81STlPX0ASRYkdobkWoHRMmClfh5v9GukVyAutwQoIV7OpIajg
+)
+
+FILES data: Array
+(
+    [file] => Array
+        (
+            [name] => CST3590 Individual Cyber Security Projects 2024-2025.pdf
+            [full_path] => CST3590 Individual Cyber Security Projects 2024-2025.pdf
+            [type] => application/pdf
+            [tmp_name] => /Applications/XAMPP/xamppfiles/temp/php0Nhq4h
+            [error] => 0
+            [size] => 116149
+        )
+
+)
+
+Using valid user ID from database: 13
+User email: admin890@share.com
+Loading encryption service
+Encrypting file...
+File encrypted successfully: ../uploads/13/62841d1bbccaad20cf1604b7f32454e7.enc
+File category: PDF
+Saving to database
+Database insert successful
+Preparing to send email notification
+Sending email to: admin890@share.com
+Email sent successfully
+--- Upload processing completed ---
+

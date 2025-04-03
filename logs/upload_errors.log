@@ -1,0 +1,18 @@
+[2025-03-28 01:01:16] File upload process started
+[2025-03-28 01:01:16] POST request received
+[2025-03-28 01:01:16] File name: Hey
+[2025-03-28 01:01:16] Key provided: YES
+[2025-03-28 01:01:16] File upload data present
+[2025-03-28 01:01:16] File name: Final Report Strucutre.pdf
+[2025-03-28 01:01:16] File size: 979845
+[2025-03-28 01:01:16] File type: application/pdf
+[2025-03-28 01:01:16] User not logged in (user_id missing from session)
+[2025-03-28 01:01:33] File upload process started
+[2025-03-28 01:01:33] POST request received
+[2025-03-28 01:01:33] File name: MISSING
+[2025-03-28 01:01:33] Key provided: NO
+[2025-03-28 01:01:33] File upload data present
+[2025-03-28 01:01:33] File name: 
+[2025-03-28 01:01:33] File size: 0
+[2025-03-28 01:01:33] File type: 
+[2025-03-28 01:01:33] File upload error code: 4
