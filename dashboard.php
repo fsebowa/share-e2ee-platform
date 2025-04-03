@@ -143,6 +143,7 @@
                     check_upload_success_messages(); 
                     check_file_upload_errors(); 
                     check_file_preview_errors();
+                    check_file_delete_errors();
                 ?>
             </div>
             <div class="progress-backdrop" id="progressBackdrop">

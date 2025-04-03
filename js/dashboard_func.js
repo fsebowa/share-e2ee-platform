@@ -309,7 +309,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // Check if we need to show the delete popup due to errors
-    const hasDeleteErrors = typeof deletePopupErrors !== 'undefined' && deletePopupErrors;
+    // const hasDeleteErrors = typeof deletePopupErrors !== 'undefined' && deletePopupErrors;
     showPopupErrors(hasDeleteErrors, 'deleteFile', 'delete_file_form');
     
     // Hide any loading overlay that might still be visible
