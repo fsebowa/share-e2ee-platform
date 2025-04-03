@@ -103,18 +103,3 @@ window.showProgressBar = showProgressBar;
 window.updateProgress = updateProgress;
 window.hideProgressBar = hideProgressBar;
 window.simulateProgress = simulateProgress;
-
-
-
-function openEllipseChild(className, popupName) {
-    document.querySelectorAll(className).forEach(popupName => {
-        popupName.addEventListener("click", function(e) {
-            e.stopPropagation();
-
-            // get file information from parent file element
-            const fileElement = this.closest(".file");
-            const fileName = fileElement.querySelector(".file-title").textContent;
-            const fileId = fileElement.getAttribute('data-file-id');
-        })
-    })
-}

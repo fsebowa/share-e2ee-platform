@@ -2,6 +2,30 @@
 
 declare(strict_types=1);
 
+
+// CSRF Token Validation
+function csrf_token_invalid($csrf_token) {
+    if($csrf_token != $_SESSION['csrf_token']){
+        return true;
+    }
+    else{
+        return false;
+    }
+}
+
+//CSRF Token Time Validation
+function csrf_token_expired($csrf_token_time) {
+    $max_time = 60*60*20;
+    // $max_time = 5;
+    if(($csrf_token_time + $max_time) <= time()){
+        unset($_SESSION['csrf_token']);
+        unset($_SESSION['csrf_token_time']);
+        return true; // token time expired
+    } else{
+        return false; // token time valid
+    }
+}
+
 //Google reCAPTCHA validation
 function is_recaptcha_invalid($secretKey, $recaptcha_response) {
     if(!isset($recaptcha_response) || empty($recaptcha_response)){

@@ -21,6 +21,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" || (isset($_GET['stream']) && isset($_
         // For initial requests, get data from POST
         $file_id = $_POST["file_id"] ?? null;
         $decryption_key = $_POST["key"] ?? null;
+        $csrf_token = $_POST["csrf_token"] ?? null;
+        $csrf_token_time = $_SESSION["csrf_token_time"] ?? null;
         $recaptcha_response = $_POST["g-recaptcha-response"] ?? null;
         $secretKey = '6LfncLgqAAAAAKefUSncQyC01BjUaUTclJ5dXEqb';
     }
@@ -28,7 +30,11 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" || (isset($_GET['stream']) && isset($_
     $errors = [];
 
     if (!$is_streaming_request) {
-        if(is_recaptcha_invalid($secretKey, $recaptcha_response)) {
+        if (csrf_token_expired($csrf_token_time)) {
+            $errors["csrf_token_expired"] = "Session token expired. Try again!";
+        } elseif (csrf_token_invalid($csrf_token)) {
+            $errors["csrf_token_invalid"] = "Invalid CSRF token";
+        } elseif(is_recaptcha_invalid($secretKey, $recaptcha_response)) {
             $errors["invalid_recaptcha"] = "The reCAPTCHA verification failed. Please try again!";
         } elseif (empty($file_id) || empty($decryption_key)) {
             $errors["empty_inputs"] = "One or more fields are empty";

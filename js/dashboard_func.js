@@ -47,6 +47,95 @@ document.addEventListener("DOMContentLoaded", () => {
         // Open the requested popup
         popupElement.style.display = 'block';
     }
+
+    // function to open ellipse menu options
+    function openEllipseChild(selector, popupId, actionName, formId, inputSelector) {
+        document.querySelectorAll(selector).forEach(element => {
+            element.addEventListener("click", function(e) {
+                e.stopPropagation();
+                
+                // Get file information from parent file element
+                const fileElement = this.closest(".file");
+                const fileName = fileElement.querySelector(".file-title").textContent.trim();
+                const fileId = fileElement.getAttribute('data-file-id');
+                
+                // Save file info to session storage
+                sessionStorage.setItem('childFileId', fileId);
+                sessionStorage.setItem('childFileTitle', `${actionName} ${fileName}`);
+                
+                // Get popup element by ID
+                const popup = document.getElementById(popupId);
+                
+                if (!popup) return;
+                
+                // Open popup
+                openPopup(popup);
+                
+                // Update popup title with file name
+                const popupTitle = popup.querySelector('h2');
+                if (popupTitle) {
+                    popupTitle.textContent = `${actionName} ${fileName}`;
+                }
+                
+                // Add file ID to form for server-side processing
+                const form = document.getElementById(formId);
+                if (form && fileId) {
+                    let fileIdInput = form.querySelector('input[name="file_id"]');
+                    if (!fileIdInput) {
+                        fileIdInput = document.createElement('input');
+                        fileIdInput.type = 'hidden';
+                        fileIdInput.name = 'file_id';
+                        form.appendChild(fileIdInput);
+                    }
+                    fileIdInput.value = fileId;
+                    
+                    // Clear any previous user input values
+                    const userInput = form.querySelector(inputSelector);
+                    if (userInput) {
+                        userInput.value = '';
+                    }
+                }
+            });
+        });
+    }
+
+    // function to show popup and errors
+    function showPopupErrors(errorFlag, popupId, formId) {
+        // Only proceed if there are errors and a popup ID is provided
+        if (typeof errorFlag !== 'undefined' && errorFlag === true && popupId) {
+            // Get the popup element by ID
+            const popupElement = document.getElementById(popupId);
+            if (!popupElement) return;
+            
+            // Get stored file info from session storage
+            const fileId = sessionStorage.getItem('childFileId');
+            const fileTitle = sessionStorage.getItem('childFileTitle');
+    
+            if (fileId && fileTitle) {
+                // Update popup title
+                const popupTitle = popupElement.querySelector('h2');
+                if (popupTitle) {
+                    popupTitle.textContent = fileTitle;
+                }
+    
+                // Set file ID in the form
+                const form = document.getElementById(formId);
+                if (form) {
+                    let fileIdInput = form.querySelector('input[name="file_id"]');
+                    if (!fileIdInput) {
+                        fileIdInput = document.createElement('input');
+                        fileIdInput.type = 'hidden';
+                        fileIdInput.name = 'file_id';
+                        form.appendChild(fileIdInput);
+                    }
+                    fileIdInput.value = fileId;
+                }
+                
+                // Show the popup
+                openPopup(popupElement);
+            }
+        }
+    }
     
     // Close popups when clicking outside
     document.addEventListener("click", function(e) {
@@ -180,50 +269,8 @@ document.addEventListener("DOMContentLoaded", () => {
     if (openFilePopup) {
         // Initially hide the popup
         openFilePopup.style.display = "none";
-        
-        // Find all "Open" options in file menus
-        document.querySelectorAll('.file-menu-popup ul li:first-child, .uploaded-files .file .file-title').forEach(openOption => {
-            openOption.addEventListener("click", function(e) {
-                e.stopPropagation();
-                
-                // Get file information from the parent file element
-                const fileElement = this.closest('.file');
-                const fileName = fileElement.querySelector('.file-title').textContent.trim();
-                const fileId = fileElement.getAttribute('data-file-id');
-                
-                // Save the file info to session storage in case of errors
-                sessionStorage.setItem('previewFileId', fileId);
-                sessionStorage.setItem('previewFileTitle', `Preview ${fileName}`);
-                
-                // Open the file preview popup
-                openPopup(openFilePopup);
-                
-                // Update popup title with file name
-                const popupTitle = openFilePopup.querySelector('h2');
-                if (popupTitle) {
-                    popupTitle.textContent = `Preview ${fileName}`;
-                }
-                
-                // Add file ID to form for server-side processing
-                const openForm = document.getElementById('open_file_form');
-                if (openForm && fileId) {
-                    let fileIdInput = openForm.querySelector('input[name="file_id"]');
-                    if (!fileIdInput) {
-                        fileIdInput = document.createElement('input');
-                        fileIdInput.type = 'hidden';
-                        fileIdInput.name = 'file_id';
-                        openForm.appendChild(fileIdInput);
-                    }
-                    fileIdInput.value = fileId;
-                    
-                    // Clear any previous decryption key
-                    const keyInput = openForm.querySelector('input[name="key"]');
-                    if (keyInput) {
-                        keyInput.value = '';
-                    }
-                }
-            });
-        });
+
+        openEllipseChild('.file-menu-popup ul li:first-child, .uploaded-files .file .file-title', 'openFile', 'Preview', 'open_file_form', 'input[name="key"]');
         
         // Handle successful file downloads by detecting form submission
         const openForm = document.getElementById('open_file_form');
@@ -248,89 +295,30 @@ document.addEventListener("DOMContentLoaded", () => {
     if (typeof hasUploadErrors !== 'undefined' && hasUploadErrors === true && uploadForm) {
         openPopup(uploadForm);
     }
-    
+
     // Check if we need to show the preview popup due to errors
-    if (typeof hasPreviewErrors !== 'undefined' && hasPreviewErrors === true && openFilePopup) {
-        // Get stored file info from session storage
-        const fileId = sessionStorage.getItem('previewFileId');
-        const fileTitle = sessionStorage.getItem('previewFileTitle');
-        
-        if (fileId && fileTitle) {
-            // Update popup title
-            const popupTitle = openFilePopup.querySelector('h2');
-            if (popupTitle) {
-                popupTitle.textContent = fileTitle;
-            }
-            
-            // Set file ID in the form
-            const openForm = document.getElementById('open_file_form');
-            if (openForm) {
-                let fileIdInput = openForm.querySelector('input[name="file_id"]');
-                if (!fileIdInput) {
-                    fileIdInput = document.createElement('input');
-                    fileIdInput.type = 'hidden';
-                    fileIdInput.name = 'file_id';
-                    openForm.appendChild(fileIdInput);
-                }
-                fileIdInput.value = fileId;
-            }
-            
-            // Show the popup
-            openPopup(openFilePopup);
-        }
+    showPopupErrors(hasPreviewErrors, 'openFile', 'open_file_form');
+
+    // ------- DELETE FILE POPUP ---------
+    if (deleteFilePopup) {
+        // Initially hide the popup
+        deleteFilePopup.style.display = "none";
+
+        // Find all "Delete" options in file menus
+        openEllipseChild('.file-menu-popup ul li:last-child', 'deleteFile', 'Delete', 'delete_file_form', 'input[name="delete_phrase"]');
     }
+
+    // Check if we need to show the delete popup due to errors
+    const hasDeleteErrors = typeof deletePopupErrors !== 'undefined' && deletePopupErrors;
+    showPopupErrors(hasDeleteErrors, 'deleteFile', 'delete_file_form');
     
     // Hide any loading overlay that might still be visible
     if (typeof hideLoadingOverlay === 'function') {
         hideLoadingOverlay();
     }
-
-
-    // Find all "Delete" options in file menus
-    document.querySelectorAll('.file-menu-popup ul li:last-child').forEach(openOption => {
-        openOption.addEventListener("click", function(e) {
-            e.stopPropagation();
-            
-            // Get file information from the parent file element
-            const fileElement = this.closest('.file');
-            const fileName = fileElement.querySelector('.file-title').textContent.trim();
-            const fileId = fileElement.getAttribute('data-file-id');
-            
-            // Save the file info to session storage in case of errors
-            sessionStorage.setItem('deleteFileId', fileId);
-            sessionStorage.setItem('deleteFileTitle', `Delete ${fileName}`);
-            
-            // Open the file delete popup
-            openPopup(deleteFilePopup);
-            
-            // Update popup title with file name
-            const popupTitle = deleteFilePopup.querySelector('h2');
-            if (popupTitle) {
-                popupTitle.textContent = `Delete ${fileName}`;
-            }
-            
-            // Add file ID to form for server-side processing
-            const openForm = document.getElementById('delete_file_form');
-            if (openForm && fileId) {
-                let fileIdInput = openForm.querySelector('input[name="file_id"]');
-                if (!fileIdInput) {
-                    fileIdInput = document.createElement('input');
-                    fileIdInput.type = 'hidden';
-                    fileIdInput.name = 'file_id';
-                    openForm.appendChild(fileIdInput);
-                }
-                fileIdInput.value = fileId;
-                
-                // Clear any previous decryption key
-                const keyInput = openForm.querySelector('input[name="key"]');
-                if (keyInput) {
-                    keyInput.value = '';
-                }
-            }
-        });
-    });
-
 });
+
+
 
 function onSubmit(token) {
     const fileInput = document.querySelector('input[type="file"]');

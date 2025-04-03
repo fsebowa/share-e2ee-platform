@@ -12,6 +12,8 @@
     // Define error flags for JavaScript
     $hasUploadErrors = isset($_SESSION["errors_file_upload"]) && !empty($_SESSION["errors_file_upload"]);
     $hasPreviewErrors = isset($_SESSION["errors_file_preview"]) && !empty($_SESSION["errors_file_preview"]);
+    $hasDeleteErrors = isset($_SESSION["errors_file_delete"]) && !empty($_SESSION["errors_file_delete"]);
+
 ?>
 <!DOCTYPE html>
 <html>
@@ -24,6 +26,7 @@
         // Make error flags available to JavaScript
         const hasUploadErrors = <?php echo $hasUploadErrors ? 'true' : 'false'; ?>;
         const hasPreviewErrors = <?php echo $hasPreviewErrors ? 'true' : 'false'; ?>;
+        const hasDeleteErrors = <?php echo $hasDeleteErrors ? 'true' : 'false'; ?>;
     </script>
     <script src="/js/profile-popup.js"></script>
     <script src="/js/progress-bar.js"></script>
@@ -198,11 +201,12 @@
 
             <!-- Delete file popup -->
             <div class="file-ellipse-popup" id="deleteFile">
-                <form action="/includes/file_management/" method="post" id="delete_file_form">
+                <form action="/includes/file_management/file_delete.inc.php" method="post" id="delete_file_form">
                     <h2></h2> <!-- File name will be inserted here dynamically-->
                     <p class="caption-text">This will permanently delete the file and cannot be undone.</p>
                     <div class="form-inputs">
                         <input type="text" id="delete_phrase" name="delete_phrase" placeholder="Type “DELETE” to complete the action">
+                        <input type="hidden" name="csrf_token" value="<?php echo $token ?? ''; ?>"> 
                     </div>
                     <!-- Submit button with reCAPTCHA trigger -->
                     <button class="g-recaptcha btn black-btn" 
