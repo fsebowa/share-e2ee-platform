@@ -98,3 +98,13 @@ function get_file_by_id(object $pdo, int $file_id, int $user_id) {
 
     return $stmt->fetch(PDO::FETCH_ASSOC);
 }
+
+function logFileDownload(object $pdo, int $file_id, int $user_id, string $download_type) {
+    $query = "INSERT INTO file_downloads (file_id, user_id, download_type, download_date) 
+            VALUES (:file_id, :user_id, :download_type, NOW())";
+    $stmt = $pdo->prepare($query);
+    $stmt->bindParam(":file_id", $file_id);
+    $stmt->bindParam(":user_id", $user_id);
+    $stmt->bindParam(":download_type", $download_type);
+    $stmt->execute();
+}

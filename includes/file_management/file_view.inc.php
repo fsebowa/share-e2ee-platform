@@ -26,6 +26,18 @@ function check_file_preview_errors() {
     }
 }
 
+function check_file_download_errors() {
+    if (isset($_SESSION['errors_file_download'])) {
+        $errors = $_SESSION['errors_file_download'];
+        echo '<div class="error-messages" id="errorMessages">';
+        foreach ($errors as $error) {
+            echo '<p class="error-danger">' . $error . '</p>';
+        }
+        echo '</div>';
+        unset($_SESSION['errors_file_download']);
+    }
+}
+
 function check_file_delete_errors() {
     if (isset($_SESSION['errors_file_delete'])) {
         $errors = $_SESSION['errors_file_delete'];
@@ -47,6 +59,18 @@ function check_upload_success_messages() {
         }
         echo '</div>';
         unset($_SESSION['success_file']);
+    }
+}
+
+function check_dowanload_success_messages() {
+    if (isset($_SESSION["success_file_download"])) {
+        $success = $_SESSION["success_file_download"];
+        echo '<div class="success-messages" id="successMessage">';
+        foreach ($success as $suc) {
+            echo '<p class="success-message">' . $suc . '</p>';
+        }
+        echo '</div>';
+        unset($_SESSION['success_file_download']);
     }
 }
 

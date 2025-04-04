@@ -105,6 +105,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                     $upload_date = date("Y-m-d H:i:s");
                     // Create email template with encryption key
                     $file_template = str_replace('{{file_name}}', $file_name, $file_template);
+                    $file_template = str_replace('{{original_filename}}', $original_filename, $file_template);
+                    $file_template = str_replace('{{file_size}}', number_format($file_size / 1024 /1024, 2), $file_template);
                     $file_template = str_replace('{{upload_date}}', $upload_date, $file_template);
                     $file_template = str_replace('{{encryption_key}}', $encryption_key, $file_template);
                     $file_template = str_replace('{{year}}', date('Y'), $file_template);
@@ -144,7 +146,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                             die();
                         }
                     } catch (Exception $e) {
-                        $errors["send_otp_error"] = "Error sending upload confirmation email.<br>Try again!";
+                        $errors["upload_file_error"] = "Error sending upload confirmation email.<br>Try again!";
                         $errors["mailer_error"] = "Mailer Error: ". $mail->ErrorInfo;
                     }
                 }

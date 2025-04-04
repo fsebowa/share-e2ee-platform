@@ -4,6 +4,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // Global variables for popup management
     const uploadForm = document.querySelector(".upload-form");
     const openFilePopup = document.getElementById("openFile");
+    const downloadFilePopup = document.getElementById("downloadFile");
     const deleteFilePopup = document.getElementById("deleteFile");
     const addFileButton = document.getElementById("add_file");
     const profilePopup = document.querySelector(".profile-popup");
@@ -24,6 +25,11 @@ document.addEventListener("DOMContentLoaded", () => {
         // Close open file popup
         if (openFilePopup) {
             openFilePopup.style.display = 'none';
+        }
+
+        // close download file popup
+        if (downloadFilePopup) {
+            downloadFilePopup.style.display = 'none';
         }
 
         // deleteFIle popup
@@ -90,7 +96,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     fileIdInput.value = fileId;
 
                     // Add file name to form for server-side processing
-                    if (actionName === 'Delete') {
+                    if (actionName === 'Delete' || actionName === 'Download') {
                         let fileNameInput = form.querySelector('input[name="file_name"]');
                         if (!fileNameInput) {
                             fileNameInput = document.createElement('input');
@@ -310,13 +316,60 @@ document.addEventListener("DOMContentLoaded", () => {
     // Check if we need to show the preview popup due to errors
     showPopupErrors(hasPreviewErrors, 'openFile', 'open_file_form');
 
+    // ------- FILE DOWNLOAD POPUP ---------
+    if (downloadFilePopup) {
+        // Initially hide the popup
+        downloadFilePopup.style.display = "none";
+
+        // Handle "Download" menu item click
+        openEllipseChild('.file-menu-popup ul li:nth-child(3)', 'downloadFile', 'Download', 'download_file_form', 'input[name="key"]');
+        
+        // Handle encrypted download button
+        const encryptedDownloadBtn = document.getElementById("encrypted_download_btn");
+        if (encryptedDownloadBtn) {
+            encryptedDownloadBtn.addEventListener("click", function() {
+                // Set the action to encrypted
+                document.getElementById("download_action").value = "encrypted";
+                
+                // Submit the form programmatically
+                if (typeof showLoadingOverlay === 'function') {
+                    showLoadingOverlay("Downloading encrypted file...");
+                }
+                
+                // Use reCAPTCHA API to validate and submit the form
+                grecaptcha.ready(function() {
+                    grecaptcha.execute('6LfncLgqAAAAABiQR-6AYNqjYPE2wFS5WsrPBAEj', {action: 'submit'}).then(function(token) {
+                        // Add the token to a hidden input
+                        let tokenInput = document.createElement('input');
+                        tokenInput.type = 'hidden';
+                        tokenInput.name = 'g-recaptcha-response';
+                        tokenInput.value = token;
+                        
+                        const downloadForm = document.getElementById('download_file_form');
+                        downloadForm.appendChild(tokenInput);
+                        downloadForm.submit();
+                    });
+                });
+            });
+        }
+        
+        // Handle decrypted download button (the default)
+        const decryptedDownloadBtn = document.getElementById("decrypted_download_btn");
+        if (decryptedDownloadBtn) {
+            // This is handled by the reCAPTCHA callback
+        }
+    }
+
+    // Check if we need to show the preview popup due to errors
+    showPopupErrors(hasDownloadErrors, 'downloadFile', 'download_file_form');
+
     // ------- DELETE FILE POPUP ---------
     if (deleteFilePopup) {
         // Initially hide the popup
         deleteFilePopup.style.display = "none";
 
         // Find all "Delete" options in file menus
-        openEllipseChild('.file-menu-popup ul li:last-child', 'deleteFile', 'Delete', 'delete_file_form', 'input[name="delete_phrase"]');
+        openEllipseChild('.file-menu-popup ul li:last-child', 'deleteFile', 'Delete', 'delete_file_form', 'input[name="decryption_key"]');
     }
 
     // Check if we need to show the delete popup due to errors
@@ -326,6 +379,21 @@ document.addEventListener("DOMContentLoaded", () => {
     // Hide any loading overlay that might still be visible
     if (typeof hideLoadingOverlay === 'function') {
         hideLoadingOverlay();
+    }
+
+    // handle download buttons
+    const downloadEncryptedBtn = document.getElementById("download_encrypted_btn");
+    if (downloadEncryptedBtn) {
+        downloadEncryptedBtn.addEventListener("click", function() {
+            // Set the action to "encrypted"
+            document.getElementById("download_action").value = "encrypted";
+            
+            // Clear the key field since it's not needed for encrypted download
+            document.getElementById("decryption_key").value = "";
+            
+            // Execute reCAPTCHA programmatically
+            grecaptcha.execute();
+        });
     }
 });
 
@@ -347,9 +415,25 @@ function onSubmitPreview(token) {
     document.getElementById("open_file_form").submit();
 }
 
+// Function for download form submission (reCAPTCHA callback)
+function onSubmitDownload(token) {
+    document.getElementById("download_action").value = "decrypted";
+    const keyInput = document.querySelector('#download_file_form input[name="key"]');
+    
+    if (keyInput && keyInput.value.length > 0) {
+        if (typeof showLoadingOverlay === 'function') {
+            showLoadingOverlay("Decrypting and downloading file...");
+        }
+        document.getElementById("download_file_form").submit();
+    } else {
+        alert("Please enter a decryption key to download the decrypted file.");
+        return false;
+    }
+}
+
 function onSubmitDelete(token) {
-    const deleteInput = document.querySelector('#delete_file_form input[name="delete_phrase"]');
-    if (deleteInput && deleteInput.value.toUpperCase() === "DELETE") {
+    const deleteInput = document.querySelector('#delete_file_form input[name="decryption_key"]');
+    if (deleteInput && deleteInput.value.length > 0 && /^[0-9a-fA-F]{64}$/.test(deleteInput.value)) {
         showDeleteProgress();
     }
     document.getElementById("delete_file_form").submit();

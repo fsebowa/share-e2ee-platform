@@ -76,15 +76,16 @@
             <h1 class="logo-text">Share</h1>
             <h2>File Delete Confirmation</h2>
             <p style="font-size: 15px;"></p>
-            <p style="color: green;">Your file has been successfully deleted.</p>
-            <p class="caption-text">This action cannot be undone!</p>
+            <p style="color: green;">Your file has been permanently deleted.</p>
+            <p class="caption-text" style="color: red;">This action cannot be undone!</p>
             <div class="content">
                 <h3>File Detials</h3>
                 <p><strong>File Name: </strong>{{file_name}}</p>
-                <p><strong>Deleted on: </strong>{{delete_date}}</p>
-                <!-- <p><strong>Encryption Key: </strong><span class="key">{{encryption_key}}</span></p> -->
+                <p><strong>Original File Name: </strong>{{original_filename}}</p>
+                <p><strong>File size: </strong>{{file_size}} MB</p>
+                <p><strong>Upload Date: </strong>{{upload_date}}</p>
+                <p><strong style="color: red;">Deleted on: </strong>{{delete_date}}</p>
             </div>
-            <!-- <p style="color: red;">Please store this key in a safe place, as it is required to decrypt your file. If lost, recovery will not be possible.</p> -->
             <p class="caption-text" style="font-size: 15px; font-style: italic;">Thank you for using our secure file sharing platform.</p>
             <p style="margin-top: 50px; margin-bottom: -30px; color: #000000; font-size: 14px;">&copy; Share {{year}}</p>
         </div>

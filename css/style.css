@@ -742,6 +742,7 @@ nav button,
 .uploaded-files .row {
     display: flex;
     justify-content: space-between;
+    align-items: center;
 }
 
 .elipse-menu i {
@@ -842,7 +843,23 @@ nav button,
     transition: width 0.2s ease;
 }
 
-.delete-progress .progress-bar {
+.delete-progress i {
+    color: red;
+}
+
+#uploadProgressContainer i{
+    color: green;
+}
+
+.progress-backdrop i {
+    position: absolute;
+    top: -70px;
+    left: 50%;
+    transform: translate(-50%);
+    font-size: 45px;
+}
+
+.delete-progress .progress-bar{
     background-color: red;
 }
 

@@ -175,7 +175,7 @@ class FileEncryptionService {
             if ($plaintext === false) {
                 return [
                     'success' => false,
-                    'message' => "Decryption failed: " . openssl_error_string() . ". This may be due to an incorrect key or corrupted file."
+                    'message' => "Error Occurred: " . openssl_error_string() . "This may be due to an incorrect key or corrupted file."
                 ];
             }
             

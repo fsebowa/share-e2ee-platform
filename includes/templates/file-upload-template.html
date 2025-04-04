@@ -14,7 +14,7 @@
             font-family: "Inria Sans", serif;
         }
         .file-template .file-details {
-            width: 500px;
+            width: 630px;
             margin: 0 auto;
             padding: 5px;
             text-align: center;
@@ -55,7 +55,8 @@
         }
         .content .key {
             display: block;
-            text-align: center;
+            text-align: left;
+            word-break: break-all;
             background-color: #e7e7e7;
             padding: 5px;
             border-radius: 5px;
@@ -80,6 +81,8 @@
             <div class="content">
                 <h3>File Detials</h3>
                 <p><strong>File Name: </strong>{{file_name}}</p>
+                <p><strong>Original File Name: </strong>{{original_filename}}</p>
+                <p><strong>File size: </strong>{{file_size}} MB</p>
                 <p><strong>Upload Date: </strong>{{upload_date}}</p>
                 <p><strong>Encryption Key: </strong><span class="key">{{encryption_key}}</span></p>
             </div>

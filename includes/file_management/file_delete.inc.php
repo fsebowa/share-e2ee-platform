@@ -3,6 +3,7 @@
 require_once __DIR__ . '/../config/config_session.inc.php';
 require_once __DIR__ . '/../auth/auth_checker.inc.php';
 require_once __DIR__ . '/file_contr.inc.php';
+require_once __DIR__ . '/../encryption/file_encryption.inc.php';
 
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
@@ -15,7 +16,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     // get data from POST
     $file_id = $_POST["file_id"] ?? null;
     $file_name = $_POST["file_name"] ?? null;
-    $delete_phrase = $_POST["delete_phrase"] ?? null;
+    $decryption_key = $_POST["decryption_key"] ?? null;
     $csrf_token = $_POST["csrf_token"] ?? null;
     $csrf_token_time = $_SESSION["csrf_token_time"] ?? null;
     $recaptcha_response = $_POST["g-recaptcha-response"] ?? null;
@@ -35,73 +36,119 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             $errors["csrf_token_invalid"] = "Invalid CSRF token";
         } elseif(is_recaptcha_invalid($secretKey, $recaptcha_response)) {
             $errors["invalid_recaptcha"] = "The reCAPTCHA verification failed. Please try again!";
-        } elseif (empty($delete_phrase) || empty($file_id)) {
+        } elseif (empty($decryption_key) || empty($file_id) || empty($file_name)) {
             $errors["empty_inputs"] = "One or more fields are empty";
-        } elseif (!empty($delete_phrase) && strtoupper($delete_phrase )!== "DELETE") {
-            $errors["wrong_phrase"] = "Wrong phrase! Only pharase allowed is 'DELETE'";
+        } elseif (!empty($decryption_key) && (strlen($decryption_key) != 64 || !ctype_xdigit($decryption_key))) {
+            $errors["wrong_key_format"] = "Key must be exactly 64 hex characters (256-bit key)";
         }
 
         // if no errors, proceed with file deletion 
         if (empty($errors)) {
-            $deleteFile  = delete_file($pdo, $file_id, $_SESSION["user_id"]);
-            if (!$deleteFile) {
-                $errors["delete_failed"] = "An error occurred, please try again!";
+            $file_info = get_file_by_id($pdo, $file_id, $_SESSION["user_id"]);
+            if (!$file_info) {
+                $errors["file_not_found"] = "File not found.";
             } else {
-                $delete_date = date("Y-m-d H:i:s");
+                // Initialize encryption service to verify decryption key
+                $encryption_service = new FileEncryptionService();
+
+                // Convert hex to binary
+                $binary_key = hex2bin($decryption_key);
                 
-                // load email template
-                $file_email_delete_template = __DIR__ . '/../templates/file-delete-template.html';
-                if (is_file_email_template_missing($file_email_delete_template)) {
-                    $errors["file_template_not_found"] = "Email template not found.";
-                } else {
-                    $file_template = file_get_contents($file_email_delete_template);
+                // Create a temporary file to verify the key
+                $temp_dir = sys_get_temp_dir() . '/share_temp_files';
+                if (!is_dir($temp_dir)) {
+                    mkdir($temp_dir, 0755, true);
+                }
+                $temp_file = $temp_dir . '/verify_' . $_SESSION["user_id"] . '_' . $file_id . '_' . uniqid();
+
+                // Attempt to decrypt the file to verify the key
+                $decryption_result = $encryption_service->decrypt_file(
+                    $file_info["file_path"],
+                    $binary_key,
+                    $temp_file
+                );
+
+                // Clean up temp file regardless of result
+                if (file_exists($temp_file)) {
+                    @unlink($temp_file);
                 }
 
-                // create email template to for delete confirmation
-                $file_template = str_replace('{{file_name}}', $file_name, $file_template);
-                $file_template = str_replace('{{delete_date}}', $delete_date, $file_template);
-                $file_template = str_replace('{{year}}', date('Y'), $file_template);
+                if (!isset($decryption_result['success']) || $decryption_result['success'] !== true) {
+                    $error_message = $decryption_result['message'] ?? "Invalid decryption key for this file.";
+                    $errors["invalid_key"] = $error_message;
+                } else { // Key is valid, proceed with deletion
+                    
+                    // Get original filename before deletion
+                    $original_filename = $file_info["original_filename"] ?? "Unknown";
+                    $file_size = number_format($file_info["file_size"] / 1024 /1024, 2) ?? "Unknown";
+                    $upload_date = $file_info["date_uploaded"] ?? "Unknown";
 
-                // send delete confirmation to user
-                $mail = new PHPMailer(true);
-                try {
-                    // server settings
-                    $mail->isSMTP();
-                    $mail->Host = 'smtp.gmail.com';
-                    $mail->Port = 465;
-                    $mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS; // Encryption mechanism
-                    $mail->SMTPAuth = true;
-                    $mail->Username = 'share.e2eeplatform@gmail.com';
-                    $mail->Password = 'vczc yawy voeo nkbk';
+                    // perform file deletion
+                    $deleteFile = delete_file($pdo, $file_id, $_SESSION["user_id"]);
+                    $delete_date = date("Y-m-d H:i:s");
 
-                    // Recipients
-                    $mail->setFrom('otp-verification@share.com', 'Share E2EE Platform');
-                    $mail->addReplyTo('no-reply@share.com', 'Share E2EE Platform');
-                    $mail->addAddress($_SESSION["email"], $_SESSION["user_data"]["first_name"] . " " . $_SESSION["user_data"]["last_name"]);
+                    if (!$deleteFile) {
+                        $errors["delete_failed"] = "An error occurred while deleting the file. Please try again!";
+                    } else {                        
+                        // load email template
+                        $file_email_delete_template = __DIR__ . '/../templates/file-delete-template.html';
+                        
+                        if (is_file_email_template_missing($file_email_delete_template)) {
+                            $errors["file_template_not_found"] = "Email template not found.";
+                        } else {
+                            $file_template = file_get_contents($file_email_delete_template);
+                            
+                            // create email template for delete confirmation
+                            $file_template = str_replace('{{file_name}}', $file_name, $file_template);
+                            $file_template = str_replace('{{original_filename}}', $original_filename, $file_template);
+                            $file_template = str_replace('{{file_size}}', $file_size, $file_template);
+                            $file_template = str_replace('{{upload_date}}', $upload_date, $file_template);
+                            $file_template = str_replace('{{delete_date}}', $delete_date, $file_template);
+                            $file_template = str_replace('{{year}}', date('Y'), $file_template);
+                            
+                            // Send deletion confirmation email
+                            $mail = new PHPMailer(true);
+                            try {
+                                // server settings
+                                $mail->isSMTP();
+                                $mail->Host = 'smtp.gmail.com';
+                                $mail->Port = 465;
+                                $mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;
+                                $mail->SMTPAuth = true;
+                                $mail->Username = 'share.e2eeplatform@gmail.com';
+                                $mail->Password = 'vczc yawy voeo nkbk';
 
-                    // Content
-                    $mail->isHTML(true);
-                    $mail->Subject = 'File Deletion Confirmation: ' . $file_name;
-                    $mail->Body = $file_template;
-                    $mail->AltBody = 'Your file was deleted successfully' . $file_name;
-                    if (!$mail->send()) {
-                        $errors["mailer_error"] = "Mailer Error: ". $mail->ErrorInfo;
-                        die();
-                    } else { //send email
-                        $success["deleted_successfully"] = "File Deleted Successfully";
-                        $_SESSION["success_file_delete"] = $success;
-                        header("Location: /dashboard.php?message=file_delete_success");
-                        die();
+                                // Recipients
+                                $mail->setFrom('otp-verification@share.com', 'Share E2EE Platform');
+                                $mail->addReplyTo('no-reply@share.com', 'Share E2EE Platform');
+                                $mail->addAddress($_SESSION["email"] ?? get_user_email_by_id($pdo, $_SESSION["user_id"]), $_SESSION["user_data"]["first_name"] . " " . $_SESSION["user_data"]["last_name"]);
+
+                                // Content
+                                $mail->isHTML(true);
+                                $mail->Subject = 'File Deletion Confirmation: ' . $file_name;
+                                $mail->Body = $file_template;
+                                $mail->AltBody = 'Your file was deleted successfully: ' . $file_name;
+                                
+                                if (!$mail->send()) {
+                                    $errors["mailer_error"] = "Mailer Error: ". $mail->ErrorInfo;
+                                } else {
+                                    $success["deleted_successfully"] = "File Deleted Successfully";
+                                    $_SESSION["success_file_delete"] = $success;
+                                    header("Location: /dashboard.php?message=file_delete_success");
+                                    exit();
+                                }
+                            } catch (Exception $e) {
+                                $errors["send_email_error"] = "Error sending delete confirmation email.<br>Try again!";
+                                $errors["mailer_error"] = "Mailer Error: ". $mail->ErrorInfo;
+                            }
+                        }
                     }
-                } catch (Exception $e) {
-                    $errors["send_otp_error"] = "Error sending delete confirmation email.<br>Try again!";
-                    $errors["mailer_error"] = "Mailer Error: ". $mail->ErrorInfo;
                 }
             }
-        } 
+        }
     } catch (Exception $e) {
         $errors["system_error"] = "An error occurred: " . $e->getMessage();
-        error_log("Exception in file_deletee.inc.php: " . $e->getMessage());
+        error_log("Exception in file_delete.inc.php: " . $e->getMessage());
     }
 
     // redirect back to dashboard if error or success messages

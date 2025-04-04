@@ -13,7 +13,7 @@
     $hasUploadErrors = isset($_SESSION["errors_file_upload"]) && !empty($_SESSION["errors_file_upload"]);
     $hasPreviewErrors = isset($_SESSION["errors_file_preview"]) && !empty($_SESSION["errors_file_preview"]);
     $hasDeleteErrors = isset($_SESSION["errors_file_delete"]) && !empty($_SESSION["errors_file_delete"]);
-
+    $hasDownloadErrors = isset($_SESSION["errors_file_download"]) && !empty($_SESSION["errors_file_download"]);
 ?>
 <!DOCTYPE html>
 <html>
@@ -27,6 +27,7 @@
         const hasUploadErrors = <?php echo $hasUploadErrors ? 'true' : 'false'; ?>;
         const hasPreviewErrors = <?php echo $hasPreviewErrors ? 'true' : 'false'; ?>;
         const hasDeleteErrors = <?php echo $hasDeleteErrors ? 'true' : 'false'; ?>;
+        const hasDownloadErrors = <?php echo $hasDownloadErrors ? 'true' : 'false'; ?>;
     </script>
     <script src="/js/profile-popup.js"></script>
     <script src="/js/progress-bar.js"></script>
@@ -116,9 +117,9 @@
                             <div class="file col" data-file-type="<?php echo htmlspecialchars($file['file_type']); ?>" data-file-id="<?php echo htmlspecialchars($file['id']); ?>">
                                 <div class="top row">
                                     <p class="file-title truncate"><?php echo htmlspecialchars($file['file_name']); ?></p>
-                                    <p class="caption-text"> 
-                                        <span><?php echo htmlspecialchars($file['file_type']);?> </span>|
-                                        <span> <?php echo number_format($file['file_size'] / 1024 /1024, 2); ?> MB</span>
+                                    <p class="caption-text" style="display: flex; align-items: center; gap: 2px;"> 
+                                        <span style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 70px; display: inline-block;"><?php echo htmlspecialchars($file['file_type']);?> </span>|
+                                        <span><?php echo number_format($file['file_size'] / 1024 /1024, 2); ?> MB</span>
                                     </p>
                                 </div>
                                 <div class="bottom row">
@@ -145,13 +146,16 @@
                     check_file_preview_errors();
                     check_file_delete_errors();
                     check_delete_success_messages();
+                    check_file_download_errors();
+                    check_dowanload_success_messages();
                 ?>
             </div>
-            
+
             <!-- Upload progress -->
             <div class="progress-backdrop" id="uploadProgressBackdrop">
                 <div id="uploadProgressContainer">
                     <div class="progress-container">
+                        <i class="fa-solid fa-cloud-arrow-up"></i>
                         <div class="progress-bar" id="uploadProgressBar"></div>
                         <p>Uploading file...</p>
                     </div>
@@ -162,6 +166,7 @@
             <div class="progress-backdrop delete-progress" id="deleteProgressBackdrop">
                 <div id="deleteProgressContainer">
                     <div class="progress-container">
+                        <i class="fa-solid fa-trash-can"></i>
                         <div class="progress-bar" id="deleteProgressBar"></div>
                         <p>Deleting file...</p>
                     </div>
@@ -213,13 +218,44 @@
                 <span class="caption-text" style="font-size: 14px;">Your files are end-to-end encrypted</span>
             </div>
 
+            <!-- Download file popup -->
+            <div class="file-ellipse-popup" id="downloadFile">
+                <form action="/includes/file_management/file_download.inc.php" method="post" id="download_file_form">
+                    <h2></h2> <!-- File name will be inserted here dynamically-->
+                    <p class="caption-text">Select download option:</p>
+                    <div class="form-inputs">
+                        <div id="decryption_key_container">
+                            <input type="text" id="decryption_key" name="key" placeholder="Enter decryption key for decrypted download">
+                        </div>
+                        <input type="hidden" name="csrf_token" value="<?php echo $token ?? ''; ?>">
+                        <input type="hidden" name="download_action" id="download_action" value="decrypted">
+                    </div>
+                    
+                    <div class="download-buttons">
+                        <!-- Single reCAPTCHA button for decrypted download -->
+                        <button id="decrypted_download_btn" class="g-recaptcha btn black-btn" 
+                            data-sitekey="6LfncLgqAAAAABiQR-6AYNqjYPE2wFS5WsrPBAEj" 
+                            data-callback='onSubmitDownload' 
+                            data-action='submit'>Decrypt & Download</button>
+                        
+                        <!-- Button to trigger encrypted download -->
+                        <button type="button" class="btn gray-btn" id="encrypted_download_btn">
+                            Download Encrypted File
+                        </button>
+                    </div>
+                </form>
+                <span class="caption-text" style="font-size: 14px;">Your files are end-to-end encrypted</span>
+            </div>
+
+
             <!-- Delete file popup -->
             <div class="file-ellipse-popup" id="deleteFile">
                 <form action="/includes/file_management/file_delete.inc.php" method="post" id="delete_file_form">
-                    <h2></h2> <!-- File name will be inserted here dynamically-->
-                    <p class="error-danger">This will permanently delete the file and cannot be undone.</p>
+                    <h2></h2> <!-- File name will be inserted here dynamically using JavaScript-->
+                    <p class="error-danger">This will permanently delete the file and cannot be undone.</p> <br>
+                    <p class="caption-text">For security, please enter the decryption key for this file to confirm deletion.</p>
                     <div class="form-inputs">
-                        <input type="text" id="delete_phrase" name="delete_phrase" placeholder="Type “DELETE” to complete the action">
+                        <input type="text" id="decryption_key" name="decryption_key" placeholder="Enter the file's decryption key">
                         <input type="hidden" name="csrf_token" value="<?php echo $token ?? ''; ?>"> 
                     </div>
                     <!-- Submit button with reCAPTCHA trigger -->
@@ -228,7 +264,8 @@
                         data-callback='onSubmitDelete' 
                         data-action='submit'>Delete</button><br>
                 </form>
-                <span class="caption-text" style="font-size: 14px;">Your files are end-to-end encrypted</span>
+                <p class="caption-text" style="font-size: 14px; margin: 0 20px;">You can find the decryption key in your email from when you uploaded this file.</p>
+                <!-- <span class="caption-text" style="font-size: 14px;">Your files are end-to-end encrypted</span> -->
             </div>
 
             <!-- Clear upload data from session after loading -->

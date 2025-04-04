@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>File Download Confirmation</title>
+    <script src="https://www.google.com/recaptcha/api.js"></script>
+    <!-- Google fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inria+Sans:ital,wght@0,300;0,400;0,700;1,300;1,400;1,700&family=Instrument+Sans:ital,wght@0,400..700;1,400..700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:ital,wght@0,400..700;1,400..700&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            font-family: "Inria Sans", serif;
+        }
+        .file-template .file-details {
+            width: 500px;
+            margin: 0 auto;
+            padding: 5px;
+            text-align: center;
+            border-radius: 10px;
+        }
+        .file-details .container {
+            margin: 0 auto;
+            padding: 50px 20px;
+            text-align: center;
+            border-radius: 10px;
+            background-color: #FFFFFF;
+            border: 2px solid #00000023;
+            overflow: hidden;
+        }
+        .caption-text {
+            font-size: 16px;
+            color: #7C7B7B;
+        }
+        .content {
+            text-align: left;
+            margin: 30px 20px;
+            padding: 20px 20px;
+            border-radius: 5px;
+            background-color: #f3f3f3;
+            box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
+            overflow: hidden;
+            word-wrap: break-word;
+        }
+        .content h3 {
+            background-color: #000000;
+            width: 160px;
+            color: #FFFFFF;
+            margin: 0 auto;
+            padding: 6px 5px;
+            border-radius: 5px;
+            text-align: center;
+        }
+        .logo-text {
+            font-size: 40px;
+            font-weight: 700;
+            margin: 0;
+        }
+    </style>
+</head>
+<body class="file-template">
+    <div class="file-details">
+        <div class="container">
+            <h1 class="logo-text">Share</h1>
+            <h2>File Download Confirmation</h2>
+            <p style="color: green;">Your file has been successfully downloaded.</p>
+            <div class="content">
+                <h3>Download Details</h3>
+                <p><strong>File Name: </strong>{{file_name}}</p>
+                <p><strong>Original File Name: </strong>{{original_filename}}</p>
+                <p><strong>Download Date: </strong>{{download_date}}</p>
+            </div>
+            <p class="caption-text" style="font-size: 15px; font-style: italic;">Thank you for using our secure file sharing platform.</p>
+            <p style="margin-top: 50px; margin-bottom: -30px; color: #000000; font-size: 14px;">&copy; Share {{year}}</p>
+        </div>
+        <div class="content">
+            <p>For your security:</p>
+            <ul>
+                <li>Keep your decryption keys in a secure location</li>
+                <li>Do not share your keys with unauthorized individuals</li>
+                <li>Consider deleting files you no longer need</li>
+            </ul>
+            <p>Please contact support if you did not initiate this download.</p>
+        </div>
+    </div>
+</body>
+</html>
