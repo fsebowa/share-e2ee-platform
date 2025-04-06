@@ -26,7 +26,6 @@ class EncryptionService {
         if (!file_exists($this->keysDirectory)) {
             mkdir($this->keysDirectory, 0700, true);
         }
-
         $privateKeyFile = $this->keysDirectory . '/private_key.pem';
         $publicKeyFile = $this->keysDirectory . '/public_key.pem';
 
@@ -37,13 +36,11 @@ class EncryptionService {
             // load existing keys
             $this->privateKey = file_get_contents($privateKeyFile);
             $this->publicKey = file_get_contents($publicKeyFile);
-
             // verfiy keys validity
             if (!$this->privateKey || !$this->publicKey) {
                 $this->generateKeys();   // keys exist but couldn't be read properly - regenerate new ones
             }
         }
-
         // Cache the keys for future instances
         self::$instanceCache = [
             'privateKey' => $this->privateKey,
@@ -59,27 +56,21 @@ class EncryptionService {
             "private_key_bits" => 2048,
             "private_key_type" => OPENSSL_KEYTYPE_RSA,
         );
-
         // create key pair
         $res = openssl_pkey_new($config);
         if (!$res) {
             throw new Exception("Failed to generate key pair: " . openssl_error_string());
         }
-
         // extract private key
         openssl_pkey_export($res, $privateKey);
         $this->privateKey = $privateKey;
-
         // extract public key
         $keyDetails = openssl_pkey_get_details($res);
         $this->publicKey = $keyDetails["key"];
-
         // save keys to files
         file_put_contents($this->keysDirectory . '/private_key.pem', $this->privateKey);
         chmod($this->keysDirectory . '/private_key.pem', 0600); // secure permissions
-
         file_put_contents($this->keysDirectory . '/public_key.pem', $this->publicKey);
-
         // save public key as JS file
         $jsPublicKey = "const SERVER_PUBLIC_KEY = `" . trim($this->publicKey) . "`;";
         file_put_contents(dirname(__DIR__) . '/js/public-key.js', $jsPublicKey);
@@ -94,7 +85,6 @@ class EncryptionService {
         if (empty($encryptedData)) {
             return null;
         }
-
         static $openssl_padding = OPENSSL_PKCS1_PADDING;
 
 

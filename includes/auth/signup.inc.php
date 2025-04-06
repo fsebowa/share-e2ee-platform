@@ -118,7 +118,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                         "registered" => true
                     ];
                     header("Location: /login.php?messege=user_created_successfully_login_to_continue");
-            
                     $pdo = null;
                     $stmt = null;
                     die();
@@ -136,18 +135,14 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 "first_name" => $first_name,
                 "last_name" => $last_name,
                 "email" => $email ?? '',
-                // "password" => $password
             ];            
             $_SESSION["signup_data"] = $signupData;
-
             header("Location: /signup.php");
             die();
         }
-
     } catch (PDOException $e) {
         die("Submission Query failed: ". $e->getMessage());
     }
-
 }   else {
     header("Location: /login.php");
     die();

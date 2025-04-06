@@ -24,6 +24,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         // Error handling
         $errors = [];
 
+        // Check CSRF token
         if (csrf_token_expired($csrf_token_time)) {
             $errors["csrf_token_expired"] = "Session token expired. Try again!";
         } elseif (csrf_token_invalid($csrf_token)) {
