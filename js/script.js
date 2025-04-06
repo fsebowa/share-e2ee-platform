@@ -139,7 +139,6 @@ function resendOtp(event) {
     if (form) {
         form.submit(); 
     } else {
-        console.error("Could not find the form 'new_otp' to submit.");
         hideLoadingOverlay();
     }
 }

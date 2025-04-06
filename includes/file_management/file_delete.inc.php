@@ -2,8 +2,8 @@
 
 require_once __DIR__ . '/../config/config_session.inc.php';
 require_once __DIR__ . '/../auth/auth_checker.inc.php';
-require_once __DIR__ . '/file_contr.inc.php';
 require_once __DIR__ . '/../encryption/file_encryption.inc.php';
+require_once __DIR__ . '/../encryption/encryption_service.inc.php';
 
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
@@ -13,10 +13,10 @@ require __DIR__ . '/../../vendor/autoload.php';
 check_login_otp_status();
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
-    // get data from POST
-    $file_id = $_POST["file_id"] ?? null;
-    $file_name = $_POST["file_name"] ?? null;
-    $decryption_key = $_POST["decryption_key"] ?? null;
+    // Initialize encryption service
+    $encryptionService = new EncryptionService();
+    $encryptedData = $_POST["encrypted_data"] ?? null;
+    // get data remaining data from POST
     $csrf_token = $_POST["csrf_token"] ?? null;
     $csrf_token_time = $_SESSION["csrf_token_time"] ?? null;
     $recaptcha_response = $_POST["g-recaptcha-response"] ?? null;
@@ -25,6 +25,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     try {
         require_once __DIR__ . '/../config/dbh.inc.php';
         require_once __DIR__ . '/file_model.inc.php';
+        require_once __DIR__ . '/file_contr.inc.php';
 
         $errors = [];
         $success = [];
@@ -36,12 +37,25 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             $errors["csrf_token_invalid"] = "Invalid CSRF token";
         } elseif(is_recaptcha_invalid($secretKey, $recaptcha_response)) {
             $errors["invalid_recaptcha"] = "The reCAPTCHA verification failed. Please try again!";
-        } elseif (empty($decryption_key) || empty($file_id) || empty($file_name)) {
-            $errors["empty_inputs"] = "One or more fields are empty";
-        } elseif (!empty($decryption_key) && (strlen($decryption_key) != 64 || !ctype_xdigit($decryption_key))) {
-            $errors["wrong_key_format"] = "Key must be exactly 64 hex characters (256-bit key)";
+        } elseif (!$encryptedData) {
+            $errors["encryption_error"] = "Failed to process encrypted data. Please try again!";
+        } else {
+            // decrypt the data
+            $decryptedData = $encryptionService->decryptFormData($encryptedData);
+            if (!$decryptedData) {
+                $errors["decryption_error"] = "Error decrypting form data. Please try again!";
+            } else {
+                $file_id = $decryptedData["file_id"] ?? null;
+                $file_name = $decryptedData["file_name"] ?? null;
+                $decryption_key = $decryptedData["decryption_key"] ?? null;
+                
+                if (empty($decryption_key) || empty($file_id) || empty($file_name)) {
+                    $errors["empty_inputs"] = "One or more fields are empty";
+                } elseif (!empty($decryption_key) && (strlen($decryption_key) != 64 || !ctype_xdigit($decryption_key))) {
+                    $errors["wrong_key_format"] = "Key must be exactly 64 hex characters (256-bit key)";
+                }
+            }
         }
-
         // if no errors, proceed with file deletion 
         if (empty($errors)) {
             $file_info = get_file_by_id($pdo, $file_id, $_SESSION["user_id"]);

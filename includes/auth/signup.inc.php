@@ -13,8 +13,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     // initilising encryption service
     $encryptionService = new EncryptionService();
     $encryptedData = $_POST["encrypted_data"] ?? null;
-    $first_name = $_POST["first-name"];
-    $last_name = $_POST["last-name"];
     $csrf_token = $_POST["csrf_token"];
     $csrf_token_time = $_SESSION['csrf_token_time'];
     $secretKey = '6LfncLgqAAAAAKefUSncQyC01BjUaUTclJ5dXEqb';
@@ -43,12 +41,14 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             if (!$decryptedData) {
                 $errors["decryption_error"] = "Failed to decrypt form data. Please try again";
             } else { // extract sensitive info from decrypted data
+                $first_name = $decryptedData["first-name"] ?? '';
+                $last_name =$decryptedData["last-name"] ?? '';
                 $email = $decryptedData["email"] ?? '';
                 $password = $decryptedData["password"] ?? '';
                 $confirm_password = $decryptedData["confirm-password"] ?? '';
 
                 // validate all inputs
-                if (is_input_empty($first_name, $last_name, $email, $password)) {
+                if (is_input_empty($first_name, $last_name, $email, $password, $confirm_password)) {
                     $errors["empty_input"] = "One or more fields are empty";
                 } else { // proceed with other checks if inputs are filled
                     if (is_email_valid($email)) {
@@ -80,6 +80,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             $template = str_replace('{{creation_date}}', $creation_date, $template);
             $template = str_replace('{{first_name}}', $first_name, $template);
             $template = str_replace('{{last_name}}', $last_name, $template);
+            $template = str_replace('{{email}}', $email, $template);
             $template = str_replace('{{year}}', date('Y'), $template);
 
             // Send OTP to user
@@ -103,7 +104,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 $mail->isHTML(true);
                 $mail->Subject = 'Account Registration';
                 $mail->Body = $template;
-                $mail->AltBody = 'Your account on Share was successfully registered on' . $creation_date;
+                $mail->AltBody = 'Your account on Share was successfully registered on ' . $creation_date;
                 
                 // Send the OTP, check for errors
                 if (!$mail->send()) {

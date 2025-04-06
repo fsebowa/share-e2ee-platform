@@ -1,6 +1,9 @@
 <?php 
 require_once __DIR__ . '/../config/config_session.inc.php';
 require_once __DIR__ . '/../auth/auth_checker.inc.php';
+require_once __DIR__ . '/../encryption/file_encryption.inc.php';
+require_once __DIR__ . '/../encryption/encryption_service.inc.php';
+
 
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
@@ -10,9 +13,12 @@ require __DIR__ . '/../../vendor/autoload.php';
 check_login_otp_status(); // check if user is logged in and OTP is verified
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
-    $file_name = $_POST["file_name"] ?? null;
-    $encryption_key = $_POST["key"] ?? null;
+     // Initialize encryption service
+    $encryptionService = new EncryptionService();
+    $encryptedData = $_POST["encrypted_data"] ?? null;
     $file = $_FILES["file"] ?? null;
+    $csrf_token = $_POST["csrf_token"] ?? null;
+    $csrf_token_time = $_SESSION["csrf_token_time"] ?? null;
     $recaptcha_response = $_POST["g-recaptcha-response"] ?? null;
     $secretKey = '6LfncLgqAAAAAKefUSncQyC01BjUaUTclJ5dXEqb';
 
@@ -20,7 +26,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         require_once __DIR__ . '/../config/dbh.inc.php';
         require_once __DIR__ . '/file_model.inc.php';
         require_once __DIR__ . '/file_contr.inc.php';
-        require_once __DIR__ . '/../encryption/file_encryption.inc.php';
 
         // error handling
         $errors = [];
@@ -30,28 +35,47 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         $stored_file_details = get_user_files($pdo, $_SESSION["user_id"]);
         $get_stored_file_name = array_map('strtolower', array_column($stored_file_details, 'file_name'));
 
-        if (is_recaptcha_invalid($secretKey, $recaptcha_response)) {
-            $errors["recaptcha_invalid"] = "The reCAPTCHA verification failed. Please try again!";
-        } elseif (is_input_empty($file_name, $encryption_key, $file)) {
-            $errors["empty_input"] = "One or more fields are empty";
+        if (csrf_token_expired($csrf_token_time)) {
+            $errors["csrf_token_expired"] = "Session token expired. Try again!";
+        } elseif (csrf_token_invalid($csrf_token)) {
+            $errors["csrf_token_invalid"] = "Invalid CSRF token";
+        } elseif(is_recaptcha_invalid($secretKey, $recaptcha_response)) {
+            $errors["invalid_recaptcha"] = "The reCAPTCHA verification failed. Please try again!";
+        } elseif (!$encryptedData) {
+            $errors["encryption_error"] = "Failed to process encrypted data. Please try again!";
+        } elseif (!$file || !isset($file["tmp_name"]) || empty($file["tmp_name"])) {
+            $errors["no_file"] = "No file was uploaded. Please select a file.";
         } else {
-            if (isset($file["name"]) && file_exists_in_db($pdo, $_SESSION["user_id"], $file["name"])) {
-                $errors["file_exist"] = "File already exists, upload a different file";
-            }
-            if (in_array(strtolower($file_name), $get_stored_file_name)) {
-                $errors["filename_in_use"] = "File name already in use. Try a different name!";
-            }
-            if (is_key_length_invalid($encryption_key)) {
-                $errors["invalid_key"] = "Encryption key must be exactly 64 hex characters long";
-            }
-            if (is_file_too_large($file)) {
-                $errors["file_too_large"] = "File is too large. Maximum allowed size is 20MB.";
-            }
-            if (is_file_type_invalid($file)) {
-                $errors["file_type_invalid"] = "This file type is not supported.";
+            // decrypt the data
+            $decryptedData = $encryptionService->decryptFormData($encryptedData);
+            if (!$decryptedData) {
+                $errors["decryption_error"] = "Error decrypting form data. Please try again!";
+            } else {
+                $file_name = $decryptedData["file_name"] ?? null;
+                $encryption_key = $decryptedData["key"] ?? null;
+                
+                if (is_input_empty($file_name, $encryption_key, $file)) {
+                    $errors["empty_input"] = "One or more fields are empty";
+                } else {
+                    if (isset($file["name"]) && file_exists_in_db($pdo, $_SESSION["user_id"], $file["name"])) {
+                        $errors["file_exist"] = "File already exists, upload a different file";
+                    }
+                    if (in_array(strtolower($file_name), $get_stored_file_name)) {
+                        $errors["filename_in_use"] = "File name already in use. Try a different name!";
+                    }
+                    if (is_key_length_invalid($encryption_key)) {
+                        $errors["invalid_key"] = "Encryption key must be exactly 64 hex characters long";
+                    }
+                    if (is_file_too_large($file)) {
+                        $errors["file_too_large"] = "File is too large. Maximum allowed size is 20MB.";
+                    }
+                    if (is_file_type_invalid($file)) {
+                        $errors["file_type_invalid"] = "This file type is not supported.";
+                    }
+                }
             }
         }
-        
+        // if no errors, proceed with file encryption and upload 
         if (empty($errors)) {
             // intialise encryption service
             $encryption_service = new FileEncryptionService();

@@ -1,0 +1,16 @@
+[2025-04-07 02:15:06] Upload started
+[2025-04-07 02:15:06] File received: Array
+(
+    [file] => Array
+        (
+            [name] => CST3520 lab01b Visualizing the Black Hats.docx
+            [full_path] => CST3520 lab01b Visualizing the Black Hats.docx
+            [type] => application/vnd.openxmlformats-officedocument.wordprocessingml.document
+            [tmp_name] => /Applications/XAMPP/xamppfiles/temp/phpdJ4Csn
+            [error] => 0
+            [size] => 72701
+        )
+
+)
+
+[2025-04-07 02:15:06] Encrypted data: present

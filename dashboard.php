@@ -21,6 +21,8 @@
     <?php include __DIR__ . "/includes/templates/header.php"; ?>
     <title>Dashboard</title>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- JSEncrypt library for RSA encryption -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jsencrypt/3.3.2/jsencrypt.min.js"></script>
     <script src="https://www.google.com/recaptcha/api.js"></script>
     <script>
         // Make error flags available to JavaScript
@@ -172,16 +174,17 @@
                     </div>
                 </div>
             </div>
-
+            
             <!-- Add new file form -->
             <div class="upload-form" id="uploadForm">
-                <form action="/includes/file_management/file_upload.inc.php" method="post" id="file_upload_form" enctype="multipart/form-data">
+                <form action="/includes/file_management/file_upload.inc.php" method="post" id="file_upload_form" enctype="multipart/form-data" class="secure-form">
                     <h2>Upload new File</h2>
                     <p class="caption-text">All files uploaded are encrypted</p>
                     <div class="form-inputs">
-                        <input type="text" id="file_name" name="file_name" placeholder="File name" value="<?php echo isset($_SESSION['upload_data']['file_name']) ? htmlspecialchars($_SESSION['upload_data']['file_name']) : ''; ?>">
+                        <input type="hidden" name="csrf_token" value="<?php echo $token ?? ''; ?>">
+                        <input type="text" id="file_name" name="file_name" placeholder="File name" data-encrypt="true" value="<?php echo isset($_SESSION['upload_data']['file_name']) ? htmlspecialchars($_SESSION['upload_data']['file_name']) : ''; ?>">
                         <div class="form-box">
-                            <input type="text" id="key" name="key" placeholder="Enter a 256-bit key (64 hex characters)"> <span>or</span>
+                            <input type="text" id="key" name="key" placeholder="Enter a 256-bit key (64 hex characters)" data-encrypt="true"> <span>or</span>
                             <span class="btn gray-btn" id="generate_key_button">Generate Key</span>
                         </div>
                         <span class="caption-text">You will receive an email with the key</span>
@@ -202,11 +205,11 @@
 
             <!-- Open file popup -->
             <div class="file-ellipse-popup" id="openFile">
-                <form action="/includes/file_management/file_preview.inc.php" method="post" id="open_file_form">
+                <form action="/includes/file_management/file_preview.inc.php" method="post" id="open_file_form" class="secure-form">
                     <h2></h2> <!-- File name will be inserted here dynamically-->
                     <p class="caption-text">A decryption key is required to open this file</p>
                     <div class="form-inputs">
-                        <input type="text" id="decryption_key" name="key" placeholder="Enter decryption key">
+                        <input type="text" id="decryption_key" name="key" placeholder="Enter decryption key" data-encrypt="true">
                         <input type="hidden" name="csrf_token" value="<?php echo $token ?? ''; ?>">
                     </div>
                     <!-- Submit button with reCAPTCHA trigger -->
@@ -255,7 +258,7 @@
                     <p class="error-danger">This will permanently delete the file and cannot be undone.</p> <br>
                     <p class="caption-text">For security, please enter the decryption key for this file to confirm deletion.</p>
                     <div class="form-inputs">
-                        <input type="text" id="decryption_key" name="decryption_key" placeholder="Enter the file's decryption key">
+                        <input type="text" id="decryption_key" name="decryption_key" data-encrypt="true" placeholder="Enter the file's decryption key">
                         <input type="hidden" name="csrf_token" value="<?php echo $token ?? ''; ?>"> 
                     </div>
                     <!-- Submit button with reCAPTCHA trigger -->
@@ -288,6 +291,19 @@
                 });
             }
         });
+        if (typeof window.onSubmitPreview !== 'function') {
+            window.onSubmitPreview = function(token) {
+                console.log("onSubmitPreview called");
+                const form = document.getElementById('open_file_form');
+                if (form) {
+                    const keyInput = form.querySelector('input[name="key"]');
+                    if (keyInput && keyInput.value.length > 0) {
+                        showLoadingOverlay("Decrypting file...");
+                    }
+                    form.submit();
+                }
+            };
+        }
     </script>
 </body>
 </html>

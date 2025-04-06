@@ -10,11 +10,16 @@
     <?php include __DIR__ . "/includes/templates/header.php"; ?>
     <title>OTP Validation</title>
     <script src="https://www.google.com/recaptcha/api.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jsencrypt/3.3.2/jsencrypt.min.js"></script>
     <script src="/js/form-encryption.js"></script>
     <script>
     function onSubmit(token) {
-        showLoadingOverlay("Verifying OTP...");
-        document.getElementById("otp_form").submit();
+        // const otpInput = document.querySelector('form #otp_code');
+        // if (otpInput.value.length > 0) {
+        //     showLoadingOverlay("Verifying OTP...");
+        // }
+        // document.getElementById("otp_form").submit();
+        console.log("reCAPTCHA validation successful");
     }
     </script>
 </head>
@@ -22,7 +27,7 @@
     <?php include __DIR__ . "/includes/templates/nav.php" ?>
     <div class="otp-form">
         <div class="container">
-            <form action="/includes/otp/otp.inc.php" method="post" id="otp_form">
+            <form action="/includes/otp/otp.inc.php" method="post" id="otp_form" class="secure-form">
                 <h2>OTP Verification</h2>
                 <p class="caption-text">
                     Enter code sent to <br>
@@ -34,7 +39,7 @@
                 </p>
                 <div class="form-inputs">
                     <input type="hidden" name="csrf_token" value="<?php echo $token ?>">
-                    <input type="text" id="otp_code" name="otp_code" placeholder="OTP Code">
+                    <input type="text" id="otp_code" name="otp_code" placeholder="OTP Code" data-encrypt="true">
                 </div>
                 <!-- Submit button with reCAPTCHA trigger -->
                 <button class="g-recaptcha btn black-btn" 

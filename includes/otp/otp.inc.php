@@ -1,9 +1,12 @@
 <?php
 
 require_once __DIR__ . '/../config/config_session.inc.php';
+require_once __DIR__ . '/../encryption/encryption_service.inc.php';
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
-    $otp_code = $_POST["otp_code"];
+    // Initialize encryption service
+    $encryptionService = new EncryptionService();
+    $encryptedData = $_POST["encrypted_data"] ?? null;
     $csrf_token = $_POST["csrf_token"];
     $csrf_token_time = $_SESSION["csrf_token_time"];
     $secretKey = '6LfncLgqAAAAAKefUSncQyC01BjUaUTclJ5dXEqb';
@@ -24,8 +27,17 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             $errors["csrf_token_invalid"] = "Invalid CSRF token";
         } elseif (is_recaptcha_invalid($secretKey, $recaptcha_response)) {
             $errors["recaptcha_invalid"] = "The reCAPTCHA verification failed. Please try again!";
-        } elseif (is_input_empty($otp_code)) {
-            $errors["empty_input"] = "Enter an OTP to continue";
+        } else {
+            // Decrypt the data and validate otp input
+            $decryptedData = $encryptionService->decryptFormData($encryptedData);
+            if (!$decryptedData) {
+                $errors["decryption_error"] = "Error decrypting form data. Please try again!";
+            } else {
+                $otp_code = $decryptedData["otp_code"] ?? '';
+                if (is_input_empty($otp_code)) {
+                    $errors["empty_input"] = "Enter an OTP to continue";
+                }
+            }           
         }
 
         if(empty($errors)) {

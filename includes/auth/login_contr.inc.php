@@ -46,7 +46,6 @@ function is_recaptcha_invalid($secretKey, $recaptcha_response) {
 
         // Check for cURL error
         if (curl_errno($ch)) {
-            // $errors[] = 'Error with reCAPTCHA validation. Please try again later.';
             curl_close($ch);
             return true; //error detected
         }
@@ -61,11 +60,9 @@ function is_recaptcha_invalid($secretKey, $recaptcha_response) {
             return false; // no errors
         } else{
             return true; //true that the recaptcha is invalid
-            // $errors[] = "The reCAPTCHA verification failed. Please try again!";
         }
     } else{
         return true; // reCAPTCHA response missing or empty
-        // $errors[] = "Something went wrong, Please try again!";
     }
 }
 

@@ -15,23 +15,19 @@ document.addEventListener("DOMContentLoaded", () => {
         // Close file menu popups
         document.querySelectorAll('.file-menu-popup').forEach(popup => {
             popup.style.display = 'none';
-        });
-        
+        })
         // Close upload form
         if (uploadForm) {
             uploadForm.style.display = 'none';
         }
-        
         // Close open file popup
         if (openFilePopup) {
             openFilePopup.style.display = 'none';
         }
-
         // close download file popup
         if (downloadFilePopup) {
             downloadFilePopup.style.display = 'none';
         }
-
         // deleteFIle popup
         if (deleteFilePopup) {
             deleteFilePopup.style.display = 'none';
@@ -71,10 +67,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 
                 // Get popup element by ID
                 const popup = document.getElementById(popupId);
-                
                 if (!popup) return;
-                
-                // Open popup
                 openPopup(popup);
                 
                 // Update popup title with file name
@@ -91,7 +84,11 @@ document.addEventListener("DOMContentLoaded", () => {
                         fileIdInput = document.createElement('input');
                         fileIdInput.type = 'hidden';
                         fileIdInput.name = 'file_id';
+                        fileIdInput.setAttribute('data-encrypt', 'true');
                         form.appendChild(fileIdInput);
+                    } else {
+                        // Ensure the attribute is set even if the input already exists
+                        fileIdInput.setAttribute('data-encrypt', 'true');
                     }
                     fileIdInput.value = fileId;
 
@@ -102,7 +99,11 @@ document.addEventListener("DOMContentLoaded", () => {
                             fileNameInput = document.createElement('input');
                             fileNameInput.type = 'hidden';
                             fileNameInput.name = 'file_name';
+                            fileNameInput.setAttribute('data-encrypt', 'true');
                             form.appendChild(fileNameInput);
+                        } else {
+                            // Ensure the attribute is set even if the input already exists
+                            fileNameInput.setAttribute('data-encrypt', 'true');
                         }
                         fileNameInput.value = fileName;
                     }
@@ -123,18 +124,15 @@ document.addEventListener("DOMContentLoaded", () => {
             // Get the popup element by ID
             const popupElement = document.getElementById(popupId);
             if (!popupElement) return;
-            
             // Get stored file info from session storage
             const fileId = sessionStorage.getItem('childFileId');
             const fileTitle = sessionStorage.getItem('childFileTitle');
-    
             if (fileId && fileTitle) {
                 // Update popup title
                 const popupTitle = popupElement.querySelector('h2');
                 if (popupTitle) {
                     popupTitle.textContent = fileTitle;
                 }
-    
                 // Set file ID in the form
                 const form = document.getElementById(formId);
                 if (form) {
@@ -143,13 +141,31 @@ document.addEventListener("DOMContentLoaded", () => {
                         fileIdInput = document.createElement('input');
                         fileIdInput.type = 'hidden';
                         fileIdInput.name = 'file_id';
+                        fileIdInput.setAttribute('data-encrypt', 'true');
                         form.appendChild(fileIdInput);
+                    } else {
+                        // Ensure the attribute is set even if the input already exists
+                        fileIdInput.setAttribute('data-encrypt', 'true');
                     }
                     fileIdInput.value = fileId;
+
+                    // If this is a delete or download form, also set the file name
+                    if (formId === 'delete_file_form' || formId === 'download_file_form') {
+                        const fileName = fileTitle.replace(/^(Delete|Download|Preview) /, '');
+                        let fileNameInput = form.querySelector('input[name="file_name"]');
+                        if (!fileNameInput) {
+                            fileNameInput = document.createElement('input');
+                            fileNameInput.type = 'hidden';
+                            fileNameInput.name = 'file_name';
+                            fileNameInput.setAttribute('data-encrypt', 'true');
+                            form.appendChild(fileNameInput);
+                        } else {
+                            fileNameInput.setAttribute('data-encrypt', 'true');
+                        }
+                        fileNameInput.value = fileName;
+                    }
                 }
-                
-                // Show the popup
-                openPopup(popupElement);
+                openPopup(popupElement); // Show the popup
             }
         }
     }
@@ -286,7 +302,6 @@ document.addEventListener("DOMContentLoaded", () => {
     if (openFilePopup) {
         // Initially hide the popup
         openFilePopup.style.display = "none";
-
         openEllipseChild('.file-menu-popup ul li:first-child, .uploaded-files .file .file-title', 'openFile', 'Preview', 'open_file_form', 'input[name="key"]');
         
         // Handle successful file downloads by detecting form submission
@@ -307,12 +322,10 @@ document.addEventListener("DOMContentLoaded", () => {
             });
         }
     }
-
     // Check if we need to show the upload form due to errors
     if (typeof hasUploadErrors !== 'undefined' && hasUploadErrors === true && uploadForm) {
         openPopup(uploadForm);
     }
-
     // Check if we need to show the preview popup due to errors
     showPopupErrors(hasPreviewErrors, 'openFile', 'open_file_form');
 
@@ -320,7 +333,6 @@ document.addEventListener("DOMContentLoaded", () => {
     if (downloadFilePopup) {
         // Initially hide the popup
         downloadFilePopup.style.display = "none";
-
         // Handle "Download" menu item click
         openEllipseChild('.file-menu-popup ul li:nth-child(3)', 'downloadFile', 'Download', 'download_file_form', 'input[name="key"]');
         
@@ -352,14 +364,12 @@ document.addEventListener("DOMContentLoaded", () => {
                 });
             });
         }
-        
         // Handle decrypted download button (the default)
         const decryptedDownloadBtn = document.getElementById("decrypted_download_btn");
         if (decryptedDownloadBtn) {
             // This is handled by the reCAPTCHA callback
         }
     }
-
     // Check if we need to show the preview popup due to errors
     showPopupErrors(hasDownloadErrors, 'downloadFile', 'download_file_form');
 
@@ -367,20 +377,16 @@ document.addEventListener("DOMContentLoaded", () => {
     if (deleteFilePopup) {
         // Initially hide the popup
         deleteFilePopup.style.display = "none";
-
         // Find all "Delete" options in file menus
         openEllipseChild('.file-menu-popup ul li:last-child', 'deleteFile', 'Delete', 'delete_file_form', 'input[name="decryption_key"]');
     }
-
     // Check if we need to show the delete popup due to errors
-    // const hasDeleteErrors = typeof deletePopupErrors !== 'undefined' && deletePopupErrors;
     showPopupErrors(hasDeleteErrors, 'deleteFile', 'delete_file_form');
     
     // Hide any loading overlay that might still be visible
     if (typeof hideLoadingOverlay === 'function') {
         hideLoadingOverlay();
     }
-
     // handle download buttons
     const downloadEncryptedBtn = document.getElementById("download_encrypted_btn");
     if (downloadEncryptedBtn) {
@@ -397,44 +403,43 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 });
 
+// function onSubmit(token) {
+//     const fileInput = document.querySelector('input[type="file"]');
+//     if (fileInput && fileInput.files.length > 0) {
+//         showUploadProgress();
+//     }
+//     document.getElementById("file_upload_form").submit();
+// }
 
-function onSubmit(token) {
-    const fileInput = document.querySelector('input[type="file"]');
-    if (fileInput && fileInput.files.length > 0) {
-        showUploadProgress();
-    }
-    document.getElementById("file_upload_form").submit();
-}
-
-// Function for the preview form submission
-function onSubmitPreview(token) {
-    const keyInput = document.querySelector('#open_file_form input[name="key"]');
-    if (typeof showLoadingOverlay === 'function' && keyInput && keyInput.value.length > 0) {
-        showLoadingOverlay("Decrypting file...");
-    }
-    document.getElementById("open_file_form").submit();
-}
+// // Function for the preview form submission
+// function onSubmitPreview(token) {
+//     const keyInput = document.querySelector('#open_file_form input[name="key"]');
+//     if (typeof showLoadingOverlay === 'function' && keyInput && keyInput.value.length > 0) {
+//         showLoadingOverlay("Decrypting file...");
+//     }
+//     document.getElementById("open_file_form").submit();
+// }
 
 // Function for download form submission (reCAPTCHA callback)
-function onSubmitDownload(token) {
-    document.getElementById("download_action").value = "decrypted";
-    const keyInput = document.querySelector('#download_file_form input[name="key"]');
+// function onSubmitDownload(token) {
+//     document.getElementById("download_action").value = "decrypted";
+//     const keyInput = document.querySelector('#download_file_form input[name="key"]');
     
-    if (keyInput && keyInput.value.length > 0) {
-        if (typeof showLoadingOverlay === 'function') {
-            showLoadingOverlay("Decrypting and downloading file...");
-        }
-        document.getElementById("download_file_form").submit();
-    } else {
-        alert("Please enter a decryption key to download the decrypted file.");
-        return false;
-    }
-}
+//     if (keyInput && keyInput.value.length > 0) {
+//         if (typeof showLoadingOverlay === 'function') {
+//             showLoadingOverlay("Decrypting and downloading file...");
+//         }
+//         document.getElementById("download_file_form").submit();
+//     } else {
+//         alert("Please enter a decryption key to download the decrypted file.");
+//         return false;
+//     }
+// }
 
-function onSubmitDelete(token) {
-    const deleteInput = document.querySelector('#delete_file_form input[name="decryption_key"]');
-    if (deleteInput && deleteInput.value.length > 0 && /^[0-9a-fA-F]{64}$/.test(deleteInput.value)) {
-        showDeleteProgress();
-    }
-    document.getElementById("delete_file_form").submit();
-}
+// function onSubmitDelete(token) {
+//     const deleteInput = document.querySelector('#delete_file_form input[name="decryption_key"]');
+//     if (deleteInput && deleteInput.value.length > 0 && /^[0-9a-fA-F]{64}$/.test(deleteInput.value)) {
+//         showDeleteProgress();
+//     }
+//     document.getElementById("delete_file_form").submit();
+// }

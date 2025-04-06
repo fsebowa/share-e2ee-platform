@@ -6,8 +6,8 @@ function signup_inputs() {
     echo '
     <div class="form-inputs">
         <div class="form-box">
-            <input type="text" id="first_name" name="first-name" placeholder="First Name" value="'. $_SESSION["signup_data"]["first_name"].'">
-            <input type="text" id="last_name" name="last-name" placeholder="Last Name" value="'. $_SESSION["signup_data"]["last_name"].'">
+            <input type="text" id="first_name" name="first-name" placeholder="First Name" data-encrypt="true" value="'. $_SESSION["signup_data"]["first_name"].'">
+            <input type="text" id="last_name" name="last-name" placeholder="Last Name" data-encrypt="true" value="'. $_SESSION["signup_data"]["last_name"].'">
         </div>';
     
     if (isset($_SESSION["signup_data"]["email"]) && !isset($_SESSION["errors_signup"]["email_used"]) && !isset($_SESSION["errors_signup"]["invalid_email"])) {

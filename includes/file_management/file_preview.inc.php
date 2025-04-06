@@ -3,43 +3,63 @@ require_once __DIR__ . '/../config/config_session.inc.php';
 require_once __DIR__ . '/../auth/auth_checker.inc.php';
 require_once __DIR__ . '/../encryption/file_encryption.inc.php';
 require_once __DIR__ . '/file_contr.inc.php';
+require_once __DIR__ . '/../encryption/encryption_service.inc.php';
 
 check_login_otp_status();
 
 if ($_SERVER["REQUEST_METHOD"] === "POST" || (isset($_GET['stream']) && isset($_GET['file_id']))) {
-    
     $user_id = $_SESSION["user_id"] ?? null;
-    
     session_write_close();    // Close session write to allow parallel requests (crucial for video streaming)
     
     $is_streaming_request = isset($_GET['stream']) && isset($_GET['file_id']);
-    
+    $errors = [];
+
     if ($is_streaming_request) {
         $file_id = $_GET['file_id']; // For streaming requests, get file_id from GET
         $decryption_key = $_GET['key'] ?? null;
+        
+        // Validate streaming request parameters
+        if (empty($file_id) || empty($decryption_key)) {
+            $errors["empty_inputs"] = "Missing required parameters for streaming";
+        } elseif (!empty($decryption_key) && (strlen($decryption_key) != 64 || !ctype_xdigit($decryption_key))) {
+            $errors["wrong_key_length"] = "Invalid key format for streaming";
+        }
     } else {
         // For initial requests, get data from POST
-        $file_id = $_POST["file_id"] ?? null;
-        $decryption_key = $_POST["key"] ?? null;
+        // Initialize encryption service
+        $encryptionService = new EncryptionService();
+        $encryptedData = $_POST["encrypted_data"] ?? null;
         $csrf_token = $_POST["csrf_token"] ?? null;
         $csrf_token_time = $_SESSION["csrf_token_time"] ?? null;
         $recaptcha_response = $_POST["g-recaptcha-response"] ?? null;
         $secretKey = '6LfncLgqAAAAAKefUSncQyC01BjUaUTclJ5dXEqb';
-    }
 
-    $errors = [];
-
-    if (!$is_streaming_request) {
+        // Validate CSRF and reCAPTCHA
         if (csrf_token_expired($csrf_token_time)) {
             $errors["csrf_token_expired"] = "Session token expired. Try again!";
         } elseif (csrf_token_invalid($csrf_token)) {
             $errors["csrf_token_invalid"] = "Invalid CSRF token";
         } elseif(is_recaptcha_invalid($secretKey, $recaptcha_response)) {
             $errors["invalid_recaptcha"] = "The reCAPTCHA verification failed. Please try again!";
-        } elseif (empty($file_id) || empty($decryption_key)) {
-            $errors["empty_inputs"] = "One or more fields are empty";
-        } elseif (!empty($decryption_key) && (strlen($decryption_key) != 64 || !ctype_xdigit($decryption_key))) {
-            $errors["wrong_key_length"] = "Key must be exactly 64 hex characters (256-bit key)";
+        } elseif (!$encryptedData) {
+            $errors["encryption_error"] = "Failed to process encrypted form data. Please try again!";
+        } else {
+            // Decrypt the form data
+            $decryptedData = $encryptionService->decryptFormData($encryptedData);
+            if (!$decryptedData) {
+                $errors["decryption_error"] = "Error decrypting form data. Please try again!";
+            } else {
+                // Extract data from decrypted payload
+                $file_id = $decryptedData["file_id"] ?? null;
+                $decryption_key = $decryptedData["key"] ?? null;
+                
+                // Validate decrypted data
+                if (empty($file_id) || empty($decryption_key)) {
+                    $errors["empty_inputs"] = "One or more fields are empty";
+                } elseif (!empty($decryption_key) && (strlen($decryption_key) != 64 || !ctype_xdigit($decryption_key))) {
+                    $errors["wrong_key_length"] = "Key must be exactly 64 hex characters (256-bit key)";
+                }
+            }
         }
     }
 
@@ -60,35 +80,28 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" || (isset($_GET['stream']) && isset($_
                 
                 // Create a unique but deterministic filename based on file_id and user_id
                 $temp_file = $temp_dir . '/decrypted_' . $user_id . '_' . $file_id . '_' . md5(basename($file_info['original_filename']));
-                $needs_decryption = !$is_streaming_request || !file_exists($temp_file); // decrypt files for initial request
+                $needs_decryption = !file_exists($temp_file); // decrypt only if file doesn't exist
 
                 if ($needs_decryption) {
                     // Initialize encryption service
                     $encryption_service = new FileEncryptionService();
                     
-                    // Convert hex key (64 chars) to binary key (32 bytes)
-                    if (!$is_streaming_request) {
-                        // Validate the key format first
-                        if (!ctype_xdigit($decryption_key) || strlen($decryption_key) !== 64) {
-                            $errors["invalid_key"] = "Invalid key format. The key must be 64 hexadecimal characters.";
-                        }
+                    // Validate the key format
+                    if (!ctype_xdigit($decryption_key) || strlen($decryption_key) !== 64) {
+                        $errors["invalid_key"] = "Invalid key format. The key must be 64 hexadecimal characters.";
                     }
-                    
                     if (empty($errors)) {
                         // Convert hex to binary
                         $binary_key = hex2bin($decryption_key);
-                        
                         // Debug log key info
                         error_log("Decryption key length (hex): " . strlen($decryption_key));
                         error_log("Decryption key length (binary): " . strlen($binary_key));
-                        
                         // Attempt decryption
                         $decryption_result = $encryption_service->decrypt_file(
                             $file_info["file_path"],
                             $binary_key,
                             $temp_file
                         );
-
                         // Check if decryption was successful
                         if (!$decryption_result['success']) {
                             $error_message = $decryption_result['message'] ?? "Failed to decrypt file. Check your decryption key.";
