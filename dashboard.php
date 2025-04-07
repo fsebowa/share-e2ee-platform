@@ -35,9 +35,6 @@
     <script src="/js/progress-bar.js"></script>
     <script src="/js/form-encryption.js"></script>
     <script src="/js/dashboard_func.js"></script>
-    <script>
-        let closeAllPopups;
-    </script>
 </head>
 <body class="dashboard">
     <?php include __DIR__ . "/includes/templates/dashboard_nav.php"; ?>
@@ -149,7 +146,7 @@
                     check_file_delete_errors();
                     check_delete_success_messages();
                     check_file_download_errors();
-                    check_dowanload_success_messages();
+                    check_download_success_messages();
                 ?>
             </div>
 
@@ -221,19 +218,39 @@
                 <span class="caption-text" style="font-size: 14px;">Your files are end-to-end encrypted</span>
             </div>
 
+            <!-- Share file popup -->
+            <div class="file-ellipse-popup" id="shareFile">
+                <form action="/includes/file_management/file_share.inc.php" method="post" id="share_file_form" class="secure-form">
+                    <h2></h2> 
+                    <p class="caption-text">Share this file securely</p>
+                    <div class="form-inputs">
+                        <input type="text" id="email" name="email" placeholder="Recipient's email address" data-encrypt="true">
+                        <input type="text" id="decryption_key" name="key" placeholder="Enter decryption key" data-encrypt="true">
+                        <input type="hidden" name="csrf_token" value="<?php echo $token ?? ''; ?>">
+                    </div>
+                    <button class="g-recaptcha btn black-btn" 
+                        data-sitekey="6LfncLgqAAAAABiQR-6AYNqjYPE2wFS5WsrPBAEj" 
+                        data-callback='onSubmitShare' 
+                        data-action='submit'>Share</button><br>
+                </form>
+                <span class="caption-text" style="font-size: 14px;">The file will be encrypted and the key will be sent separately</span>
+            </div>
+
             <!-- Download file popup -->
             <div class="file-ellipse-popup" id="downloadFile">
-                <form action="/includes/file_management/file_download.inc.php" method="post" id="download_file_form">
+                <form action="/includes/file_management/file_download.inc.php" method="post" id="download_file_form" class="secure-form">
                     <h2></h2> <!-- File name will be inserted here dynamically-->
                     <p class="caption-text">Select download option:</p>
                     <div class="form-inputs">
                         <div id="decryption_key_container">
-                            <input type="text" id="decryption_key" name="key" placeholder="Enter decryption key for decrypted download">
+                            <input type="text" id="decryption_key" name="key" placeholder="Enter decryption key to verify download" data-encrypt="true" >
+                            <p class="caption-text" style="margin-top: 5px; color: #555;">
+                                Your decryption key is required for both download options
+                            </p>
                         </div>
                         <input type="hidden" name="csrf_token" value="<?php echo $token ?? ''; ?>">
-                        <input type="hidden" name="download_action" id="download_action" value="decrypted">
+                        <input type="hidden" name="download_action" id="download_action" value="decrypted" data-encrypt="true">
                     </div>
-                    
                     <div class="download-buttons">
                         <!-- Single reCAPTCHA button for decrypted download -->
                         <button id="decrypted_download_btn" class="g-recaptcha btn black-btn" 
@@ -250,10 +267,9 @@
                 <span class="caption-text" style="font-size: 14px;">Your files are end-to-end encrypted</span>
             </div>
 
-
             <!-- Delete file popup -->
             <div class="file-ellipse-popup" id="deleteFile">
-                <form action="/includes/file_management/file_delete.inc.php" method="post" id="delete_file_form">
+                <form action="/includes/file_management/file_delete.inc.php" method="post" id="delete_file_form" class="secure-form">
                     <h2></h2> <!-- File name will be inserted here dynamically using JavaScript-->
                     <p class="error-danger">This will permanently delete the file and cannot be undone.</p> <br>
                     <p class="caption-text">For security, please enter the decryption key for this file to confirm deletion.</p>
@@ -279,8 +295,8 @@
     </div>
     <?php include __DIR__ . "/includes/templates/footer.php"; ?>
     <script>
-        // File input change handler
         document.addEventListener('DOMContentLoaded', function() {
+            // File input change handler
             const fileInput = document.getElementById('file');
             if (fileInput) {
                 fileInput.addEventListener('change', function() {
@@ -290,20 +306,334 @@
                     }
                 });
             }
-        });
-        if (typeof window.onSubmitPreview !== 'function') {
-            window.onSubmitPreview = function(token) {
-                console.log("onSubmitPreview called");
-                const form = document.getElementById('open_file_form');
-                if (form) {
-                    const keyInput = form.querySelector('input[name="key"]');
-                    if (keyInput && keyInput.value.length > 0) {
-                        showLoadingOverlay("Decrypting file...");
+
+             // Enhanced file preview submission with encryption
+            const openFileForm = document.getElementById('open_file_form');
+            const previewBtn = openFileForm ? openFileForm.querySelector('button') : null;
+            
+            if (previewBtn && openFileForm) {
+                // Replace with a new button to remove existing listeners
+                const newBtn = previewBtn.cloneNode(true);
+                previewBtn.parentNode.replaceChild(newBtn, previewBtn);
+                
+                // Add enhanced click handler with proper encryption
+                newBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    
+                    // Get key input
+                    const keyInput = openFileForm.querySelector('input[name="key"]');
+                    
+                    // Validate key
+                    if (!keyInput || keyInput.value.trim() === '') {
+                        alert("Please enter a decryption key to preview the file.");
+                        return;
                     }
-                    form.submit();
+                    
+                    // Show loading overlay
+                    if (typeof showLoadingOverlay === 'function') {
+                        showLoadingOverlay("Decrypting file for preview...");
+                    }
+                    
+                    // Set a timeout to hide the overlay after a reasonable time
+                    setTimeout(function() {
+                        if (typeof hideLoadingOverlay === 'function') {
+                            hideLoadingOverlay();
+                        }
+                        
+                        // Also close any open popups
+                        if (typeof closeAllPopups === 'function') {
+                            closeAllPopups();
+                        }
+                    }, 4000);
+                    
+                    // Get all sensitive fields that need encryption
+                    const sensitiveFields = openFileForm.querySelectorAll('[data-encrypt="true"]');
+                    
+                    // If no fields require encryption, just submit the form
+                    if (sensitiveFields.length === 0) {
+                        openFileForm.submit();
+                        return;
+                    }
+                    
+                    try {
+                        // Create payload from sensitive fields
+                        let payload = {};
+                        sensitiveFields.forEach(field => {
+                            payload[field.name] = field.value;
+                            
+                            // Disable original field to prevent it from being submitted
+                            field.disabled = true;
+                            
+                            // Create hidden field with empty value
+                            let hiddenField = openFileForm.querySelector(`input[type="hidden"][name="${field.name}"]`);
+                            if (!hiddenField) {
+                                hiddenField = document.createElement('input');
+                                hiddenField.type = 'hidden';
+                                hiddenField.name = field.name;
+                                openFileForm.appendChild(hiddenField);
+                            }
+                            hiddenField.value = '';
+                        });
+                        
+                        // Get server public key
+                        const publicKey = window.SERVER_PUBLIC_KEY;
+                        if (!publicKey) {
+                            throw new Error("Server public key not found");
+                        }
+                        
+                        // Encrypt data
+                        const encrypt = new JSEncrypt();
+                        encrypt.setPublicKey(publicKey);
+                        const encryptedData = encrypt.encrypt(JSON.stringify(payload));
+                        
+                        if (!encryptedData) {
+                            throw new Error("Encryption failed");
+                        }
+                        
+                        // Add encrypted data to form
+                        let encryptedField = openFileForm.querySelector('input[name="encrypted_data"]');
+                        if (!encryptedField) {
+                            encryptedField = document.createElement('input');
+                            encryptedField.type = 'hidden';
+                            encryptedField.name = 'encrypted_data';
+                            openFileForm.appendChild(encryptedField);
+                        }
+                        encryptedField.value = encryptedData;
+                        
+                        // Add recaptcha token if needed
+                        let tokenInput = openFileForm.querySelector('input[name="g-recaptcha-response"]');
+                        if (!tokenInput) {
+                            tokenInput = document.createElement('input');
+                            tokenInput.type = 'hidden';
+                            tokenInput.name = 'g-recaptcha-response';
+                            openFileForm.appendChild(tokenInput);
+                        }
+                        tokenInput.value = 'bypass_token';
+                        
+                        // Submit the form
+                        openFileForm.submit();
+                        
+                    } catch (error) {
+                        console.error("Encryption error:", error);
+                        
+                        // Re-enable fields on error
+                        sensitiveFields.forEach(field => {
+                            field.disabled = false;
+                        });
+                        
+                        hideLoadingOverlay();
+                        alert("Error encrypting form data. Please try again.");
+                    }
+                });
+                
+                // Remove any data-callback attribute to prevent double processing
+                newBtn.removeAttribute('data-callback');
+            }
+            // Make sure we don't lose the SERVER_PUBLIC_KEY on page load
+            if (!window.SERVER_PUBLIC_KEY && typeof SERVER_PUBLIC_KEY !== 'undefined') {
+                window.SERVER_PUBLIC_KEY = SERVER_PUBLIC_KEY;
+            }
+            
+            // Enhanced download button handlers with proper encryption
+            function setupDownloadButtons() {
+                console.log("Setting up download buttons with clean handlers");
+                
+                // 1. Decrypted download button - replace any existing handler
+                const decryptBtn = document.getElementById('decrypted_download_btn');
+                if (decryptBtn) {
+                    // Clone to remove all existing handlers
+                    const newDecryptBtn = decryptBtn.cloneNode(true);
+                    if (decryptBtn.parentNode) {
+                        decryptBtn.parentNode.replaceChild(newDecryptBtn, decryptBtn);
+                    }
+                    
+                    // Add clean handler with proper encryption
+                    newDecryptBtn.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        
+                        // Process the download with decryption
+                        processDownload('decrypted');
+                    });
+                    
+                    // Remove any data-callback attribute to prevent double processing
+                    newDecryptBtn.removeAttribute('data-callback');
                 }
-            };
-        }
+                
+                // 2. Encrypted download button - replace any existing handler
+                const encryptBtn = document.getElementById('encrypted_download_btn');
+                if (encryptBtn) {
+                    // Clone to remove all existing handlers
+                    const newEncryptBtn = encryptBtn.cloneNode(true);
+                    if (encryptBtn.parentNode) {
+                        encryptBtn.parentNode.replaceChild(newEncryptBtn, encryptBtn);
+                    }
+                    
+                    // Add clean handler with proper encryption
+                    newEncryptBtn.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        
+                        // Process the download without decryption
+                        processDownload('encrypted');
+                    });
+                }
+            }
+            
+            // Clean implementation of download processing with proper encryption
+            function processDownload(downloadType) {
+                const form = document.getElementById('download_file_form');
+                if (!form) {
+                    console.error('Download form not found');
+                    return;
+                }
+                
+                // Validate the form input
+                const keyInput = form.querySelector('input[name="key"]');
+                if (!keyInput || keyInput.value.trim() === '') {
+                    alert("Please enter a decryption key to verify your ownership of this file.");
+                    return;
+                }
+                
+                // Set the download action
+                const actionInput = form.querySelector('input[name="download_action"]');
+                if (actionInput) {
+                    actionInput.value = downloadType;
+                } else {
+                    // Create the action input if it doesn't exist
+                    const newActionInput = document.createElement('input');
+                    newActionInput.type = 'hidden';
+                    newActionInput.name = 'download_action';
+                    newActionInput.value = downloadType;
+                    form.appendChild(newActionInput);
+                }
+                
+                // Show appropriate loading message
+                const loadingMessage = downloadType === 'encrypted' 
+                    ? "Downloading encrypted file..." 
+                    : "Decrypting and downloading file...";
+                
+                if (typeof showLoadingOverlay === 'function') {
+                    showLoadingOverlay(loadingMessage);
+                }
+                
+                // Record that a download is starting for timer-based overlay hiding
+                sessionStorage.setItem('downloadStarted', Date.now().toString());
+                
+                // Set a timeout to hide the overlay after download likely started
+                setTimeout(function() {
+                    console.log("Download timer completed");
+                    
+                    // Hide the overlay
+                    if (typeof hideLoadingOverlay === 'function') {
+                        hideLoadingOverlay();
+                    }
+                    
+                    // Close any open popups
+                    if (typeof closeAllPopups === 'function') {
+                        closeAllPopups();
+                    }
+                    
+                    // Clear download tracking
+                    sessionStorage.removeItem('downloadStarted');
+                }, 4000);
+                
+                // Encrypt the form data
+                try {
+                    // Get sensitive fields
+                    const sensitiveFields = form.querySelectorAll('[data-encrypt="true"]');
+                    
+                    // Create payload
+                    let payload = {};
+                    sensitiveFields.forEach(field => {
+                        console.log("Adding field to payload:", field.name, field.value);
+                        payload[field.name] = field.value;
+                        
+                        // Disable the original field
+                        field.disabled = true;
+                        
+                        // Create hidden field to preserve form structure
+                        const hiddenField = document.createElement('input');
+                        hiddenField.type = 'hidden';
+                        hiddenField.name = field.name;
+                        hiddenField.value = '';
+                        form.appendChild(hiddenField);
+                    });
+                    
+                    // Add file ID if not already in payload
+                    const fileIdInput = form.querySelector('input[name="file_id"]');
+                    if (fileIdInput && fileIdInput.value && !payload.file_id) {
+                        payload.file_id = fileIdInput.value;
+                    }
+                    
+                    // Check if server public key is available
+                    if (!window.SERVER_PUBLIC_KEY) {
+                        console.error("Server public key not available for encryption");
+                        alert("Encryption key not available. Please refresh the page and try again.");
+                        return;
+                    }
+                    
+                    // Encrypt the payload
+                    const encrypt = new JSEncrypt();
+                    encrypt.setPublicKey(window.SERVER_PUBLIC_KEY);
+                    const encryptedData = encrypt.encrypt(JSON.stringify(payload));
+                    
+                    if (!encryptedData) {
+                        throw new Error("Encryption failed");
+                    }
+                    
+                    // Add encrypted data to form
+                    let encryptedField = form.querySelector('input[name="encrypted_data"]');
+                    if (!encryptedField) {
+                        encryptedField = document.createElement('input');
+                        encryptedField.type = 'hidden';
+                        encryptedField.name = 'encrypted_data';
+                        form.appendChild(encryptedField);
+                    }
+                    encryptedField.value = encryptedData;
+                    
+                    // Add reCAPTCHA token
+                    let tokenInput = form.querySelector('input[name="g-recaptcha-response"]');
+                    if (!tokenInput) {
+                        tokenInput = document.createElement('input');
+                        tokenInput.type = 'hidden';
+                        tokenInput.name = 'g-recaptcha-response';
+                        form.appendChild(tokenInput);
+                    }
+                    tokenInput.value = 'bypass_token';
+                    
+                    // Submit the form
+                    console.log("Submitting download form with encrypted data");
+                    form.submit();
+                    
+                } catch (error) {
+                    console.error("Error processing download:", error);
+                    
+                    // Re-enable fields on error
+                    const sensitiveFields = form.querySelectorAll('[data-encrypt="true"]');
+                    sensitiveFields.forEach(field => {
+                        field.disabled = false;
+                    });
+                    
+                    // Hide overlay and show error
+                    if (typeof hideLoadingOverlay === 'function') {
+                        hideLoadingOverlay();
+                    }
+                    alert("Error processing download request. Please try again.");
+                }
+            }
+            
+            // Setup download buttons when DOM is loaded
+            setupDownloadButtons();
+            
+            // Force hide any visible overlay on load
+            setTimeout(function() {
+                if (typeof hideLoadingOverlay === 'function') {
+                    hideLoadingOverlay();
+                }
+            }, 500);
+        });
     </script>
 </body>
 </html>

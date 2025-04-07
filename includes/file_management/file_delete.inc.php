@@ -92,7 +92,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                     $errors["invalid_key"] = $error_message;
                 } else { // Key is valid, proceed with deletion
                     
-                    // Get original filename before deletion
+                    // Get original filename, upload date and file-size before deletion
                     $original_filename = $file_info["original_filename"] ?? "Unknown";
                     $file_size = number_format($file_info["file_size"] / 1024 /1024, 2) ?? "Unknown";
                     $upload_date = $file_info["date_uploaded"] ?? "Unknown";
@@ -131,12 +131,10 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                                 $mail->SMTPAuth = true;
                                 $mail->Username = 'share.e2eeplatform@gmail.com';
                                 $mail->Password = 'vczc yawy voeo nkbk';
-
                                 // Recipients
                                 $mail->setFrom('otp-verification@share.com', 'Share E2EE Platform');
                                 $mail->addReplyTo('no-reply@share.com', 'Share E2EE Platform');
                                 $mail->addAddress($_SESSION["email"] ?? get_user_email_by_id($pdo, $_SESSION["user_id"]), $_SESSION["user_data"]["first_name"] . " " . $_SESSION["user_data"]["last_name"]);
-
                                 // Content
                                 $mail->isHTML(true);
                                 $mail->Subject = 'File Deletion Confirmation: ' . $file_name;

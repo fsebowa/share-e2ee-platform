@@ -50,6 +50,18 @@ function check_file_delete_errors() {
     }
 }
 
+function load_success_messages($success_session_name) {
+    if (isset($success_session_name)) {
+        $success = $success_session_name;
+        echo '<div class="success-messages" id="successMessage">';
+        foreach ($success as $suc) {
+            echo '<p class="success-message">' . $suc . '</p>';
+        }
+        echo '</div>';
+        unset($success_session_name);
+    }
+}
+
 function check_upload_success_messages() {
     if (isset($_SESSION["success_file"])) {
         $success = $_SESSION["success_file"];
@@ -62,7 +74,8 @@ function check_upload_success_messages() {
     }
 }
 
-function check_dowanload_success_messages() {
+function check_download_success_messages() {
+    // load_success_messages($_SESSION["success_file_download"]);
     if (isset($_SESSION["success_file_download"])) {
         $success = $_SESSION["success_file_download"];
         echo '<div class="success-messages" id="successMessage">';

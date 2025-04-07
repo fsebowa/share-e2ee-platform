@@ -100,11 +100,27 @@ function get_file_by_id(object $pdo, int $file_id, int $user_id) {
 }
 
 function logFileDownload(object $pdo, int $file_id, int $user_id, string $download_type) {
-    $query = "INSERT INTO file_downloads (file_id, user_id, download_type, download_date) 
-            VALUES (:file_id, :user_id, :download_type, NOW())";
-    $stmt = $pdo->prepare($query);
-    $stmt->bindParam(":file_id", $file_id);
-    $stmt->bindParam(":user_id", $user_id);
-    $stmt->bindParam(":download_type", $download_type);
-    $stmt->execute();
+    try {
+        // Check if the table exists first
+        $check_query = "SELECT 1 FROM information_schema.tables WHERE table_schema = DATABASE() AND table_name = 'file_downloads'";
+        $stmt = $pdo->prepare($check_query);
+        $stmt->execute();
+        if ($stmt->fetchColumn()) {
+            // Table exists, log the download
+            $query = "INSERT INTO file_downloads (file_id, user_id, download_type, download_date) 
+                    VALUES (:file_id, :user_id, :download_type, NOW())";
+            $stmt = $pdo->prepare($query);
+            $stmt->bindParam(":file_id", $file_id);
+            $stmt->bindParam(":user_id", $user_id);
+            $stmt->bindParam(":download_type", $download_type);
+            $stmt->execute();
+            return true;
+        }
+        // Table doesn't exist, but that's okay - we'll just skip logging
+        return false;
+    } catch (PDOException $e) {
+        // Log error but don't interrupt the download
+        error_log("Failed to log file download: " . $e->getMessage());
+        return false;
+    }
 }
