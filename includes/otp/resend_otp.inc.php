@@ -62,9 +62,9 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
             // Content
             $mail->isHTML(true);
-            $mail->Subject = 'OTP Verification Code';
+            $mail->Subject = 'New OTP Verification Code';
             $mail->Body = $template;
-            $mail->AltBody = 'Enter the code below to complete the sign in request'. $otp_code;
+            $mail->AltBody = 'Enter the new code below to complete the sign in request'. $otp_code;
 
             //send the otp, check for errors
             if (!$mail->send()) {

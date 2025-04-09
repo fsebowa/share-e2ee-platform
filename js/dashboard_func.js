@@ -1,6 +1,7 @@
 let closeAllPopups; // make it available globally
 
 document.addEventListener("DOMContentLoaded", () => {
+    // cleanupShareURL();
     // Global variables for popup management
     const uploadForm = document.querySelector(".upload-form");
     const openFilePopup = document.getElementById("openFile");
@@ -8,6 +9,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const deleteFilePopup = document.getElementById("deleteFile");
     const addFileButton = document.getElementById("add_file");
     const profilePopup = document.querySelector(".profile-popup");
+    const shareFilePopup = document.getElementById('shareFile');
 
     // ------- POPUP MANAGEMENT ---------
     // Function to close all popups - make it available globally
@@ -40,6 +42,14 @@ document.addEventListener("DOMContentLoaded", () => {
         // Close profile popup
         if (profilePopup) {
             profilePopup.style.display = 'none';
+        }
+        // close share file popup
+        if (shareFilePopup) {
+            shareFilePopup.style.display = 'none';
+        }
+
+        if (typeof cleanupUrlState === 'function') {
+            cleanupUrlState();
         }
     };
     
@@ -557,12 +567,43 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Check if we need to show the delete popup due to errors
     showPopupErrors(hasDeleteErrors, 'deleteFile', 'delete_file_form');
+
+    // Check if we need to show the share popup due to errors
+    // showPopupErrors(shareErrors, 'shareFile', 'share_file_form');
+    if (typeof shareErrors != 'undefined'  && shareErrors ===  true) {
+        const fileId = new URLSearchParams(window.location.search).get('file_id');
+        if (fileId) {
+            const fileElement = document.querySelector(`file[data-file-id="${fileId}"]`);
+            const fileName = fileElement ? fileElement.querySelector(".file-title").textContent.trim() : "File";
+            const sharePopup = document.getElementById('shareFile');
+            if (sharePopup) {
+                openPopup(sharePopup);
+                // update title
+                const popupTitle = sharePopup.querySelector('h2');
+                if (popupTitle) {
+                    popupTitle.textContent = `Share ${fileName}`;
+                }
+                // update hidden file_id
+                const fileIdInput = sharePopup.querySelector('input[name="file_id"]');
+                if (fileIdInput) {
+                    fileIdInput.value = fileId;
+                }
+                // make form visible
+                const formArea = sharePopup.querySelector('form');
+                const successArea = sharePopup.querySelector('.share-success');
+                if (formArea) {
+                    formArea.style.display = 'block';
+                }
+                if (successArea) {
+                    successArea.style.display = 'none';
+                }
+            }
+        }
+
+    }
     
     // Hide any loading overlay that might still be visible
     if (typeof hideLoadingOverlay === 'function') {
         hideLoadingOverlay();
     }
 });
-
-// Remove the global functions - these will be handled by form-encryption.js
-// onSubmit, onSubmitPreview, onSubmitDownload, and onSubmitDelete should be defined there

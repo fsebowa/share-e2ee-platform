@@ -12,6 +12,7 @@ a {
     text-decoration: none;
     cursor: pointer;
     transition: 0.5s;
+    color: inherit;
 }
 
 .container {
@@ -324,6 +325,7 @@ form input:focus-visible {
 .error-messages,
 .success-messages {
     text-align: center;
+    font-size: 14px;
     background-color: #ffffff;
     padding: 15px 20px;
     border-radius: 5px;
@@ -907,4 +909,154 @@ nav button,
 
 .file-ellipse-popup form button {
     margin-bottom: 20px;
+}
+
+/* Share popup */
+/* .file-ellipse-popup {
+    width: 550px !important;
+} */
+
+#shareFile form select {
+    text-align: left !important;
+    padding: 5px;
+    box-shadow: 0px 3px 8px -6px rgba(0,0,0,0.8);
+}
+
+#shareFile form label {
+    display: block;
+    text-align: left;
+    padding: 10px 0;
+    /* width: 100%; */
+}
+
+#shareFile .form-box {
+    justify-content: flex-start; 
+    padding-bottom: 5px;
+    align-items: center;
+}
+
+/* #shareFile .form-box {
+    width: 100%;
+    gap: 0;
+} */
+
+#shareFile .form-inputs {
+    /* border: 1px solid #a2a2a2; */
+    /* padding: 10px; */
+    border-radius: 10px;
+}
+
+.share-success {
+    display: none;
+    padding: 0 20px;
+}
+
+.share-success input {
+    color: blue;
+    text-decoration: underline;
+    width: 100%;
+    padding: 15px 20px;
+    border-radius: 8px;
+    border: 1px solid #CFCFCF;
+    margin: 7px 0;
+    font-size: 15px;
+}
+
+.share-success h3 {
+    color: green;
+}
+.copy-field {
+    position: relative;
+    margin: 15px 0;
+}
+.copy-field input {
+    width: 100%;
+    padding-right: 40px;
+}
+.copy-button {
+    position: absolute;
+    right: -20px;
+    top: 60%;
+    transform: translate(0, -50%);
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding-right: 40px !important;
+}
+
+.copied-message {
+    display: none;
+    color: green;
+    font-size: 14px;
+    margin-left: 10px;
+}
+
+.share-options-dialog {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 450px;
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0px 0px 56px -18px rgba(0, 0, 0, 0.75);
+    z-index: 1000;
+    display: none;
+}
+
+.share-options-dialog h3 {
+    margin-top: 0;
+}
+
+.share-buttons {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+}
+
+.share-buttons button {
+    padding: 10px 20px;
+}
+
+/* Style for the shares list in dashboard */
+.file-shares-list {
+    margin-top: 20px;
+    border: 1px solid #7C7B7B;
+    border-radius: 5px;
+    padding: 15px;
+}
+
+.file-shares-list h4 {
+    margin-top: 0;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 10px;
+}
+
+.share-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 0;
+    border-bottom: 1px solid #f5f5f5;
+}
+
+.share-item:last-child {
+    border-bottom: none;
+}
+
+.share-details span {
+    display: block;
+    font-size: 13px;
+    color: #7C7B7B;
+}
+
+.share-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.share-actions button {
+    padding: 5px 10px;
+    font-size: 12px;
 }

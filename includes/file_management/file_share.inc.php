@@ -1,13 +1,22 @@
 <?php
+declare(strict_types=1);
+
 require_once __DIR__ . '/../config/config_session.inc.php';
 require_once __DIR__ . '/../auth/auth_checker.inc.php';
-require_once __DIR__ . '/../encryption/file_encryption.inc.php';
-require_once __DIR__ . '/file_contr.inc.php';
 require_once __DIR__ . '/../encryption/encryption_service.inc.php';
+require_once __DIR__ . '/../encryption/file_encryption.inc.php';
 
-check_login_otp_status();
+// Ensure user is logged in and verified
+if (!check_login_otp_status()) {
+    exit();
+}
 
-if ($_SERVER["REQUEST_METHOD"] === "POST" || (isset($_GET['stream']) && isset($_GET['file_id']))) {
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\Exception;
+use PHPMailer\PHPMailer\SMTP;
+require __DIR__ . '/../../vendor/autoload.php';
+
+if ($_SERVER["REQUEST_METHOD"] === "POST") {
     // Initialize encryption service for form data
     $encryptionService = new EncryptionService();
     $encryptedData = $_POST["encrypted_data"] ?? null;
@@ -22,295 +31,230 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" || (isset($_GET['stream']) && isset($_
         require_once __DIR__ . '/../config/dbh.inc.php';
         require_once __DIR__ . '/file_model.inc.php';
         require_once __DIR__ . '/file_contr.inc.php';
-
+        require_once __DIR__ . '/../share/share_model.inc.php';
+        require_once __DIR__ . '/../share/share_contr.inc.php';
+        
+        // Get user ID from session
+        $user_id = $_SESSION["user_id"];
+        
+        // Error handling
         $errors = [];
         $success = [];
-
-        // Validate inputs and security checks
+        
+        // Check CSRF token
         if (csrf_token_expired($csrf_token_time)) {
             $errors["csrf_token_expired"] = "Session token expired. Try again!";
-        } elseif (csrf_token_invalid($csrf_token)) {
+        } elseif ($csrf_token != $_SESSION['csrf_token']) {
             $errors["csrf_token_invalid"] = "Invalid CSRF token";
-        } elseif(is_recaptcha_invalid($secretKey, $recaptcha_response)) {
-            $errors["invalid_recaptcha"] = "The reCAPTCHA verification failed. Please try again!";
+        } elseif (is_recaptcha_invalid($secretKey, $recaptcha_response)) {
+            $errors["recaptcha_invalid"] = "The reCAPTCHA verification failed. Please try again!";
         } elseif (!$encryptedData) {
             $errors["encryption_error"] = "Failed to process encrypted data. Please try again!";
         } else {
             // Decrypt the form data
-            error_log("Attempting to decrypt form data");
             $decryptedData = $encryptionService->decryptFormData($encryptedData);
             
             if (!$decryptedData) {
                 $errors["decryption_error"] = "Error decrypting form data. Please try again!";
-                error_log("Form data decryption failed");
             } else {
-                error_log("Form data decrypted successfully: " . print_r($decryptedData, true));
-                
                 // Extract data from decrypted payload
-                $file_id = $decryptedData["file_id"] ?? null;
-                $file_name = $decryptedData["file_name"] ?? null;
-                $decryption_key = $decryptedData["key"] ?? null;
-                // Fix: Ensure download_action is properly extracted
-                $download_action = isset($decryptedData["download_action"]) ? $decryptedData["download_action"] : "decrypted";
+                $file_id = $decryptedData["file_id"] ?? '';
+                $recipient = $decryptedData["recipient"] ?? null;
+                $expiryDays = $decryptedData["expiry_days"] ?? '7';
+                $maxAccess = isset($decryptedData["max_access"]) && !empty($decryptedData["max_access"]) ? $decryptedData["max_access"] : null;
+                $keyDelivery = $decryptedData["key_delivery"] ?? 'manual';
+                $decryption_key = $decryptedData["decryption_key"] ?? '';
+                $sharePassword = $decryptedData["share_password"] ?? null; // Extract password
                 
-                error_log("Download action set to: " . $download_action);
-                
-                // Validate required fields
-                if (empty($file_id)) {
-                    $errors["file_id_missing"] = "File ID is required";
-                }
-                
-                // For both types of downloads, we require a valid key for verification
-                if (empty($decryption_key)) {
-                    $errors["key_missing"] = "Decryption key is required for both download types";
-                } elseif (strlen($decryption_key) != 64 || !ctype_xdigit($decryption_key)) {
-                    $errors["key_format"] = "Key must be exactly 64 hex characters (256-bit key)";
-                }
-            }
-        }
-
-    }  catch (Exception $e) {
-        $errors["system_error"] = "An error occurred: " . $e->getMessage();
-        error_log("Exception in file_download.inc.php: " . $e->getMessage());
-        error_log("Exception trace: " . $e->getTraceAsString());
-    }
-
-    // If no errors, proceed with file handling
-    if(empty($errors)) {
-        try {
-            $file_info = get_file_by_id($pdo, $file_id, $user_id);
-            if (!$file_info) {
-                $errors["file_not_found"] = "File not found.";
-            } else {
-                $temp_dir = sys_get_temp_dir() . '/share_temp_files'; // location for decrypted temporary files
-                if (!is_dir($temp_dir)) {
-                    mkdir($temp_dir, 0755, true);
-                }
-                
-                // Create a unique but deterministic filename based on file_id and user_id
-                $temp_file = $temp_dir . '/decrypted_' . $user_id . '_' . $file_id . '_' . md5(basename($file_info['original_filename']));
-                $needs_decryption = !file_exists($temp_file); // decrypt only if file doesn't exist
-
-                if ($needs_decryption) {
-                    // Initialize encryption service
-                    $encryption_service = new FileEncryptionService();
-                    
-                    // Validate the key format
-                    if (!ctype_xdigit($decryption_key) || strlen($decryption_key) !== 64) {
-                        $errors["invalid_key"] = "Invalid key format. The key must be 64 hexadecimal characters.";
-                    }
-                    if (empty($errors)) {
+                // Validate inputs
+                if (empty($file_id) || !is_numeric($file_id)) {
+                    $errors["invalid_file"] = "Invalid file selected";
+                } elseif (empty($decryption_key)) {
+                    $errors["missing_key"] = "Decryption key is required for sharing";
+                } else {
+                    // Check if file exists and belongs to the user
+                    $file = get_file_by_id($pdo, (int)$file_id, $user_id);
+                    if (!$file) {
+                        $errors["file_not_found"] = "The selected file was not found or does not belong to you";
+                    } else {
+                        // Initialize encryption service to verify decryption key
+                        $encryption_service = new FileEncryptionService();
                         // Convert hex to binary
                         $binary_key = hex2bin($decryption_key);
-                        // Debug log key info
-                        error_log("Decryption key length (hex): " . strlen($decryption_key));
-                        error_log("Decryption key length (binary): " . strlen($binary_key));
-                        // Attempt decryption
-                        $decryption_result = $encryption_service->decrypt_file(
-                            $file_info["file_path"],
-                            $binary_key,
-                            $temp_file
-                        );
-                        // Check if decryption was successful
-                        if (!$decryption_result['success']) {
-                            $error_message = $decryption_result['message'] ?? "Failed to decrypt file. Check your decryption key.";
-                            $errors["decryption_error"] = $error_message;
-                            error_log("Decryption error: " . $error_message);
-                        }
-                    }
-                }
-                
-                if (empty($errors) && file_exists($temp_file)) {
-                    // Determine MIME type
-                    $finfo = finfo_open(FILEINFO_MIME_TYPE);
-                    $mime_type = finfo_file($finfo, $temp_file);
-                    finfo_close($finfo);
-                    
-                    // Normalize video MIME types
-                    if (strpos($mime_type, 'video/') === 0) {
-                        $ext = strtolower(pathinfo($file_info['original_filename'], PATHINFO_EXTENSION));
-                        if ($ext === 'mp4') {
-                            $mime_type = 'video/mp4';
-                        } elseif ($ext === 'webm') {
-                            $mime_type = 'video/webm';
-                        } elseif ($ext === 'ogg' || $ext === 'ogv') {
-                            $mime_type = 'video/ogg';
-                        }
-                    }
-                    $file_size = filesize($temp_file);
-                    $is_video = strpos($mime_type, 'video/') === 0;
-                    
-                    if (!$is_streaming_request && $is_video) {
-                        // Generate a URL for video streaming 
-                        $stream_url = '/includes/file_management/file_preview.inc.php?' . 
-                                    'stream=1&file_id=' . urlencode($file_id) . 
-                                    '&key=' . urlencode($decryption_key);
-                        
-                        // Creating an HTML page with a video player
-                        echo '<!DOCTYPE html>
-                                <html>
-                                <head>
-                                    <title>Video Player - ' . htmlspecialchars($file_info['file_name']) . '</title>
-                                    <style>
-                                        body { font-family: Arial, Helvetica, sans-serif; margin: 0; padding: 0; background-color: #000; height: 100vh;}
-                                        video { max-width: 100%; max-height: 100%; height: 605px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);}
-                                        .controls { position: fixed; top: 20px; right: 20px; z-index: 10;}
-                                        .controls a {margin-left: 10px; display: inline-block; background: rgba(255, 255, 255); color: #000; padding: 10px 20px; text-decoration: none; border-radius: 5px; box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px; }
-                                        .controls a:hover {background:  rgba(234, 234, 234); box-shadow: rgba(99, 99, 99, 0.5) 0px 2px 8px 0px;}
-                                    </style>
-                                </head>
-                                <body> 
-                                <div class="controls">
-                                        <a href="/dashboard.php">Back to Dashboard</a>
-                                        <a href="' . $stream_url . '&download=1">Download Video</a>
-                                    </div>
-                                    <video controls autoplay>
-                                        <source src="' . $stream_url . '" type="' . $mime_type . '">
-                                        Your browser does not support the video tag.
-                                    </video>
-                                </body>
-                                </html>';
-                        exit();
-                    }
-                    
-                    // Handle HTTP Range requests for video streaming
-                    $range = isset($_SERVER['HTTP_RANGE']) ? $_SERVER['HTTP_RANGE'] : null;
-                    $is_download = isset($_GET['download']) && $_GET['download'] == '1';
-                    
-                    if ($range && $is_video && !$is_download) {
-                        list($unit, $range) = explode('=', $range, 2);
-                        
-                        if ($unit == 'bytes') {
-                            // Parse the actual range values
-                            list($range) = explode(',', $range, 2);
-                            list($start, $end) = explode('-', $range, 2);
-                            
-                            $start = empty($start) ? 0 : intval($start);
-                            $end = empty($end) ? ($file_size - 1) : intval($end);
-                            
-                            $end = min($end, $file_size - 1);  // prevents exceeding the file size
-                            $length = $end - $start + 1;
-                            
-                            // setting appropriate headers for partial content
-                            header('HTTP/1.1 206 Partial Content');
-                            header('Content-Length: ' . $length);
-                            header('Content-Range: bytes ' . $start . '-' . $end . '/' . $file_size);
-                            header('Accept-Ranges: bytes');
-                            header('Content-Type: ' . $mime_type);
-                            header('Content-Disposition: inline; filename="' . basename($file_info['original_filename']) . '"');
-                            
-                            // Add CORS headers for cross-origin requests
-                            header('Access-Control-Allow-Origin: *');
-                            header('Access-Control-Allow-Methods: GET, OPTIONS');
-                            header('Access-Control-Allow-Headers: Range');
-                            
-                            header('Cache-Control: public, max-age=86400'); // enabling cache control for video segments
-                            
-                            // Ensure clean output
-                            if (ob_get_level()) {
-                                ob_end_clean();
-                            }
-                            flush();
-                            
-                            // Open the file and seek to the start position
-                            $fp = fopen($temp_file, 'rb');
-                            fseek($fp, $start);
-                            
-                            // Output data in chunks
-                            $buffer_size = 8192; // 8KB chunks
-                            $bytes_to_read = $length;
-                            
-                            while ($bytes_to_read > 0 && !feof($fp)) {
-                                $buffer = fread($fp, min($buffer_size, $bytes_to_read));
-                                echo $buffer;
-                                flush();
-                                $bytes_to_read -= strlen($buffer);
-                            }
-                            fclose($fp);
-                            exit();
-                        }
-                    } else {
-                        // Determine if file should be displayed inline or downloaded
-                        $inline_types = ['application/pdf', 'image/', 'text/'];
-                        $display_inline = false;
-                        
-                        // Always download videos in "download" mode
-                        if ($is_video && $is_download) {
-                            $display_inline = false;
+                        if (!$binary_key) {
+                            $errors["key_conversion"] = "Invalid decryption key format";
                         } else {
-                            foreach ($inline_types as $type) {
-                                if (strpos($mime_type, $type) === 0) {
-                                    $display_inline = true;
-                                    break;
+                            // Create a temporary file to verify the key
+                            $temp_dir = sys_get_temp_dir() . '/share_temp_files';
+                            if (!is_dir($temp_dir)) {
+                                mkdir($temp_dir, 0755, true);
+                            }
+                            $temp_file = $temp_dir . '/verify_' . $_SESSION["user_id"] . '_' . $file_id . '_' . uniqid();
+                            // Attempt to decrypt the file to verify the key
+                            $decryption_result = $encryption_service->decrypt_file(
+                                $file["file_path"],
+                                $binary_key,
+                                $temp_file
+                            );
+                            // Clean up temp file regardless of result
+                            if (file_exists($temp_file)) {
+                                @unlink($temp_file);
+                            }
+                            if (!isset($decryption_result['success']) || $decryption_result['success'] !== true) {
+                                $error_message = $decryption_result['message'] ?? "Invalid decryption key for this file.";
+                                $errors["invalid_key"] = $error_message;
+                            } else {
+                                // Validate remaining inputs
+                                $validationErrors = validate_share_inputs($recipient, $expiryDays, $maxAccess, $keyDelivery, null);
+                                if (!empty($validationErrors)) {
+                                    $errors = array_merge($errors, $validationErrors);
                                 }
                             }
                         }
-                        
-                        // setting appropriate headers 
-                        header('Content-Description: File Transfer');
-                        header('Content-Type: ' . $mime_type);
-                        
-                        if ($display_inline && !$is_download) {
-                            header('Content-Disposition: inline; filename="' ."decrypted_" . basename($file_info['original_filename']) . '"');
-                        } else {
-                            header('Content-Disposition: attachment; filename="' ."decrypted_". basename($file_info['original_filename']) . '"');
-                        }
-                        
-                        if ($is_video) {
-                            header('Accept-Ranges: bytes');
-                        }
-                        
-                        header('Content-Length: ' . $file_size);
-                        header('Cache-Control: public, max-age=86400'); // Allow caching for non-sensitive content
-                        header('Expires: ' . gmdate('D, d M Y H:i:s', time() + 86400) . ' GMT');
-                        
-                        // Ensure clean output
-                        if (ob_get_level()) {
-                            ob_end_clean();
-                        }
-                        flush();
-                        readfile($temp_file); // Output the file
-                        
-                        // For non-video files, delete the temp file immediately
-                        // For videos, only delete when downloading
-                        if (!$is_video || $is_download) {
-                            @unlink($temp_file);
-                        }
-                        exit();
                     }
                 }
             }
-        } catch (Exception $e) {
-            $errors["system_error"] = "An error occurred: " . $e->getMessage();
-            error_log("Exception in file_preview.inc.php: " . $e->getMessage());
         }
-    }
-
-    // redirect back to dashboard if error messages
-    if (!empty($errors)) {
-        if (session_status() == PHP_SESSION_NONE) {
-            session_start();
+        
+        if (empty($errors)) {
+            // Generate share token
+            $shareToken = generate_share_token();
+            
+            // Calculate expiry date
+            $expiryDate = calculate_expiry_date((int)$expiryDays);
+            
+            // Create the share in the database
+            $shareId = create_file_share(
+                $pdo,
+                (int)$file_id,
+                $user_id,
+                $recipient,
+                $shareToken,
+                $sharePassword,
+                $expiryDate,
+                $maxAccess !== null ? (int)$maxAccess : null,
+                $keyDelivery
+            );
+            
+            if (!$shareId) {
+                $errors["share_creation_failed"] = "Failed to create share. Please try again.";
+            } else {
+                // Generate the share URL
+                $shareUrl = generate_share_url($shareToken);
+                // Send email to recipient if key delivery is by email
+                if ($keyDelivery === 'email' && $recipient) {
+                    if (file_exists(__DIR__ . '/../templates/file-share-template.html')) {
+                        $template = file_get_contents(__DIR__ . '/../templates/file-share-template.html');
+                    } else {
+                        // Create a simple template if the file doesn't exist
+                        $template = '<!DOCTYPE html>
+                        <html>
+                        <head>
+                            <title>File Shared With You</title>
+                        </head>
+                        <body>
+                            <h1>A file has been shared with you</h1>
+                            <p><strong>File:</strong> {{file_name}}</p>
+                            <p><strong>Shared by:</strong> {{sender_name}}</p>
+                            <p><strong>Access link:</strong> <a href="{{share_url}}">{{share_url}}</a></p>
+                            <p><strong>Decryption key:</strong> {{decryption_key}}</p>
+                            <p><strong>Expires on:</strong> {{expiry_date}}</p>
+                            <p>{{access_info}}</p>
+                            <p>&copy; Share {{year}}</p>
+                        </body>
+                        </html>';
+                    }
+                    
+                    // Prepare the email content
+                    $template = str_replace('{{file_name}}', htmlspecialchars($file['original_filename']), $template);
+                    $template = str_replace('{{share_url}}', $shareUrl, $template);
+                    $template = str_replace('{{expiry_date}}', date('d/m/Y H:i', strtotime($expiryDate)), $template);
+                    $template = str_replace('{{decryption_key}}', htmlspecialchars($decryption_key), $template);
+                    $template = str_replace('{{sender_name}}', $_SESSION['first_name'] . ' ' . $_SESSION['last_name'], $template);
+                    $template = str_replace('{{year}}', date('Y'), $template);
+                    
+                    // Additional info based on share settings
+                    $accessInfo = '';
+                    if ($maxAccess) {
+                        $accessInfo .= "This link can be accessed {$maxAccess} times. ";
+                    }
+                    $template = str_replace('{{access_info}}', $accessInfo, $template);
+                    
+                    // Send email
+                    $mail = new PHPMailer(true);
+                    try {
+                        // Server settings
+                        $mail->isSMTP();
+                        $mail->Host = 'smtp.gmail.com';
+                        $mail->Port = 465;
+                        $mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;
+                        $mail->SMTPAuth = true;
+                        $mail->Username = 'share.e2eeplatform@gmail.com';
+                        $mail->Password = 'vczc yawy voeo nkbk';
+                        
+                        // Recipients
+                        $mail->setFrom('no-reply@sharee2ee.com', 'Share E2EE Platform');
+                        $mail->addReplyTo('no-reply@sharee2ee.com', 'Share E2EE Platform');
+                        $mail->addAddress($recipient);
+                        $mail->addCC($_SESSION['email']); // CC the sender
+                        
+                        // Content
+                        $mail->isHTML(true);
+                        $mail->Subject = $_SESSION['first_name'] . ' shared a file with you';
+                        $mail->Body = $template;
+                        $mail->AltBody = "A file has been shared with you by " . $_SESSION['first_name'] . 
+                                        ". Access it at: " . $shareUrl . ". Decryption key: " . $decryption_key;
+                        $mail->send();
+                        $success['share_link_sent'] = "File shared successfully and details sent to ". $recipient;
+                    } catch (Exception $e) {
+                        $errors["email_send_failed"] = "Warning: Share created but email could not be sent: " . $mail->ErrorInfo;
+                    }
+                } else {
+                    $success['share_details_success'] = "File shared successfully! The sharing details are ready above.";
+                }
+                
+                if (empty($errors)) {
+                    // Success! Set session variables for the next page
+                    $_SESSION['share_success'] = true;
+                    $_SESSION['share_url'] = $shareUrl;
+                    $_SESSION['share_decryption_key'] = $decryption_key;
+                    $_SESSION['share_expiry'] = date('d/m/Y H:i', strtotime($expiryDate));
+                    $_SESSION['share_delivery'] = $keyDelivery;
+                    $_SESSION['share_recipient'] = $recipient;
+                    $_SESSION['share_file_name'] = $file['file_name'];
+                    // Redirect back to dashboard with success message and file ID to reopen popup
+                    $_SESSION['share_success_message'] = $success;
+                    header("Location: /dashboard.php?file_id=" . $file_id . "&message=file_shared_successfully");
+                    exit();
+                }
+            }
         }
-        $_SESSION["errors_file_preview"] = $errors;
-        header("Location: /dashboard.php");
+        
+        // If there were errors
+        $_SESSION['share_errors'] = $errors;
+        $_SESSION['share_data'] = [
+            'file_id' => $file_id ?? '',
+            'recipient' => $recipient ?? '',
+            'expiry_days' => $expiryDays ?? '7',
+            'max_access' => $maxAccess ?? '',
+            'key_delivery' => $keyDelivery ?? 'manual'
+        ];
+        // Redirect back with file_id to reopen the popup
+        header("Location: /dashboard.php?file_id=" . ($file_id ?? '') . "&error=share_failed");
         exit();
+    } catch (Exception $e) {
+        // Log the error
+        error_log("Share creation failed: " . $e->getMessage());
+        
+        // Set generic error message
+        $_SESSION['share_errors'] = ["An unexpected error occurred. Please try again later."];
+        
+        // Redirect back to dashboard
+        header("Location: /dashboard.php?error=system_error");
+        exit();;
     }
 } else {
+    // Not a POST request
     header("Location: /dashboard.php");
     exit();
 }
-
-// Helper function to clean up old temporary files called via a cron job
-function cleanup_temp_files($temp_dir, $max_age_hours = 24) {
-    if (!is_dir($temp_dir)) return;
-    
-    $files = glob($temp_dir . '/decrypted_*');
-    $now = time();
-    
-    foreach ($files as $file) {
-        if (is_file($file) && ($now - filemtime($file) > $max_age_hours * 3600)) {
-            @unlink($file);
-        }
-    }
-}
-?>

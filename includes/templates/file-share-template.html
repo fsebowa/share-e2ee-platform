@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>File Shared With You</title>
+    <script src="https://www.google.com/recaptcha/api.js"></script>
+    <!-- Google fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inria+Sans:ital,wght@0,300;0,400;0,700;1,300;1,400;1,700&family=Instrument+Sans:ital,wght@0,400..700;1,400..700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:ital,wght@0,400..700;1,400..700&display=swap" rel="stylesheet">
+    <!-- Icons -->
+    <script src="https://kit.fontawesome.com/615e7ceea3.js" crossorigin="anonymous"></script>
+    <style>
+        body {
+            font-family: "Inria Sans", serif;
+        }
+        .file-template .file-details {
+            width: 630px;
+            margin: 0 auto;
+            padding: 5px;
+            text-align: center;
+            border-radius: 10px;
+        }
+        .file-details .container {
+            margin: 0 auto;
+            padding: 50px 20px;
+            text-align: center;
+            border-radius: 10px;
+            background-color: #FFFFFF;
+            border: 2px solid #00000023;
+            overflow: hidden;
+        }
+        .caption-text {
+            font-size: 16px;
+            color: #7C7B7B;
+        }
+        .content {
+            text-align: left;
+            margin: 30px 20px;
+            padding: 20px 20px;
+            border-radius: 5px;
+            background-color: #f3f3f3;
+            box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
+            overflow: hidden;
+            word-wrap: break-word;
+        }
+        .content h3 {
+            background-color: #000000;
+            width: 150px;
+            color: #FFFFFF;
+            margin: 0 auto;
+            padding: 6px 5px;
+            border-radius: 5px;
+            text-align: center;
+        }
+        .content .key {
+            display: block;
+            text-align: left;
+            word-break: break-all;
+            background-color: #e7e7e7;
+            padding: 5px;
+            border-radius: 5px;
+            line-height: 30px;
+            margin: 5px 0 0;
+        }
+        .access-button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 10px 20px;
+            background-color: green;
+            color: #FFFFFF !important;
+            text-decoration: none;
+            font-weight: bold;
+            border-radius: 5px;
+            margin-top: 20px;
+        }
+        .logo-text {
+            font-size: 40px;
+            font-weight: 700;
+            margin: 0;
+        }
+    </style>
+</head>
+<body class="file-template">
+    <div class="file-details">
+        <div class="container">
+            <h1 class="logo-text">Share</h1>
+            <h2>File Shared With You</h2>
+            <p>{{sender_name}} has shared a file with you via Share's secure E2EE platform.</p>
+            <div class="content">
+                <h3>File Details</h3>
+                <p><strong>File Name:</strong> {{file_name}}</p>
+                <p><strong>Available Until:</strong> {{expiry_date}}</p>
+                <p>{{access_info}}</p>
+                <a href="{{share_url}}" class="access-button"> Access File <i class="fa-solid fa-arrow-up-right-from-square" style="font-size: 14px; padding-left: 5px;"></i></a>
+            </div>
+            <div class="content">
+                <h3>Decryption Key</h3>
+                <p>To decrypt this file, you'll need the following key:</p>
+                <span class="key">{{decryption_key}}</span>
+                <p><strong style="color: red;">IMPORTANT:</strong> Keep this key secure. Without it, the file cannot be decrypted.</p>
+                <p>For security reasons, the decryption key is sent in this email but is not stored on our servers. Keep it safe.</p>
+            </div>
+            <p class="caption-text" style="font-size: 15px; font-style: italic;">Thank you for using our secure file sharing platform.</p>
+            <p style="margin-top: 50px; margin-bottom: -30px; color: #000000; font-size: 14px;">&copy; Share {{year}}</p>
+        </div>
+        <div class="content">
+            <p>To access and decrypt the shared file:</p>
+            <ol>
+                <li>Click the "Access File" button above</li>
+                <li>If a password is required, enter it when prompted</li>
+                <li>Enter the decryption key shown above when requested</li>
+                <li>Download and open your file</li>
+            </ol>
+            <p>For security reasons, we recommend storing the decryption key separately and deleting this email after saving the key.</p>
+        </div>
+    </div>
+</body>
+</html>

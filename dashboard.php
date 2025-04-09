@@ -4,6 +4,7 @@
     require_once __DIR__ . '/includes/config/dbh.inc.php';
     require_once __DIR__ . '/includes/file_management/file_model.inc.php';
     require_once __DIR__ . '/includes/file_management/file_view.inc.php';
+
     check_login_otp_status(); 
 
     // get user's files
@@ -14,6 +15,8 @@
     $hasPreviewErrors = isset($_SESSION["errors_file_preview"]) && !empty($_SESSION["errors_file_preview"]);
     $hasDeleteErrors = isset($_SESSION["errors_file_delete"]) && !empty($_SESSION["errors_file_delete"]);
     $hasDownloadErrors = isset($_SESSION["errors_file_download"]) && !empty($_SESSION["errors_file_download"]);
+    $shareCreated = isset($_SESSION['share_success']) && $_SESSION['share_success'] === true;
+    $shareErrors = isset($_SESSION['share_errors']) && !empty($_SESSION['share_errors']);
 ?>
 <!DOCTYPE html>
 <html>
@@ -24,17 +27,28 @@
     <!-- JSEncrypt library for RSA encryption -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jsencrypt/3.3.2/jsencrypt.min.js"></script>
     <script src="https://www.google.com/recaptcha/api.js"></script>
-    <script>
-        // Make error flags available to JavaScript
-        const hasUploadErrors = <?php echo $hasUploadErrors ? 'true' : 'false'; ?>;
-        const hasPreviewErrors = <?php echo $hasPreviewErrors ? 'true' : 'false'; ?>;
-        const hasDeleteErrors = <?php echo $hasDeleteErrors ? 'true' : 'false'; ?>;
-        const hasDownloadErrors = <?php echo $hasDownloadErrors ? 'true' : 'false'; ?>;
-    </script>
     <script src="/js/profile-popup.js"></script>
     <script src="/js/progress-bar.js"></script>
     <script src="/js/form-encryption.js"></script>
     <script src="/js/dashboard_func.js"></script>
+    <script src="/js/share.js"></script>
+    <script>
+        // Make error flags available to JavaScript
+        window.hasUploadErrors = <?php echo $hasUploadErrors ? 'true' : 'false'; ?>;
+        window.hasPreviewErrors = <?php echo $hasPreviewErrors ? 'true' : 'false'; ?>;
+        window.hasDeleteErrors = <?php echo $hasDeleteErrors ? 'true' : 'false'; ?>;
+        window.hasDownloadErrors = <?php echo $hasDownloadErrors ? 'true' : 'false'; ?>;
+        // Share data
+        window.shareCreated = <?php echo $shareCreated ? 'true' : 'false'; ?>;
+        window.shareErrors = <?php echo $shareErrors ? 'true' : 'false'; ?>;
+        <?php if ($shareCreated): ?>
+        window.shareUrl = <?php echo json_encode($_SESSION['share_url'] ?? ''); ?>;
+        window.shareKey = <?php echo json_encode($_SESSION['share_decryption_key'] ?? ''); ?>;
+        window.shareExpiry = <?php echo json_encode($_SESSION['share_expiry'] ?? ''); ?>;
+        window.shareRecipient = <?php echo json_encode($_SESSION['share_recipient'] ?? ''); ?>;
+        window.shareDelivery = <?php echo json_encode($_SESSION['share_delivery'] ?? 'manual'); ?>;
+        <?php endif; ?>
+    </script>
 </head>
 <body class="dashboard">
     <?php include __DIR__ . "/includes/templates/dashboard_nav.php"; ?>
@@ -44,7 +58,7 @@
             <div class="left-menu-top">
                 <div class="action-buttons">
                     <div class="btn-container">
-                        <button class="action-btn active-btn"><i class="fa-regular fa-folder-open"></i>Files</button>
+                        <button class="action-btn active-btn"><a href="/dashboard.php"><i class="fa-regular fa-folder-open"></i> Files</a></button>
                         <button class="action-btn"><i class="fa-regular fa-clock"></i>Recent</button>
                         <button class="action-btn"><i class="fa-solid fa-share-nodes"></i>Shared</button>
                     </div>
@@ -219,21 +233,79 @@
             </div>
 
             <!-- Share file popup -->
-            <div class="file-ellipse-popup" id="shareFile">
+            <div class="file-ellipse-popup" id="shareFile" style="display: block;">
                 <form action="/includes/file_management/file_share.inc.php" method="post" id="share_file_form" class="secure-form">
-                    <h2></h2> 
+                    <h2>Share File</h2> <!-- Filename will be inserted here dynamically -->
                     <p class="caption-text">Share this file securely</p>
                     <div class="form-inputs">
-                        <input type="text" id="email" name="email" placeholder="Recipient's email address" data-encrypt="true">
-                        <input type="text" id="decryption_key" name="key" placeholder="Enter decryption key" data-encrypt="true">
+                        <input type="hidden" name="file_id" data-encrypt="true">
                         <input type="hidden" name="csrf_token" value="<?php echo $token ?? ''; ?>">
+                        <div class="form-box">
+                            <label for="key_delivery">Key delivery method:</label>
+                            <select class="btn-form btn1" id="key_delivery" name="key_delivery" data-encrypt="true">
+                                <option value="email">Send via email</option>
+                                <option value="manual">Share key manually</option>
+                            </select>
+                        </div>
+                        <div class="form-box" style="justify-content: space-between;">
+                            <div class="form-box">
+                                <label for="expiry_days">Link expires after:</label>
+                                <select class="btn-form btn1" id="expiry_days" name="expiry_days" data-encrypt="true">
+                                    <option value="1" selected>1 day</option>
+                                    <option value="3">3 days</option>
+                                    <option value="7">7 days</option>
+                                    <option value="14">14 days</option>
+                                    <option value="30">30 days</option>
+                                </select>
+                            </div>
+                            <div class="form-box">
+                                <label for="password_protect">Add Password?</label>
+                                <input style="width: 15px;" type="checkbox" id="password_protect" class="share-checkbox">
+                            </div>
+                        </div>
+                        <div class="form-box">
+                            <input type="number" id="max_access" name="max_access" placeholder="Max downloads (optional)" min="1" max="100" data-encrypt="true">
+                            <div id="password_field" style="display: none; width: 100%;">
+                                <input type="password" id="share_password" name="share_password" placeholder="Enter a password" data-encrypt="true">
+                            </div>
+                        </div>
+                        
+                        <div id="recipient_field">
+                            <input type="email" id="recipient" name="recipient" placeholder="Recipient's email address" data-encrypt="true">
+                        </div>
+                        <!-- <input type="number" id="max_access" name="max_access" placeholder="Maximum downloads (optional)" min="1" max="100" data-encrypt="true"> -->
+                        <input type="text" id="decryption_key" name="decryption_key" placeholder="Enter file's decryption key" data-encrypt="true" required>
                     </div>
+                    <!-- Submit button with reCAPTCHA trigger -->
                     <button class="g-recaptcha btn black-btn" 
                         data-sitekey="6LfncLgqAAAAABiQR-6AYNqjYPE2wFS5WsrPBAEj" 
                         data-callback='onSubmitShare' 
-                        data-action='submit'>Share</button><br>
+                        data-action='submit'>Create Share Link</button><br>
                 </form>
-                <span class="caption-text" style="font-size: 14px;">The file will be encrypted and the key will be sent separately</span>
+                <!-- Success message area (hidden by default) -->
+                <div class="share-success">
+                    <h3>File shared successfully!</h3>
+                    <div class="copy-field">
+                        <p>Share this link with your recipient:</p>
+                        <input type="text" id="share_url" readonly>
+                        <button class="copy-button" onclick="copyToClipboard('share_url')">
+                            <i class="fa-regular fa-copy"></i>
+                        </button>
+                        <span id="share_url_copied" class="copied-message">Copied!</span>
+                    </div>
+                    <div class="copy-field">
+                        <p>Decryption key (required to access the file):</p>
+                        <input type="text" id="share_key" readonly>
+                        <button class="copy-button" onclick="copyToClipboard('share_key')">
+                            <i class="fa-regular fa-copy"></i>
+                        </button>
+                        <span id="share_key_copied" class="copied-message">Copied!</span>
+                    </div>
+                    
+                    <p>The share link will expire on: <span id="share_expiry"></span></p>
+                    <div id="share_recipient_info"></div>
+                </div>
+                <span class="caption-text" style="font-size: 14px;">Files are shared with end-to-end encryption</span>
             </div>
 
             <!-- Download file popup -->
@@ -291,6 +363,40 @@
             <?php if (isset($_SESSION['upload_data'])) { ?>
                 <?php unset($_SESSION['upload_data']); ?>
             <?php } ?>
+            <?php
+                 // Check for share errors and display them
+                if (isset($_SESSION['share_errors']) && !empty($_SESSION['share_errors'])) {
+                    echo '<div class="error-messages" id="errorMessages">';
+                    foreach ($_SESSION['share_errors'] as $error) {
+                        echo '<p>' . htmlspecialchars($error) . '</p>';
+                    }
+                    echo '</div>';
+                    unset($_SESSION['share_errors']);
+                }
+                
+                if (isset($_SESSION['share_success_message']) && !empty($_SESSION['share_success_message'])) {
+                    echo '<div class="success-messages" id="successMessage">';
+                    foreach ($_SESSION['share_success_message'] as $suc) {
+                        echo '<p class="success-message">' . $suc . '</p>';
+                    }
+                    echo '</div>';
+                    unset($_SESSION['share_success_message']);
+                }
+            ?>
+            <!-- Clean up share session data after use -->
+            <script>
+                if (shareCreated || shareErrors) {
+                    setTimeout(function() {
+                    fetch('/includes/ajax/clean_share_session.inc.php', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-Token': '<?php echo $_SESSION["csrf_token"] ?? ""; ?>'
+                        }
+                    });
+    }, 3000);
+                }
+            </script>
         </div>
     </div>
     <?php include __DIR__ . "/includes/templates/footer.php"; ?>
@@ -480,7 +586,6 @@
                     });
                 }
             }
-            
             // Clean implementation of download processing with proper encryption
             function processDownload(downloadType) {
                 const form = document.getElementById('download_file_form');
@@ -623,10 +728,8 @@
                     alert("Error processing download request. Please try again.");
                 }
             }
-            
             // Setup download buttons when DOM is loaded
             setupDownloadButtons();
-            
             // Force hide any visible overlay on load
             setTimeout(function() {
                 if (typeof hideLoadingOverlay === 'function') {
