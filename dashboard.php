@@ -60,7 +60,7 @@
                     <div class="btn-container">
                         <button class="action-btn active-btn"><a href="/dashboard.php"><i class="fa-regular fa-folder-open"></i> Files</a></button>
                         <button class="action-btn"><i class="fa-regular fa-clock"></i>Recent</button>
-                        <button class="action-btn"><i class="fa-solid fa-share-nodes"></i>Shared</button>
+                        <button class="action-btn"><i class="fa-solid fa-share-nodes"></i><a href="/dashboard/shared.php" target="_blank" rel="noopener noreferrer">Shared</a></button>
                     </div>
                 </div>
                 <div class="action-buttons">
@@ -233,9 +233,9 @@
             </div>
 
             <!-- Share file popup -->
-            <div class="file-ellipse-popup" id="shareFile" style="display: block;">
+            <div class="file-ellipse-popup" id="shareFile">
                 <form action="/includes/file_management/file_share.inc.php" method="post" id="share_file_form" class="secure-form">
-                    <h2>Share File</h2> <!-- Filename will be inserted here dynamically -->
+                    <h2></h2> <!-- Filename will be inserted here dynamically -->
                     <p class="caption-text">Share this file securely</p>
                     <div class="form-inputs">
                         <input type="hidden" name="file_id" data-encrypt="true">
@@ -356,7 +356,6 @@
                         data-action='submit'>Delete</button><br>
                 </form>
                 <p class="caption-text" style="font-size: 14px; margin: 0 20px;">You can find the decryption key in your email from when you uploaded this file.</p>
-                <!-- <span class="caption-text" style="font-size: 14px;">Your files are end-to-end encrypted</span> -->
             </div>
 
             <!-- Clear upload data from session after loading -->

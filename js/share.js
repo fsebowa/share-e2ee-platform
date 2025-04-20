@@ -104,11 +104,12 @@ document.addEventListener('DOMContentLoaded', function() {
     // setup password option
     const passCheckBox = document.getElementById('password_protect');
     const passContainer = document.getElementById('password_field');
+    const passInput = document.getElementById('share_password');
     if (passCheckBox && passContainer) {
         passCheckBox.addEventListener('change', function () {
             passContainer.style.display = this.checked ? 'block' : 'none';
-            // make password required based on checkbox stat
-            const passInput = document.getElementById('share_password');
+            passInput.value = '';  // clear password input when click changes
+            // make password required based on checkbox state
             if (passInput) {
                 if (this.checked) {
                     passInput.setAttribute('required', 'required');

@@ -26,7 +26,7 @@ document.addEventListener('DOMContentLoaded', async function() {
 
 // Handle all form encryption including reCAPTCHA-enabled forms
 function setupFormEncryption() {
-    const callbackFunctions = ['onSubmit', 'onSubmitPreview', 'onSubmitDownload', 'onSubmitDelete'];
+    const callbackFunctions = ['onSubmit', 'onSubmitPreview', 'onSubmitDownload', 'onSubmitDelete', 'onSubmitAccessPassword'];
     // Store original callbacks and override them with encryption-enabled versions
     callbackFunctions.forEach(callbackName => {
         if (typeof window[callbackName] === 'function') {
@@ -60,6 +60,14 @@ function handleFormSubmission(callbackName, token) {
             loadingMessage = 'Verifying deletion...';
             useCustomProgress = true; // Use custom progress for delete
             break;
+        case 'onSubmitAccessPassword':
+            formId = 'share_access_form';
+            loadingMessage = 'Verifying password...';
+            break;
+        case 'onSubmitShareDownload':
+        formId = 'share_decryption_form';
+        loadingMessage = 'Preparing download...';
+        break;
         default: // Standard onSubmit for login/signup/otp
             // Try to determine form ID based on existing forms
             if (document.getElementById('login_form')) {
@@ -434,6 +442,89 @@ window.onSubmitDownload = function(token) {
 window.onSubmitDelete = function(token) {
     handleFormSubmission('onSubmitDelete', token);
 };
+
+window.onSubmitAccessPassword = function(token) {
+    handleFormSubmission('onSubmitAccessPassword', token);
+};
+
+window.onSubmitShareDownload = function(token) {
+    handleShareDownload(token);
+};
+
+// Special handler for shared file downloads
+function handleShareDownload(token) {
+    const form = document.getElementById('share_decryption_form');
+    if (!form) {
+        console.error('Share download form not found');
+        return;
+    }
+    // Show loading message
+    showLoadingOverlay("Decrypting and downloading file...");
+    // Mark that download is starting
+    sessionStorage.setItem('fileDownloadStarted', 'true');
+    // Set timeout to hide overlay after download likely started
+    setTimeout(function() {
+        hideLoadingOverlay();
+        // Clear the download flag
+        sessionStorage.removeItem('fileDownloadStarted');
+    }, 3000); 
+    
+    // Process the form's sensitive fields
+    const sensitiveFields = form.querySelectorAll('[data-encrypt="true"]');
+    if (sensitiveFields.length > 0) {
+        try {
+            // Create payload from sensitive fields
+            let payload = {};
+            sensitiveFields.forEach(field => {
+                payload[field.name] = field.value;
+                field.disabled = true;
+                
+                // Create hidden field for the disabled one
+                const hiddenField = document.createElement('input');
+                hiddenField.type = 'hidden';
+                hiddenField.name = field.name;
+                hiddenField.value = '';
+                form.appendChild(hiddenField);
+            });
+            
+            // Encrypt data
+            const encrypt = new JSEncrypt();
+            encrypt.setPublicKey(window.SERVER_PUBLIC_KEY);
+            const encryptedData = encrypt.encrypt(JSON.stringify(payload));
+            
+            // Add encrypted data to form
+            let encryptedField = form.querySelector('input[name="encrypted_data"]');
+            if (!encryptedField) {
+                encryptedField = document.createElement('input');
+                encryptedField.type = 'hidden';
+                encryptedField.name = 'encrypted_data';
+                form.appendChild(encryptedField);
+            }
+            encryptedField.value = encryptedData;
+            
+            // Add recaptcha token
+            let tokenInput = form.querySelector('input[name="g-recaptcha-response"]');
+            if (!tokenInput) {
+                tokenInput = document.createElement('input');
+                tokenInput.type = 'hidden';
+                tokenInput.name = 'g-recaptcha-response';
+                form.appendChild(tokenInput);
+            }
+            tokenInput.value = token || 'bypass_token';
+            
+            // Submit the form
+            form.submit();
+            
+        } catch (error) {
+            hideLoadingOverlay();
+            alert("Error processing download request. Please try again.");
+        }
+    } else {
+        // No sensitive fields, just submit
+        form.submit();
+    }
+}
+
 
 // Loading overlay functions
 function showLoadingOverlay(message) {

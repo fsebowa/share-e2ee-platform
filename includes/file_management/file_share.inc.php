@@ -1,6 +1,8 @@
 <?php
 declare(strict_types=1);
-
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
 require_once __DIR__ . '/../config/config_session.inc.php';
 require_once __DIR__ . '/../auth/auth_checker.inc.php';
 require_once __DIR__ . '/../encryption/encryption_service.inc.php';
@@ -64,7 +66,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 $maxAccess = isset($decryptedData["max_access"]) && !empty($decryptedData["max_access"]) ? $decryptedData["max_access"] : null;
                 $keyDelivery = $decryptedData["key_delivery"] ?? 'manual';
                 $decryption_key = $decryptedData["decryption_key"] ?? '';
-                $sharePassword = $decryptedData["share_password"] ?? null; // Extract password
+                $sharePassword = $decryptedData["share_password"] ?? null; 
                 
                 // Validate inputs
                 if (empty($file_id) || !is_numeric($file_id)) {
@@ -105,7 +107,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                                 $errors["invalid_key"] = $error_message;
                             } else {
                                 // Validate remaining inputs
-                                $validationErrors = validate_share_inputs($recipient, $expiryDays, $maxAccess, $keyDelivery, null);
+                                $validationErrors = validate_share_inputs($recipient, $expiryDays, $maxAccess, $keyDelivery, $sharePassword);
                                 if (!empty($validationErrors)) {
                                     $errors = array_merge($errors, $validationErrors);
                                 }
@@ -119,10 +121,13 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         if (empty($errors)) {
             // Generate share token
             $shareToken = generate_share_token();
-            
             // Calculate expiry date
             $expiryDate = calculate_expiry_date((int)$expiryDays);
-            
+            // hash password
+            $hashedPassword = null;
+            if ($sharePassword !== null && !empty($sharePassword)) {
+                $hashedPassword = hash_share_password($sharePassword);
+            }
             // Create the share in the database
             $shareId = create_file_share(
                 $pdo,
@@ -130,7 +135,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 $user_id,
                 $recipient,
                 $shareToken,
-                $sharePassword,
+                $hashedPassword,
                 $expiryDate,
                 $maxAccess !== null ? (int)$maxAccess : null,
                 $keyDelivery

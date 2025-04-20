@@ -88,6 +88,14 @@ function get_file_shares(object $pdo, int $fileId, int $userId) {
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
 
+function get_all_user_shared_files (object $pdo, int $user_id) {
+    $query = "SELECT * FROM file_shares WHERE shared_by = :user_id ORDER BY created_at DESC";
+    $stmt = $pdo->prepare($query);
+    $stmt->bindParam(":shared_by", $user_id, PDO::PARAM_INT);
+    $stmt->execute();
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
+
 function deactivate_file_share(object $pdo, int $shareId, int $userId) {
     $query = "UPDATE file_shares 
                 SET is_active = FALSE 

@@ -55,7 +55,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 $file_id = $decryptedData["file_id"] ?? null;
                 $file_name = $decryptedData["file_name"] ?? null;
                 $decryption_key = $decryptedData["key"] ?? null;
-                // Fix: Ensure download_action is properly extracted
                 $download_action = isset($decryptedData["download_action"]) ? $decryptedData["download_action"] : "decrypted";
                 
                 error_log("Download action set to: " . $download_action);
