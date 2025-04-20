@@ -1,7 +1,4 @@
 <?php
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
 require_once __DIR__ . '/../config/config_session.inc.php';
 require_once __DIR__ . '/../encryption/encryption_service.inc.php';
 
@@ -87,16 +84,6 @@ if (empty($shareToken)) {
                         }
                     }
                 }
-
-                // $enteredPassword = $_POST['password'] ?? '';
-                // if (verify_share_password($enteredPassword, $shareData['access_password'])) {
-                //     $_SESSION['password_verified_'.$shareData['id']] = true;
-                //     $_SESSION['active_share_token'] = $shareToken; // Store token in session
-                //     header("Location: /s.php?token=".$shareToken);
-                //     exit();
-                // } else {
-                //     $errorMessage[] = "Incorrect password. Please try again.";
-                // }
             }
         }
     } catch (PDOException $e) {

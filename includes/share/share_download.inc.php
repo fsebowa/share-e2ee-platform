@@ -1,8 +1,4 @@
 <?php
-// Suppress any errors before headers are sent
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
 // Start session if not already started
 require_once __DIR__ . '/../config/config_session.inc.php';
 require_once __DIR__ . '/../encryption/file_encryption.inc.php';

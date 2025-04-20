@@ -1,17 +1,9 @@
 <?php
-    ini_set('display_errors', 1);
-    ini_set('display_startup_errors', 1);
-    error_reporting(E_ALL);
     include __DIR__ . '/includes/share/s.inc.php';
-
     if (isset($_SESSION["share_error_messages"])) {
         $errorMessage = $_SESSION["share_error_messages"];
         unset($_SESSION["share_error_messages"]);
     }
-    // if (isset($_SESSION["share_success_messages"])) {
-    //     $successMessage = $_SESSION["share_success_messages"];
-    //     unset($_SESSION["share_success_messages"]);
-    // }
 ?>
 
 <!DOCTYPE html>
@@ -22,14 +14,7 @@
     <!-- JSEncrypt library for RSA encryption -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jsencrypt/3.3.2/jsencrypt.min.js"></script>
     <script src="/js/form-encryption.js"></script>
-    
     <script src="https://www.google.com/recaptcha/api.js"></script>
-    <!-- submitting recapture token -->
-    <script>
-    // function onSubmitAccessPassword(token) {
-    //     console.log("reCAPTCHA validation successful");
-    // }
-    </script>
     <script src="/js/profile-popup.js"></script>
     <script src="/js/dashboard_func.js"></script>
 </head>
@@ -65,21 +50,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
                 echo '</div>';
             }
-
-            // if (!empty($successMessage)) {
-            //     echo '<div class="success-messages" id="successMessage">';
-            //     if (is_array($successMessage)) {
-            //         foreach ($successMessage as $suc) {
-            //             echo '<p class="success-message">' . htmlspecialchars($suc) . '</p>';
-            //         }
-            //     } else {
-            //         echo '<p class="success-message">' . htmlspecialchars($successMessage) . '</p>';
-            //     }
-            //     echo '</div>';
-            // }
         ?>
         
-        <?php if (isset($shareData)): ?>
+        <?php if (isset($shareData) && !empty($shareData)): ?>
             <div class="file-info share-file-wrapper">
                 <h2><?php echo htmlspecialchars($shareData['original_name']); ?></h2>
                 <div class="form-box" style="justify-content: center;">
@@ -99,7 +72,6 @@ document.addEventListener('DOMContentLoaded', function() {
                         <input type="hidden" name="csrf_token" value="<?php echo $token; ?>">
                         <input type="password" id="password" name="password" placeholder="Enter password" data-encrypt="true">
                     </div>
-                    <!-- <button class="btn black-btn" name="submit_password" type="submit">Submit Password</button> -->
                     <button class="g-recaptcha btn black-btn" 
                                 name="submit_password"
                                 data-sitekey="6LfncLgqAAAAABiQR-6AYNqjYPE2wFS5WsrPBAEj" 
@@ -124,7 +96,6 @@ document.addEventListener('DOMContentLoaded', function() {
                             data-sitekey="6LfncLgqAAAAABiQR-6AYNqjYPE2wFS5WsrPBAEj" 
                             data-callback='onSubmitShareDownload' 
                             data-action='submit'>Download File</button>
-                    <!-- <button class="btn black-btn" name="submit_download" type="submit">Download File</button> -->
                 </form>
             </div>
         <?php endif; ?>
