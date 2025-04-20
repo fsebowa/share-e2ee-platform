@@ -599,11 +599,66 @@ document.addEventListener("DOMContentLoaded", () => {
                 }
             }
         }
-
     }
     
     // Hide any loading overlay that might still be visible
     if (typeof hideLoadingOverlay === 'function') {
         hideLoadingOverlay();
+    }
+
+    // Setup sorting dropdown
+    const sortDropdown = document.getElementById('sort_files');
+    if (sortDropdown) {
+        sortDropdown.addEventListener('change', function() {
+            sortFiles(this.value);
+        });
+        
+        // Initialize with default sort
+        sortFiles(sortDropdown.value);
+    }
+    
+    // Function to sort files
+    function sortFiles(sortBy) {
+        const filesContainer = document.querySelector('.uploaded-files');
+        if (!filesContainer) return;
+        // Get all visible file elements 
+        const files = Array.from(filesContainer.querySelectorAll('.file')).filter(file => 
+            window.getComputedStyle(file).display !== 'none'
+        );
+        
+        if (files.length === 0) return;
+        // Sort the files
+        files.sort((a, b) => {
+            switch(sortBy) {
+                case 'Name':
+                    const nameA = a.querySelector('.file-title').textContent.trim().toLowerCase();
+                    const nameB = b.querySelector('.file-title').textContent.trim().toLowerCase();
+                    return nameA.localeCompare(nameB);
+                    
+                case 'Type':
+                    const typeA = a.getAttribute('data-file-type').toLowerCase();
+                    const typeB = b.getAttribute('data-file-type').toLowerCase();
+                    return typeA.localeCompare(typeB);
+                    
+                case 'Size':
+                    // Extract size values (format: "X.XX MB")
+                    const sizeTextA = a.querySelector('.top .caption-text span:nth-child(2)').textContent;
+                    const sizeTextB = b.querySelector('.top .caption-text span:nth-child(2)').textContent;
+                    // Parse the numeric values, stripping out "MB" and any other text
+                    const sizeA = parseFloat(sizeTextA.replace(/[^\d.]/g, ''));
+                    const sizeB = parseFloat(sizeTextB.replace(/[^\d.]/g, ''));
+                    return sizeB - sizeA; // Sort from largest to smallest
+                    
+                case 'Date Added':
+                default:
+                    const dateA = new Date(a.querySelector('.bottom .caption-text').textContent.trim());
+                    const dateB = new Date(b.querySelector('.bottom .caption-text').textContent.trim());
+                    return dateB - dateA; // Sort from newest to oldest
+            }
+        });
+        
+        // Remove all sorted files from the container and re-add them in the new order
+        files.forEach(file => file.remove());
+        files.forEach(file => filesContainer.appendChild(file));
     }
 });
