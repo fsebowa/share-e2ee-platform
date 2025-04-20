@@ -25,7 +25,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" || (isset($_GET['stream']) && isset($_
             $errors["wrong_key_length"] = "Invalid key format for streaming";
         }
     } else {
-        // For initial requests, get data from POST
         // Initialize encryption service
         $encryptionService = new EncryptionService();
         $encryptedData = $_POST["encrypted_data"] ?? null;
@@ -78,9 +77,13 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" || (isset($_GET['stream']) && isset($_
                     mkdir($temp_dir, 0755, true);
                 }
                 
-                // Create a unique but deterministic filename based on file_id and user_id
-                $temp_file = $temp_dir . '/decrypted_' . $user_id . '_' . $file_id . '_' . md5(basename($file_info['original_filename']));
-                $needs_decryption = !file_exists($temp_file); // decrypt only if file doesn't exist
+                // Create a unique filename based on user_id, file_id, key hash and filename
+                // Include key hash in the filename to ensure different keys create different files
+                $key_hash = md5($decryption_key);
+                $temp_file = $temp_dir . '/decrypted_' . $user_id . '_' . $file_id . '_' . $key_hash . '_' . md5(basename($file_info['original_filename']));
+                
+                // Always decrypt for streaming requests or if the file doesn't exist yet
+                $needs_decryption = $is_streaming_request || !file_exists($temp_file);
 
                 if ($needs_decryption) {
                     // Initialize encryption service
@@ -90,6 +93,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" || (isset($_GET['stream']) && isset($_
                     if (!ctype_xdigit($decryption_key) || strlen($decryption_key) !== 64) {
                         $errors["invalid_key"] = "Invalid key format. The key must be 64 hexadecimal characters.";
                     }
+                    
                     if (empty($errors)) {
                         // Convert hex to binary
                         $binary_key = hex2bin($decryption_key);
@@ -132,7 +136,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" || (isset($_GET['stream']) && isset($_
                     $is_video = strpos($mime_type, 'video/') === 0;
                     
                     if (!$is_streaming_request && $is_video) {
-                        // Generate a URL for video streaming 
+                        // Generate a URL for video streaming that includes the decryption key
                         $stream_url = '/includes/file_management/file_preview.inc.php?' . 
                                     'stream=1&file_id=' . urlencode($file_id) . 
                                     '&key=' . urlencode($decryption_key);
@@ -195,7 +199,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" || (isset($_GET['stream']) && isset($_
                             header('Access-Control-Allow-Methods: GET, OPTIONS');
                             header('Access-Control-Allow-Headers: Range');
                             
-                            header('Cache-Control: public, max-age=86400'); // enabling cache control for video segments
+                            header('Cache-Control: public, max-age=3600'); // shorter cache time for video segments
                             
                             // Ensure clean output
                             if (ob_get_level()) {
@@ -252,8 +256,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" || (isset($_GET['stream']) && isset($_
                         }
                         
                         header('Content-Length: ' . $file_size);
-                        header('Cache-Control: public, max-age=86400'); // Allow caching for non-sensitive content
-                        header('Expires: ' . gmdate('D, d M Y H:i:s', time() + 86400) . ' GMT');
+                        header('Cache-Control: public, max-age=3600'); // Reduced cache time for security
+                        header('Expires: ' . gmdate('D, d M Y H:i:s', time() + 3600) . ' GMT');
                         
                         // Ensure clean output
                         if (ob_get_level()) {
@@ -292,7 +296,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" || (isset($_GET['stream']) && isset($_
 }
 
 // Helper function to clean up old temporary files called via a cron job
-function cleanup_temp_files($temp_dir, $max_age_hours = 24) {
+function cleanup_temp_files($temp_dir, $max_age_hours = 4) { // Reduced from 24 to 4 hours for security
     if (!is_dir($temp_dir)) return;
     
     $files = glob($temp_dir . '/decrypted_*');
@@ -303,5 +307,11 @@ function cleanup_temp_files($temp_dir, $max_age_hours = 24) {
             @unlink($file);
         }
     }
+}
+
+// Auto-cleanup on each request (as a fallback if cron job isn't configured)
+$temp_dir = sys_get_temp_dir() . '/share_temp_files';
+if (is_dir($temp_dir) && mt_rand(1, 10) === 1) { 
+    cleanup_temp_files($temp_dir);
 }
 ?>
