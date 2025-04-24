@@ -35,7 +35,7 @@
                 </div>
                 <div class="action-buttons">
                     <div class="btn-container">   
-                        <button class="action-btn active-btn"><i class="fa-solid fa-user-lock"></i><a href="/encrypt-decrypt.php">Encrypt/ Decrypt</a></button>
+                        <button class="action-btn active-btn"><i class="fa-solid fa-user-lock"></i>Encrypt/ Decrypt</button>
                         <button class="action-btn"><i class="fa-solid fa-code-compare"></i>Calculate hashes</button>
                     </div>
                 </div>
@@ -56,7 +56,7 @@
                                 <span class="btn gray-btn" id="encrypt_generate_key">Generate Key</span>
                             </div>
                             <div class="custom-input">
-                                <span id="encrypt-file-name" class="file-name truncate" style="max-width: 207px;">Select file</span>
+                                <span id="encrypt-file-name" class="file-name truncate" style="max-width: 210px;">Select file</span>
                                 <label for="encrypt_file_input" class="custom-file-label">Choose File</label>
                                 <input type="file" name="file" id="encrypt_file_input" class="custom-file-input">
                             </div>
@@ -80,7 +80,7 @@
                                 <input type="text" id="decrypt_key" name="key" placeholder="Enter the decryption key (64 hex characters)" data-encrypt="true" style="width: 100%;">
                             </div>
                             <div class="custom-input">
-                                <span id="decrypt-file-name" class="file-name">Select file</span>
+                                <span id="decrypt-file-name" class="file-name truncate" style="max-width: 210px;">Upload encrypted file</span>
                                 <label for="decrypt_file_input" class="custom-file-label">Choose File</label>
                                 <input type="file" name="file" id="decrypt_file_input" class="custom-file-input">
                             </div>
@@ -104,22 +104,40 @@
                     echo '</div>';
                     unset($_SESSION['errors_encrypt_decrypt']);
                 }
-                
-                // Display success messages if any
-                if (isset($_SESSION['success_encrypt_decrypt'])) {
-                    echo '<div class="success-messages" id="successMessage">';
-                    foreach ($_SESSION['success_encrypt_decrypt'] as $message) {
-                        echo '<p class="success-message">' . htmlspecialchars($message) . '</p>';
-                    }
-                    echo '</div>';
-                    unset($_SESSION['success_encrypt_decrypt']);
-                }
             ?>
         </div>
     </div>
     
+    <style>
+        /* Ensure loading overlay is visible */
+        #loadingOverlay {
+            position: fixed !important;
+            top: 0 !important;
+            left: 0 !important;
+            width: 100% !important;
+            height: 100% !important;
+            background-color: rgba(0, 0, 0, 0.7) !important;
+            z-index: 9999 !important;
+            display: none;
+        }
+        
+        #uploadProgressContainer {
+            position: fixed !important;
+            top: 50% !important;
+            left: 50% !important;
+            transform: translate(-50%, -50%) !important;
+            background-color: white !important;
+            padding: 20px !important;
+            border-radius: 10px !important;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5) !important;
+            width: 300px !important;
+            height: 200px !important;
+            z-index: 10000 !important;
+        }
+    </style>
+    
     <!-- Loading Overlay -->
-    <div class="progress-backdrop" id="loadingOverlay" style="display: none;">
+    <div id="loadingOverlay" style="display: none;">
         <div id="uploadProgressContainer">
             <div class="progress-container">
                 <i class="fa-solid fa-shield-halved"></i>

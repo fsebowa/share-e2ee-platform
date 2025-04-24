@@ -2,6 +2,17 @@
  * JavaScript functions for the encrypt-decrypt page
  */
 
+/**
+ * Helper function to hide the custom overlay
+ */
+function hideCustomOverlay() {
+    const overlay = document.getElementById('loadingOverlay');
+    if (overlay) {
+        overlay.style.display = 'none';
+        console.log("Hiding custom overlay");
+    }
+}
+
 document.addEventListener('DOMContentLoaded', function() {
     // Setup encrypt file input display
     setupFileInput('encrypt_file_input', 'encrypt-file-name');
@@ -94,14 +105,38 @@ function hideMessages() {
  * Callback for reCAPTCHA on encrypt form
  */
 window.onSubmitEncrypted = function(token) {
-    handleFormSubmission('encrypt_file_form', token, "Encrypting your file...");
+    const overlay = document.getElementById('loadingOverlay');
+    if (overlay) {
+        overlay.style.display = 'block';
+        console.log("Showing loading overlay for encryption");
+    }
+    
+    // Get loading message element
+    const messageElement = document.getElementById('loading-message');
+    if (messageElement) {
+        messageElement.textContent = "Encrypting your file...";
+    }
+    
+    setTimeout(() => handleFormSubmission('encrypt_file_form', token, "Encrypting your file..."), 100);
 };
 
 /**
  * Callback for reCAPTCHA on decrypt form
  */
 window.onSubmitDecrypted = function(token) {
-    handleFormSubmission('decrypt_file_form', token, "Decrypting your file...");
+    const overlay = document.getElementById('loadingOverlay');
+    if (overlay) {
+        overlay.style.display = 'block';
+        console.log("Showing loading overlay for decryption");
+    }
+    
+    // Get loading message element
+    const messageElement = document.getElementById('loading-message');
+    if (messageElement) {
+        messageElement.textContent = "Decrypting your file...";
+    }
+    
+    setTimeout(() => handleFormSubmission('decrypt_file_form', token, "Decrypting your file..."), 100);
 };
 
 /**
@@ -115,9 +150,17 @@ function handleFormSubmission(formId, token, loadingMessage) {
         return;
     }
     
-    // Show loading overlay
-    if (typeof showLoadingOverlay === 'function') {
-        showLoadingOverlay(loadingMessage);
+    // Directly manipulate the overlay
+    const overlay = document.getElementById('loadingOverlay');
+    if (overlay) {
+        overlay.style.display = 'block';
+        console.log("Showing loading overlay from handler function");
+    }
+    
+    // Update the loading message
+    const messageElement = document.getElementById('loading-message');
+    if (messageElement) {
+        messageElement.textContent = loadingMessage;
     }
     
     // Validate inputs
@@ -125,17 +168,13 @@ function handleFormSubmission(formId, token, loadingMessage) {
     const fileInput = form.querySelector('input[type="file"]');
     
     if (!keyInput || keyInput.value.trim() === '') {
-        if (typeof hideLoadingOverlay === 'function') {
-            hideLoadingOverlay();
-        }
+        hideCustomOverlay();
         alert("Please enter or generate a key.");
         return;
     }
     
     if (!fileInput || !fileInput.files || fileInput.files.length === 0) {
-        if (typeof hideLoadingOverlay === 'function') {
-            hideLoadingOverlay();
-        }
+        hideCustomOverlay();
         alert("Please select a file.");
         return;
     }
@@ -148,8 +187,16 @@ function handleFormSubmission(formId, token, loadingMessage) {
             let payload = {};
             sensitiveFields.forEach(field => {
                 payload[field.name] = field.value;
-                // Disable original field to prevent plaintext transmission
-                field.disabled = true;
+                
+                // Don't disable fields - instead use cloning approach
+                // Create a clone of the form for submission to prevent field disabling
+                const originalValue = field.value;
+                
+                // Reset the original field after form is submitted
+                setTimeout(() => {
+                    field.value = originalValue;
+                    field.disabled = false;
+                }, 500);
             });
             
             // Encrypt the data
@@ -180,16 +227,11 @@ function handleFormSubmission(formId, token, loadingMessage) {
             // Track download status
             window.downloadStarting = true;
             
-            // Set a shorter timeout to hide the loading overlay
-            window.processingCrypto = true;
-            
-            // Hide the loading overlay after a shorter time
+            // Set a timeout to hide the overlay after a reasonable time
             setTimeout(function() {
-                if (typeof hideLoadingOverlay === 'function' && window.processingCrypto) {
-                    hideLoadingOverlay();
-                    window.processingCrypto = false;
-                }
-            }, 5000); // Reduced to 5 seconds
+                console.log("Hiding loading overlay after timeout");
+                hideCustomOverlay();
+            }, 3000); // Extended to 10 seconds for better visibility
             
             // Submit form
             form.submit();

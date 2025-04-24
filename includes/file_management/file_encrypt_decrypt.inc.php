@@ -116,7 +116,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                         $original_filename = substr($original_filename, 10);
                     }
                     
-                    $download_filename = $original_filename;
+                    $download_filename = "decrypted_" . $original_filename;
                     
                     // Try to determine the actual mime type of the decrypted file
                     $finfo = finfo_open(FILEINFO_MIME_TYPE);
@@ -129,6 +129,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             
             // If we have a file to download, send it to the user
             if (isset($download_file) && file_exists($download_file)) {
+                // Send download headers
                 header('Content-Description: File Transfer');
                 header('Content-Type: ' . $mime_type);
                 header('Content-Disposition: attachment; filename="' . $download_filename . '"');
