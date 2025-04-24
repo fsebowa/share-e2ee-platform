@@ -145,7 +145,8 @@ footer .footer-links a:hover{
 .signup-form,
 .signin-form ,
 .otp-form,
-.upload-form {
+.upload-form,
+.encrypt-decrypt-form {
     text-align: center;
 }
 
@@ -154,13 +155,18 @@ footer .footer-links a:hover{
 .otp-form .container,
 .upload-form,
 .file-ellipse-popup,
-.shared-file-container {
+.shared-file-container,
+.encrypt-decrypt-form {
     width: 420px;
     margin: 0 auto;
     padding: 40px 10px;
     text-align: center;
     border-radius: 10px;
     box-shadow: 0px 0px 7px -3px rgba(0,0,0,0.75);
+}
+
+.encrypt-decrypt-form {
+    width: 450px;
 }
 
 form input {

@@ -65,7 +65,7 @@
                 </div>
                 <div class="action-buttons">
                     <div class="btn-container">   
-                        <button class="action-btn"><i class="fa-solid fa-user-lock"></i>Encrypt/ Decrypt</button>
+                        <button class="action-btn"><i class="fa-solid fa-user-lock"></i><a href="/encrypt-decrypt.php">Encrypt/ Decrypt</a></button>
                         <button class="action-btn"><i class="fa-solid fa-code-compare"></i>Calculate hashes</button>
                     </div>
                 </div>

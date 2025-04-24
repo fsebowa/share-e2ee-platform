@@ -162,7 +162,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                                     if (isset($filename_parts['extension'])) {
                                         $decrypted_filename .= '.' . $filename_parts['extension'];
                                     }
-                                    header('Content-Disposition: attachment; filename="' . $decrypted_filename . '"');
+                                    header('Content-Disposition: attachment; filename="decrypted_'. $decrypted_filename . '"');
                                     header('Expires: 0');
                                     header('Cache-Control: must-revalidate');
                                     header('Pragma: public');
