@@ -661,4 +661,83 @@ document.addEventListener("DOMContentLoaded", () => {
         files.forEach(file => file.remove());
         files.forEach(file => filesContainer.appendChild(file));
     }
+
+    function setupSearchFunctionality() {
+        const searchInput = document.getElementById('search_files');
+        if (searchInput) {
+            // Clear any existing event listeners by cloning and replacing the element
+            const newSearchInput = searchInput.cloneNode(true);
+            searchInput.parentNode.replaceChild(newSearchInput, searchInput);
+            
+            // Add the event listener to the new element
+            newSearchInput.addEventListener('input', function() {
+                const searchTerm = this.value.toLowerCase();
+                let visibleCount = 0;
+                
+                // Get currently active category
+                const activeCategory = document.querySelector('.categories li.active-cat');
+                const activeFilter = activeCategory ? activeCategory.textContent.trim() : 'All';
+                
+                document.querySelectorAll('.file').forEach(function(fileElement) {
+                    const fileTitle = fileElement.querySelector('.file-title');
+                    if (!fileTitle) return;
+                    
+                    const fileName = fileTitle.textContent.toLowerCase();
+                    const fileType = fileElement.getAttribute('data-file-type');
+                    
+                    const matchesSearch = fileName.includes(searchTerm);
+                    const matchesCategory = (activeFilter === 'All' || fileType === activeFilter);
+                    
+                    // File should be visible only if it matches both search and category filter
+                    if (matchesSearch && matchesCategory) {
+                        fileElement.style.display = 'flex';
+                        visibleCount++;
+                    } else {
+                        fileElement.style.display = 'none';
+                    }
+                });
+                
+                // Check if there are any visible files after filtering
+                const dashFiles = document.querySelector('.dash-files');
+                const existingEmptyMessage = document.querySelector('.empty-search-results');
+                const uploadedFiles = document.querySelector('.uploaded-files');
+                
+                if (visibleCount === 0) {
+                    // No files match the search query
+                    if (!existingEmptyMessage) {
+                        // Add search-specific message
+                        const emptyMessage = document.createElement('p');
+                        emptyMessage.className = 'empty-dash empty-search-results';
+                        emptyMessage.textContent = searchTerm.length > 0 ? 
+                            'No files match your search' : 
+                            'No files found in this category';
+                        
+                        if (dashFiles) dashFiles.appendChild(emptyMessage);
+                        
+                        // Hide the files container but don't remove it
+                        if (uploadedFiles) {
+                            uploadedFiles.style.display = 'none';
+                        }
+                    } else if (searchTerm.length > 0) {
+                        // Update existing message for search
+                        existingEmptyMessage.textContent = 'No files match your search';
+                    } else {
+                        // Update existing message for category
+                        existingEmptyMessage.textContent = 'No files found in this category';
+                    }
+                } else {
+                    // Remove empty message if it exists
+                    if (existingEmptyMessage) {
+                        existingEmptyMessage.remove();
+                    }
+                    
+                    // Make sure uploaded files container is visible
+                    if (uploadedFiles) {
+                        uploadedFiles.style.display = 'flex';
+                    }
+                }
+            });
+        }
+    }
+    setupSearchFunctionality();
 });
