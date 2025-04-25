@@ -1123,6 +1123,7 @@ nav button,
 /* Hash page */
 .hash-text {
     text-align: left;
+    overflow-wrap: break-word;
 }
 
 .hash-text span {

@@ -1,7 +1,5 @@
 // JavaScript for the shared files page
-document.addEventListener('DOMContentLoaded', function() {
-    console.log('shared.js loaded');
-    
+document.addEventListener('DOMContentLoaded', function() {    
     // Initialize popup behaviors first
     setupPopupBehavior();
     
@@ -18,9 +16,7 @@ document.addEventListener('DOMContentLoaded', function() {
     setTimeout(hideMessages, 5000);
 });
 
-function setupPopupBehavior() {
-    console.log('Setting up popup behavior');
-    
+function setupPopupBehavior() {    
     // Close popups when clicking outside
     document.addEventListener('click', function(e) {
         if (!e.target.closest('.file-menu-popup') && 
@@ -55,9 +51,7 @@ function setupPopupBehavior() {
 }
 
 
-function setupEllipseMenus() {
-    console.log('Setting up ellipse menus');
-    
+function setupEllipseMenus() {    
     document.querySelectorAll('.elipse-menu').forEach(menu => {
         // Remove any existing listeners by cloning the element
         const newMenu = menu.cloneNode(true);
@@ -68,7 +62,6 @@ function setupEllipseMenus() {
         // Add fresh click handler
         newMenu.addEventListener('click', function(e) {
             e.stopPropagation();
-            console.log('Ellipse menu clicked');
             
             // Get the menu popup
             const fileContainer = this.closest('.file');
@@ -92,21 +85,16 @@ function setupEllipseMenus() {
             // Only open this one if it wasn't already open
             if (!isAlreadyOpen) {
                 menuPopup.style.display = 'block';
-                console.log('Menu opened');
             }
         });
     });
 }
 
-function setupLinkButtons() {
-    console.log('Setting up link buttons');
-    
+function setupLinkButtons() {    
     // Setup copy link buttons
     document.querySelectorAll('.copy-link-btn').forEach(button => {
         button.addEventListener('click', function(e) {
-            e.stopPropagation();
-            console.log('Copy link clicked');
-            
+            e.stopPropagation();            
             const fileElement = this.closest('.file');
             if (!fileElement) return;
             
@@ -140,7 +128,6 @@ function setupLinkButtons() {
     document.querySelectorAll('.revoke-link-btn').forEach(button => {
         button.addEventListener('click', function(e) {
             e.stopPropagation();
-            console.log('Revoke link clicked');
             
             const fileElement = this.closest('.file');
             if (!fileElement) return;
@@ -199,9 +186,7 @@ function setupLinkButtons() {
     }
 }
 
-function setupSearch() {
-    console.log('Setting up search');
-    
+function setupSearch() {    
     const searchInput = document.getElementById('search_files');
     if (searchInput) {
         searchInput.addEventListener('input', function() {
@@ -223,9 +208,7 @@ function setupSearch() {
     }
 }
 
-function setupSorting() {
-    console.log('Setting up sorting');
-    
+function setupSorting() {    
     const sortDropdown = document.getElementById('sort_files');
     if (sortDropdown) {
         sortDropdown.addEventListener('change', function() {
@@ -237,9 +220,7 @@ function setupSorting() {
     }
 }
 
-function sortSharedFiles(sortBy) {
-    console.log('Sorting files by:', sortBy);
-    
+function sortSharedFiles(sortBy) {    
     const filesContainer = document.querySelector('.uploaded-files');
     if (!filesContainer) return;
     
@@ -295,13 +276,10 @@ function sortSharedFiles(sortBy) {
 }
 
 
-function checkRevokedShares() {
-    console.log('Checking for revoked shares');
-    
+function checkRevokedShares() {    
     // Check for shares revoked via form submission
     const revokedShareId = sessionStorage.getItem('revokedShareId');
     if (revokedShareId) {
-        console.log('Found revoked share ID in session storage:', revokedShareId);
         removeShareFromUI('share-item-' + revokedShareId);
         sessionStorage.removeItem('revokedShareId');
     }
@@ -310,7 +288,6 @@ function checkRevokedShares() {
     const urlParams = new URLSearchParams(window.location.search);
     const shareIdParam = urlParams.get('share_id');
     if (shareIdParam && urlParams.get('message') === 'share_revoked') {
-        console.log('Found revoked share ID in URL:', shareIdParam);
         removeShareFromUI('share-item-' + shareIdParam);
         
         // Clean up URL to prevent repeated removal on refresh
@@ -321,9 +298,7 @@ function checkRevokedShares() {
     }
 }
 
-function removeShareFromUI(shareContainerId) {
-    console.log('Removing share from UI:', shareContainerId);
-    
+function removeShareFromUI(shareContainerId) {    
     const shareContainer = document.getElementById(shareContainerId);
     if (!shareContainer) {
         console.error('Share container not found:', shareContainerId);
@@ -377,9 +352,7 @@ function hideMessages() {
     }
 }
 
-function closeAllPopups() {
-    console.log('Closing all popups');
-    
+function closeAllPopups() {    
     // Close file menus
     document.querySelectorAll('.file-menu-popup').forEach(popup => {
         popup.style.display = 'none';
@@ -391,9 +364,7 @@ function closeAllPopups() {
     });
 }
 
-function copyToClipboard(elementId) {
-    console.log('Copying to clipboard:', elementId);
-    
+function copyToClipboard(elementId) {    
     const element = document.getElementById(elementId);
     if (!element) return;
     
