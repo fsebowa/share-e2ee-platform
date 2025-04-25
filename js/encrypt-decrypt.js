@@ -27,14 +27,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Hide any messages after 5 seconds
     setTimeout(hideMessages, 5000);
-    
-    // Listen for beforeunload event which might indicate a download 
-    window.addEventListener('beforeunload', function(e) {
-        if (window.processingCrypto) {
-            hideLoadingOverlay();
-            window.processingCrypto = false;
-        }
-    });
 });
 
 /**
@@ -105,38 +97,56 @@ function hideMessages() {
  * Callback for reCAPTCHA on encrypt form
  */
 window.onSubmitEncrypted = function(token) {
-    const overlay = document.getElementById('loadingOverlay');
-    if (overlay) {
-        overlay.style.display = 'block';
-        console.log("Showing loading overlay for encryption");
+    const form = document.getElementById('encrypt_file_form');
+    if (!form) return;
+    
+    const keyInput = form.querySelector('input[name="key"]');
+    const fileInput = form.querySelector('input[type="file"]');
+    
+    if (!keyInput || keyInput.value.trim() === '') {
+        alert("Please enter or generate a key.");
+        return;
     }
     
-    // Get loading message element
-    const messageElement = document.getElementById('loading-message');
-    if (messageElement) {
-        messageElement.textContent = "Encrypting your file...";
+    if (!fileInput || !fileInput.files || fileInput.files.length === 0) {
+        alert("Please select a file.");
+        return;
     }
     
-    setTimeout(() => handleFormSubmission('encrypt_file_form', token, "Encrypting your file..."), 100);
+    // Show loading overlay just like the download button does
+    if (typeof showLoadingOverlay === 'function') {
+        showLoadingOverlay("Encrypting and downloading file...");
+    }
+    
+    processEncryptedForm(form, token);
 };
 
 /**
  * Callback for reCAPTCHA on decrypt form
  */
 window.onSubmitDecrypted = function(token) {
-    const overlay = document.getElementById('loadingOverlay');
-    if (overlay) {
-        overlay.style.display = 'block';
-        console.log("Showing loading overlay for decryption");
+    const form = document.getElementById('decrypt_file_form');
+    if (!form) return;
+    
+    const keyInput = form.querySelector('input[name="key"]');
+    const fileInput = form.querySelector('input[type="file"]');
+    
+    if (!keyInput || keyInput.value.trim() === '') {
+        alert("Please enter a decryption key.");
+        return;
     }
     
-    // Get loading message element
-    const messageElement = document.getElementById('loading-message');
-    if (messageElement) {
-        messageElement.textContent = "Decrypting your file...";
+    if (!fileInput || !fileInput.files || fileInput.files.length === 0) {
+        alert("Please select a file.");
+        return;
     }
     
-    setTimeout(() => handleFormSubmission('decrypt_file_form', token, "Decrypting your file..."), 100);
+    // Show loading overlay just like the download button does
+    if (typeof showLoadingOverlay === 'function') {
+        showLoadingOverlay("Decrypting and downloading file...");
+    }
+    
+    processEncryptedForm(form, token);
 };
 
 /**
@@ -231,7 +241,7 @@ function handleFormSubmission(formId, token, loadingMessage) {
             setTimeout(function() {
                 console.log("Hiding loading overlay after timeout");
                 hideCustomOverlay();
-            }, 3000); // Extended to 10 seconds for better visibility
+            }, 10000); // Extended to 10 seconds for better visibility
             
             // Submit form
             form.submit();
