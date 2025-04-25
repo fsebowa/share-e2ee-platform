@@ -88,11 +88,27 @@ function get_file_shares(object $pdo, int $fileId, int $userId) {
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
 
-function get_all_user_shared_files (object $pdo, int $user_id) {
-    $query = "SELECT * FROM file_shares WHERE shared_by = :user_id ORDER BY created_at DESC";
+// function get_all_user_shared_files (object $pdo, int $user_id) {
+//     $query = "SELECT * FROM file_shares WHERE shared_by = :user_id ORDER BY created_at DESC";
+//     $stmt = $pdo->prepare($query);
+//     $stmt->bindParam(":shared_by", $user_id, PDO::PARAM_INT);
+//     $stmt->execute();
+//     return $stmt->fetchAll(PDO::FETCH_ASSOC);
+// }
+
+function get_user_shared_files_with_details(object $pdo, int $user_id) {
+    $query = "SELECT s.*, f.file_name, f.original_filename, f.file_type, f.file_size, f.date_uploaded,
+                u.first_name, u.last_name
+            FROM file_shares s
+            JOIN file_uploads f ON s.file_id = f.id
+            LEFT JOIN users u ON s.shared_by = u.id
+            WHERE s.shared_by = :user_id 
+            ORDER BY s.created_at DESC";
+    
     $stmt = $pdo->prepare($query);
-    $stmt->bindParam(":shared_by", $user_id, PDO::PARAM_INT);
+    $stmt->bindParam(":user_id", $user_id, PDO::PARAM_INT);
     $stmt->execute();
+    
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
 
