@@ -1107,3 +1107,15 @@ nav button,
 .share-file-wrapper form button {
     margin-bottom: 0;
 }
+
+
+/* Ensure consistent positioning of error messages below file containers */
+.main-cont.share-item {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+
+

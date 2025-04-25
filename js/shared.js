@@ -1,23 +1,29 @@
-// Manages UI interactions for shared files, including copying links and revoking shares
-
 document.addEventListener('DOMContentLoaded', function() {
-    // Initialize shared files functionality
-    initSharedFilesPage();
-    
-    // Hide messages after 5 seconds
-    setTimeout(hideMessages, 5000);
-    
-    // Set up popup behavior
+    // Initialize popup behaviors first
     setupPopupBehavior();
     
-    // Check for revoked shares to remove
+    // Setup ellipsis menu handlers with proper popup closing
+    setupEllipsisMenuHandlers();
+        
+    // Then setup other functionality
+    setupCategoryFiltering();
+    setupSearch();
+    setupFileSorting();
+    
+    // Handle any pending operations (like deleted shares)
     checkRevokedShares();
+    
+    // Auto-dismiss messages after a delay
+    setTimeout(hideMessages, 5000);
 });
 
 /**
  * Initialize all functionality for the shared files page
  */
 function initSharedFilesPage() {
+    // Add ID to all share items
+    addShareItemIds();
+    
     // Setup menu item actions
     setupMenuItemActions();
     
@@ -29,6 +35,49 @@ function initSharedFilesPage() {
     
     // Setup sorting
     setupSorting();
+    
+    // Apply the initial category filter (All by default)
+    applyInitialCategory();
+}
+
+/**
+ * Add IDs to all share items to support removal and tracking
+ */
+function addShareItemIds() {
+    document.querySelectorAll('.main-cont.share-item').forEach(function(item, index) {
+        const fileElement = item.querySelector('.file');
+        if (fileElement && !item.id) {
+            const shareId = fileElement.getAttribute('data-share-id');
+            if (shareId) {
+                item.id = 'share-item-' + shareId;
+            } else {
+                item.id = 'share-item-unknown-' + index;
+            }
+        }
+    });
+}
+
+/**
+ * Apply the initial category filter when the page loads
+ */
+function applyInitialCategory() {
+    // Get the "All" category element
+    const allCategory = document.querySelector('.categories li[data-category="All"]');
+    if (!allCategory) return;
+    
+    // Ensure it has the active-cat class
+    document.querySelectorAll('.categories li').forEach(li => {
+        li.classList.remove('active-cat');
+    });
+    allCategory.classList.add('active-cat');
+    
+    // Apply the filter to show all files initially
+    document.querySelectorAll('.file').forEach(file => {
+        const mainCont = file.closest('.main-cont');
+        if (mainCont) {
+            mainCont.style.display = 'block';
+        }
+    });
 }
 
 /**
@@ -131,7 +180,7 @@ function setupCategoryFiltering() {
             // Add active class to clicked category
             this.classList.add('active-cat');
             
-            const categoryText = this.textContent;
+            const categoryText = this.getAttribute('data-category') || this.textContent;
             
             // Show/hide files based on category
             document.querySelectorAll('.file').forEach(function(file) {
@@ -198,10 +247,6 @@ function setupSorting() {
     }
 }
 
-/**
- * Sort shared files based on the selected criteria
- * @param {string} sortBy - The sorting criteria
- */
 function sortSharedFiles(sortBy) {
     const filesContainer = document.querySelector('.uploaded-files');
     if (!filesContainer) return;
@@ -260,10 +305,6 @@ function sortSharedFiles(sortBy) {
     files.forEach(file => filesContainer.appendChild(file));
 }
 
-/**
- * Copy the contents of an input element to clipboard
- * @param {string} elementId - The ID of the input element
- */
 function copyToClipboard(elementId) {
     const element = document.getElementById(elementId);
     if (!element) return;
@@ -282,9 +323,6 @@ function copyToClipboard(elementId) {
     }
 }
 
-/**
- * Hide error and success messages with a fade effect
- */
 function hideMessages() {
     const errorMessages = document.getElementById('errorMessages');
     const successMessages = document.getElementById('successMessage');
@@ -310,10 +348,6 @@ function hideMessages() {
     }
 }
 
-/**
- * Set up popup behavior for the shared files page
- * Ensures popups can be closed when clicking outside and only one is visible at a time
- */
 function setupPopupBehavior() {
     // Get popup elements
     const copyLinkPopup = document.getElementById('copyShareLink');
@@ -322,13 +356,22 @@ function setupPopupBehavior() {
     
     // Close popups when clicking outside
     document.addEventListener('click', function(e) {
-        if (e.target.closest('.file-ellipse-popup') || 
-            e.target.closest('.copy-link-btn') || 
-            e.target.closest('.revoke-link-btn') || 
-            e.target.closest('.file-menu-popup')) {
+        // If clicking on ellipsis menu, close all popups
+        if (e.target.closest('.elipse-menu')) {
+            allPopups.forEach(popup => {
+                if (popup) popup.style.display = 'none';
+            });
             return;
         }
         
+        // Don't close if clicking inside popup or on specific buttons
+        if (e.target.closest('.file-ellipse-popup') || 
+            e.target.closest('.copy-link-btn') || 
+            e.target.closest('.revoke-link-btn')) {
+            return;
+        }
+        
+        // Close popups otherwise
         allPopups.forEach(popup => {
             if (popup && popup.style.display === 'block') {
                 popup.style.display = 'none';
@@ -344,43 +387,198 @@ function setupPopupBehavior() {
             });
         }
     });
+    
+    // Setup ellipsis menu to close all popups when clicked
+    document.querySelectorAll('.elipse-menu').forEach(menu => {
+        menu.addEventListener('click', function(e) {
+            // Close all popups when ellipsis menu is clicked
+            allPopups.forEach(popup => {
+                if (popup) popup.style.display = 'none';
+            });
+        });
+    });
 }
 
-/**
- * Check for revoked shares and remove them from the UI
- * Uses sessionStorage to track which shares were revoked
- */
 function checkRevokedShares() {
+    // First check sessionStorage for shares revoked via form submission
     const revokedShareId = sessionStorage.getItem('revokedShareId');
     if (revokedShareId) {
-        const shareContainer = document.getElementById('share-item-' + revokedShareId);
-        if (shareContainer) {
-            // Animate removal for better UX
-            shareContainer.style.transition = 'opacity 0.5s, height 0.5s, margin 0.5s';
-            shareContainer.style.opacity = '0';
-            shareContainer.style.height = '0';
-            shareContainer.style.margin = '0';
-            shareContainer.style.overflow = 'hidden';
-            
-            // Remove from DOM after animation completes
-            setTimeout(() => {
-                shareContainer.remove();
-                
-                // Check if there are no more shares and show empty message if needed
-                const remainingShares = document.querySelectorAll('.main-cont.share-item');
-                if (remainingShares.length === 0) {
-                    const filesContainer = document.querySelector('.dash-files');
-                    if (filesContainer) {
-                        filesContainer.innerHTML = '<p class="empty-dash">You haven\'t shared any files yet</p>';
-                    }
-                }
-            }, 500);
-        }
-        
-        // Clear the revoked share ID
+        removeShareFromUI('share-item-' + revokedShareId);
         sessionStorage.removeItem('revokedShareId');
     }
+    
+    // Also check URL parameters for shares revoked via PHP redirect
+    const urlParams = new URLSearchParams(window.location.search);
+    const shareIdParam = urlParams.get('share_id');
+    if (shareIdParam && urlParams.get('message') === 'share_revoked') {
+        removeShareFromUI('share-item-' + shareIdParam);
+        
+        // Clean up URL to prevent repeated removal on refresh
+        if (history.replaceState) {
+            const newUrl = window.location.pathname;
+            history.replaceState(null, document.title, newUrl);
+        }
+    }
 }
+
+function removeShareFromUI(shareContainerId) {
+    const shareContainer = document.getElementById(shareContainerId);
+    if (!shareContainer) return;
+    
+    // Animate removal for better UX
+    shareContainer.style.transition = 'opacity 0.5s, height 0.5s, margin 0.5s';
+    shareContainer.style.opacity = '0';
+    shareContainer.style.height = '0';
+    shareContainer.style.margin = '0';
+    shareContainer.style.overflow = 'hidden';
+    
+    // Remove from DOM after animation completes
+    setTimeout(() => {
+        shareContainer.remove();
+        
+        // Check if there are no more shares and show empty message if needed
+        const remainingShares = document.querySelectorAll('.main-cont.share-item');
+        if (remainingShares.length === 0) {
+            const filesContainer = document.querySelector('.dash-files');
+            if (filesContainer) {
+                filesContainer.innerHTML = '<p class="empty-dash">You haven\'t shared any files yet</p>';
+            }
+        }
+    }, 500);
+}
+
+function applyDefaultCategoryFilter() {
+    // Ensure the 'All' category has the active-cat class
+    const categories = document.querySelectorAll('.categories li');
+    categories.forEach(cat => {
+        cat.classList.remove('active-cat');
+    });
+    
+    const allCategory = document.querySelector('.categories li:first-child');
+    if (allCategory) {
+        allCategory.classList.add('active-cat');
+        
+        // Apply the filter to show all files
+        const files = document.querySelectorAll('.file');
+        files.forEach(file => {
+            const mainCont = file.closest('.main-cont');
+            if (mainCont) {
+                mainCont.style.display = 'block';
+            }
+        });
+    }
+}
+
+function setupEllipsisMenuHandlers() {
+    document.querySelectorAll('.elipse-menu').forEach(menu => {
+        menu.addEventListener('click', function(e) {
+            e.stopPropagation();
+            
+            // First, close any open file-ellipse-popup elements
+            closeAllPopups();
+            
+            // Then find the menu popup associated with this ellipsis
+            const fileContainer = this.closest('.file');
+            const menuPopup = fileContainer.querySelector('.file-menu-popup');
+            
+            // Check if this menu is already open
+            const isMenuOpen = (menuPopup.style.display === 'block');
+            
+            // Close all menu popups first
+            document.querySelectorAll('.file-menu-popup').forEach(popup => {
+                popup.style.display = 'none';
+            });
+            
+            // Toggle this menu (only open if it was closed before)
+            if (!isMenuOpen) {
+                menuPopup.style.display = 'block';
+            }
+        });
+    });
+}
+
+function setupLinkActionHandlers() {
+    // Copy link button handlers
+    document.querySelectorAll('.copy-link-btn').forEach(button => {
+        button.addEventListener('click', handleCopyLinkClick);
+    });
+    
+    // Revoke link button handlers
+    document.querySelectorAll('.revoke-link-btn').forEach(button => {
+        button.addEventListener('click', handleRevokeLinkClick);
+    });
+}
+
+function handleCopyLinkClick(e) {
+    e.stopPropagation();
+    
+    // First, close all popups to prevent overlap
+    closeAllPopups();
+    
+    const fileElement = this.closest('.file');
+    const shareUrl = fileElement.getAttribute('data-share-url');
+    const fileName = fileElement.querySelector('.file-title').textContent.trim();
+    
+    // Open copy link popup
+    const popup = document.getElementById('copyShareLink');
+    if (!popup) return;
+    
+    popup.querySelector('h2').textContent = 'Copy Link: ' + fileName;
+    document.getElementById('shareLink').value = shareUrl;
+    
+    // Hide any existing copied message
+    const copiedMsg = document.getElementById('shareLink_copied');
+    if (copiedMsg) copiedMsg.style.display = 'none';
+    
+    // Display the popup
+    popup.style.display = 'block';
+}
+
+function handleRevokeLinkClick(e) {
+    e.stopPropagation();
+    
+    // First, close all popups to prevent overlap
+    closeAllPopups();
+    
+    const fileElement = this.closest('.file');
+    const shareId = fileElement.getAttribute('data-share-id');
+    const fileName = fileElement.querySelector('.file-title').textContent.trim();
+    
+    // Store reference to file container for removal after revocation
+    const fileContainer = fileElement.closest('.main-cont');
+    
+    // Open revoke link popup
+    const popup = document.getElementById('deleteLink');
+    if (!popup) return;
+    
+    popup.querySelector('h2').textContent = 'Revoke Share: ' + fileName;
+    
+    // Set the share ID and store file container reference
+    const revokeShareIdInput = document.getElementById('revoke_share_id');
+    revokeShareIdInput.value = shareId;
+    
+    // Add ID to container if needed for easy removal later
+    if (fileContainer && !fileContainer.id) {
+        fileContainer.id = 'share-item-' + shareId;
+    }
+    
+    // Display the popup
+    popup.style.display = 'block';
+}
+
+function closeAllPopups() {
+    // Close file operation popups (copy link, revoke link)
+    const filePopups = document.querySelectorAll('#copyShareLink, #deleteLink');
+    filePopups.forEach(popup => {
+        if (popup) popup.style.display = 'none';
+    });
+    
+    // Close all file menu popups
+    document.querySelectorAll('.file-menu-popup').forEach(popup => {
+        popup.style.display = 'none';
+    });
+}
+
 
 // Make functions globally available
 window.copyToClipboard = copyToClipboard;

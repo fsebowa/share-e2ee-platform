@@ -113,9 +113,9 @@ function get_user_shared_files_with_details(object $pdo, int $user_id) {
 }
 
 function deactivate_file_share(object $pdo, int $shareId, int $userId) {
-    $query = "UPDATE file_shares 
-                SET is_active = FALSE 
-                WHERE id = :share_id AND shared_by = :user_id";
+    // Delete the share record completely instead of just marking as inactive
+    $query = "DELETE FROM file_shares 
+            WHERE id = :share_id AND shared_by = :user_id";
     
     $stmt = $pdo->prepare($query);
     $stmt->bindParam(":share_id", $shareId, PDO::PARAM_INT);

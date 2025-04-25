@@ -78,10 +78,10 @@
             <div class="categories dash-box">
                 <h4>Categories:</h4>
                 <ul class="dash-box">
-                    <li class="active-cat">All</li>
-                    <li>Active</li>
-                    <li>Expired</li>
-                    <li>Password Protected</li>
+                    <li class="active-cat" data-category="All">All</li>
+                    <li data-category="Active">Active</li>
+                    <li data-category="Expired">Expired</li>
+                    <li data-category="Password Protected">Password Protected</li>
                 </ul>
             </div>
             
@@ -125,11 +125,11 @@
                         ?>
                             <div class="main-cont share-item">
                                 <div class="file col" 
-                                    data-file-type="<?php echo htmlspecialchars($share['file_type'] ?? 'Document'); ?>" 
-                                    data-file-id="<?php echo htmlspecialchars($share['file_id']); ?>"
-                                    data-share-id="<?php echo htmlspecialchars($share['id']); ?>"
-                                    data-share-url="<?php echo htmlspecialchars($share_url); ?>"
-                                    data-share-class="<?php echo $share_class; ?>">
+                                     data-file-type="<?php echo htmlspecialchars($share['file_type'] ?? 'Document'); ?>" 
+                                     data-file-id="<?php echo htmlspecialchars($share['file_id']); ?>"
+                                     data-share-id="<?php echo htmlspecialchars($share['id']); ?>"
+                                     data-share-url="<?php echo htmlspecialchars($share_url); ?>"
+                                     data-share-class="<?php echo $share_class; ?>">
                                     <div class="top row">
                                         <p class="file-title truncate"><?php echo htmlspecialchars($share['original_name'] ?? $share['file_name'] ?? 'Shared File'); ?></p>
                                         <p class="caption-text" style="display: flex; align-items: center; gap: 2px;"> 

@@ -27,45 +27,58 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         // Get user ID from session
         $userId = $_SESSION["user_id"];
         
-        // Get share info before deactivation for logging purposes
-        $query = "SELECT s.*, f.file_name 
-                  FROM file_shares s
-                  JOIN file_uploads f ON s.file_id = f.id
-                  WHERE s.id = :share_id AND s.shared_by = :user_id";
-        $stmt = $pdo->prepare($query);
-        $stmt->bindParam(":share_id", $shareId, PDO::PARAM_INT);
-        $stmt->bindParam(":user_id", $userId, PDO::PARAM_INT);
-        $stmt->execute();
-        $shareInfo = $stmt->fetch(PDO::FETCH_ASSOC);
+        // Log the request
+        error_log("User {$userId} is attempting to delete share {$shareId}");
         
-        if (!$shareInfo) {
-            $_SESSION['share_revoke_error'] = "Share not found or you don't have permission to revoke it.";
-            header("Location: /shared.php?error=share_not_found");
-            exit();
-        }
-        
-        // Log the revocation
-        error_log("User {$userId} is revoking share {$shareId} for file: {$shareInfo['file_name']}");
-        
-        // Deactivate the share
+        // Delete the share from the database
         $result = deactivate_file_share($pdo, (int)$shareId, $userId);
         
         if ($result) {
-            // Store the revoked share ID in session for the JavaScript to use
+            // Store the deleted share ID in session for the JavaScript to use
             $_SESSION['revoked_share_id'] = $shareId;
-            $_SESSION['share_revoke_success'] = "Share link has been successfully revoked.";
-            header("Location: /shared.php?message=share_revoked&share_id=" . $shareId);
+            $_SESSION['share_revoke_success'] = "Share link has been permanently deleted.";
+            
+            // Check if this is an AJAX request
+            if (!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest') {
+                echo json_encode(['success' => true]);
+                exit;
+            }
+            
+            // Regular form submission - redirect with success message
+            header("Location: /shared.php?message=share_deleted&share_id=" . $shareId);
         } else {
-            $_SESSION['share_revoke_error'] = "Failed to revoke share. Please try again.";
-            header("Location: /shared.php?error=revoke_failed");
+            $_SESSION['share_revoke_error'] = "Failed to delete share. Please try again.";
+            
+            // Check if this is an AJAX request
+            if (!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest') {
+                echo json_encode(['success' => false, 'error' => 'Failed to delete share']);
+                exit;
+            }
+            
+            // Regular form submission - redirect with error
+            header("Location: /shared.php?error=delete_failed");
         }
     } catch (PDOException $e) {
-        error_log("Share revocation failed: " . $e->getMessage());
+        error_log("Share deletion failed: " . $e->getMessage());
         $_SESSION['share_revoke_error'] = "An unexpected error occurred. Please try again later.";
+        
+        // Check if this is an AJAX request
+        if (!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest') {
+            echo json_encode(['success' => false, 'error' => 'Database error']);
+            exit;
+        }
+        
         header("Location: /shared.php?error=database_error");
     } catch (Exception $e) {
-        error_log("Share revocation exception: " . $e->getMessage());
+        error_log("Share deletion exception: " . $e->getMessage());
         $_SESSION['share_revoke_error'] = "An unexpected error occurred. Please try again later.";
+        
+        // Check if this is an AJAX request
+        if (!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest') {
+            echo json_encode(['success' => false, 'error' => 'System error']);
+            exit;
+        }
+        
         header("Location: /shared.php?error=system_error");
     }
 } else {
