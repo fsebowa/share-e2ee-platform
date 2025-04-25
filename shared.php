@@ -243,6 +243,26 @@
     
     <script>
     document.addEventListener('DOMContentLoaded', function() {
+        // Get popup elements
+        const copyLinkPopup = document.getElementById('copyShareLink');
+        const revokeLinkPopup = document.getElementById('deleteLink');
+        
+        // Make the popups closable when clicking outside
+        document.addEventListener('click', function(e) {
+            // Check if click is outside any popup
+            if (copyLinkPopup && !copyLinkPopup.contains(e.target) && 
+                !e.target.closest('.copy-link-btn') && 
+                copyLinkPopup.style.display === 'block') {
+                copyLinkPopup.style.display = 'none';
+            }
+            
+            if (revokeLinkPopup && !revokeLinkPopup.contains(e.target) && 
+                !e.target.closest('.revoke-link-btn') && 
+                revokeLinkPopup.style.display === 'block') {
+                revokeLinkPopup.style.display = 'none';
+            }
+        });
+        
         // Setup handlers for copy link buttons
         document.querySelectorAll('.copy-link-btn').forEach(button => {
             button.addEventListener('click', function(e) {
@@ -275,10 +295,23 @@
                 const shareId = fileElement.getAttribute('data-share-id');
                 const fileName = fileElement.querySelector('.file-title').textContent.trim();
                 
+                // Store reference to file container for removal after revocation
+                const fileContainer = fileElement.closest('.main-cont');
+                
                 // Open revoke link popup
                 const popup = document.getElementById('deleteLink');
                 popup.querySelector('h2').textContent = 'Revoke Share: ' + fileName;
-                document.getElementById('revoke_share_id').value = shareId;
+                
+                // Set the share ID and store file container reference
+                const revokeShareIdInput = document.getElementById('revoke_share_id');
+                revokeShareIdInput.value = shareId;
+                revokeShareIdInput.dataset.fileContainer = fileContainer ? fileContainer.id : '';
+                
+                if (!fileContainer.id) {
+                    // Assign a unique ID if none exists
+                    fileContainer.id = 'share-item-' + shareId;
+                    revokeShareIdInput.dataset.fileContainer = fileContainer.id;
+                }
                 
                 // Show the popup
                 if (typeof closeAllPopups === 'function') {
@@ -354,20 +387,70 @@
                 successMessages.style.transition = 'opacity 1s';
                 successMessages.style.opacity = '0';
                 setTimeout(() => successMessages.remove(), 1000);
+                
+                // If we have a successful revocation
+                if (window.hasRevokeSuccess) {
+                    // Get and remove the revoked share element
+                    const revokedShareId = sessionStorage.getItem('revokedShareId');
+                    if (revokedShareId) {
+                        const shareContainer = document.getElementById('share-item-' + revokedShareId);
+                        if (shareContainer) {
+                            shareContainer.remove();
+                        }
+                        sessionStorage.removeItem('revokedShareId');
+                    }
+                }
             }
         }, 5000);
         
         // Setup form submission for revoke link
         const deleteLinkForm = document.getElementById('delete_link_form');
         if (deleteLinkForm) {
-            deleteLinkForm.addEventListener('submit', function() {
+            deleteLinkForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                // Get the share ID and file container reference
+                const shareIdInput = document.getElementById('revoke_share_id');
+                const shareId = shareIdInput.value;
+                const fileContainerId = shareIdInput.dataset.fileContainer;
+                
+                // Store the share ID in session storage for use after redirect
+                sessionStorage.setItem('revokedShareId', shareId);
+                
                 // Show loading overlay
                 const deleteProgressBackdrop = document.getElementById('deleteProgressBackdrop');
                 if (deleteProgressBackdrop) {
                     deleteProgressBackdrop.style.display = 'block';
                 }
+                
+                // Submit the form normally
+                this.submit();
+                
+                // Remove the share element from DOM if immediate feedback is preferred
+                if (fileContainerId) {
+                    const fileContainer = document.getElementById(fileContainerId);
+                    if (fileContainer) {
+                        // Use setTimeout to give visual feedback before removing
+                        setTimeout(() => {
+                            fileContainer.style.opacity = '0.5';
+                        }, 500);
+                    }
+                }
             });
         }
+        
+        // Add ID to all share items if they don't have one
+        document.querySelectorAll('.main-cont.share-item').forEach(function(item, index) {
+            const fileElement = item.querySelector('.file');
+            if (fileElement && !item.id) {
+                const shareId = fileElement.getAttribute('data-share-id');
+                if (shareId) {
+                    item.id = 'share-item-' + shareId;
+                } else {
+                    item.id = 'share-item-unknown-' + index;
+                }
+            }
+        });
     });
     
     // Function to copy text to clipboard
@@ -387,6 +470,14 @@
                 message.style.display = 'none';
             }, 2000);
         }
+        
+        // Hide the popup after a delay
+        setTimeout(() => {
+            const popup = element.closest('.file-ellipse-popup');
+            if (popup) {
+                popup.style.display = 'none';
+            }
+        }, 1500);
     }
     </script>
 </body>

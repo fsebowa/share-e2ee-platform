@@ -1,7 +1,4 @@
-/**
- * JavaScript for the shared files page
- * Manages UI interactions for shared files, including copying links and revoking shares
- */
+// Manages UI interactions for shared files, including copying links and revoking shares
 
 document.addEventListener('DOMContentLoaded', function() {
     // Initialize shared files functionality
@@ -9,6 +6,12 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Hide messages after 5 seconds
     setTimeout(hideMessages, 5000);
+    
+    // Set up popup behavior
+    setupPopupBehavior();
+    
+    // Check for revoked shares to remove
+    checkRevokedShares();
 });
 
 /**
@@ -80,11 +83,35 @@ function setupMenuItemActions() {
     // Setup form submission for revoke link
     const deleteLinkForm = document.getElementById('delete_link_form');
     if (deleteLinkForm) {
-        deleteLinkForm.addEventListener('submit', function() {
+        deleteLinkForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Get the share ID and file container reference
+            const shareIdInput = document.getElementById('revoke_share_id');
+            const shareId = shareIdInput.value;
+            const fileContainerId = shareIdInput.dataset.fileContainer;
+            
+            // Store the share ID in session storage for use after redirect
+            sessionStorage.setItem('revokedShareId', shareId);
+            
             // Show loading overlay
             const deleteProgressBackdrop = document.getElementById('deleteProgressBackdrop');
             if (deleteProgressBackdrop) {
                 deleteProgressBackdrop.style.display = 'block';
+            }
+            
+            // Submit the form normally
+            this.submit();
+            
+            // Remove the share element from DOM if immediate feedback is preferred
+            if (fileContainerId) {
+                const fileContainer = document.getElementById(fileContainerId);
+                if (fileContainer) {
+                    // Use setTimeout to give visual feedback before removing
+                    setTimeout(() => {
+                        fileContainer.style.opacity = '0.5';
+                    }, 500);
+                }
             }
         });
     }
@@ -283,7 +310,81 @@ function hideMessages() {
     }
 }
 
+/**
+ * Set up popup behavior for the shared files page
+ * Ensures popups can be closed when clicking outside and only one is visible at a time
+ */
+function setupPopupBehavior() {
+    // Get popup elements
+    const copyLinkPopup = document.getElementById('copyShareLink');
+    const revokeLinkPopup = document.getElementById('deleteLink');
+    const allPopups = [copyLinkPopup, revokeLinkPopup];
+    
+    // Close popups when clicking outside
+    document.addEventListener('click', function(e) {
+        if (e.target.closest('.file-ellipse-popup') || 
+            e.target.closest('.copy-link-btn') || 
+            e.target.closest('.revoke-link-btn') || 
+            e.target.closest('.file-menu-popup')) {
+            return;
+        }
+        
+        allPopups.forEach(popup => {
+            if (popup && popup.style.display === 'block') {
+                popup.style.display = 'none';
+            }
+        });
+    });
+    
+    // Prevent propagation when clicking inside popups
+    allPopups.forEach(popup => {
+        if (popup) {
+            popup.addEventListener('click', function(e) {
+                e.stopPropagation();
+            });
+        }
+    });
+}
+
+/**
+ * Check for revoked shares and remove them from the UI
+ * Uses sessionStorage to track which shares were revoked
+ */
+function checkRevokedShares() {
+    const revokedShareId = sessionStorage.getItem('revokedShareId');
+    if (revokedShareId) {
+        const shareContainer = document.getElementById('share-item-' + revokedShareId);
+        if (shareContainer) {
+            // Animate removal for better UX
+            shareContainer.style.transition = 'opacity 0.5s, height 0.5s, margin 0.5s';
+            shareContainer.style.opacity = '0';
+            shareContainer.style.height = '0';
+            shareContainer.style.margin = '0';
+            shareContainer.style.overflow = 'hidden';
+            
+            // Remove from DOM after animation completes
+            setTimeout(() => {
+                shareContainer.remove();
+                
+                // Check if there are no more shares and show empty message if needed
+                const remainingShares = document.querySelectorAll('.main-cont.share-item');
+                if (remainingShares.length === 0) {
+                    const filesContainer = document.querySelector('.dash-files');
+                    if (filesContainer) {
+                        filesContainer.innerHTML = '<p class="empty-dash">You haven\'t shared any files yet</p>';
+                    }
+                }
+            }, 500);
+        }
+        
+        // Clear the revoked share ID
+        sessionStorage.removeItem('revokedShareId');
+    }
+}
+
 // Make functions globally available
 window.copyToClipboard = copyToClipboard;
 window.sortSharedFiles = sortSharedFiles;
 window.hideMessages = hideMessages;
+window.setupPopupBehavior = setupPopupBehavior;
+window.checkRevokedShares = checkRevokedShares;
