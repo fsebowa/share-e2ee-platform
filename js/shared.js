@@ -1,14 +1,15 @@
+// JavaScript for the shared files page
 document.addEventListener('DOMContentLoaded', function() {
+    console.log('shared.js loaded');
+    
     // Initialize popup behaviors first
     setupPopupBehavior();
     
-    // Setup ellipsis menu handlers with proper popup closing
-    setupEllipsisMenuHandlers();
-        
-    // Then setup other functionality
-    setupCategoryFiltering();
+    // Setup menu items and other functionality
+    setupEllipseMenus();
+    setupLinkButtons();
     setupSearch();
-    setupFileSorting();
+    setupSorting();
     
     // Handle any pending operations (like deleted shares)
     checkRevokedShares();
@@ -17,128 +18,165 @@ document.addEventListener('DOMContentLoaded', function() {
     setTimeout(hideMessages, 5000);
 });
 
-/**
- * Initialize all functionality for the shared files page
- */
-function initSharedFilesPage() {
-    // Add ID to all share items
-    addShareItemIds();
+function setupPopupBehavior() {
+    console.log('Setting up popup behavior');
     
-    // Setup menu item actions
-    setupMenuItemActions();
+    // Close popups when clicking outside
+    document.addEventListener('click', function(e) {
+        if (!e.target.closest('.file-menu-popup') && 
+            !e.target.closest('.elipse-menu') && 
+            !e.target.closest('.file-ellipse-popup') &&
+            !e.target.closest('.copy-link-btn') &&
+            !e.target.closest('.revoke-link-btn')) {
+            
+            closeAllPopups();
+        }
+    });
     
-    // Setup category filtering
-    setupCategoryFiltering();
+    // Prevent propagation when clicking inside popups
+    document.querySelectorAll('.file-ellipse-popup').forEach(popup => {
+        if (popup) {
+            popup.addEventListener('click', function(e) {
+                e.stopPropagation();
+            });
+        }
+    });
     
-    // Setup search functionality
-    setupSearch();
+    // Ensure all menus start hidden
+    document.querySelectorAll('.file-menu-popup').forEach(popup => {
+        popup.style.display = 'none';
+    });
     
-    // Setup sorting
-    setupSorting();
-    
-    // Apply the initial category filter (All by default)
-    applyInitialCategory();
+    // Make sure all ellipse menu icons are visible
+    document.querySelectorAll('.elipse-menu').forEach(menu => {
+        menu.style.display = 'inline-block';
+        menu.style.visibility = 'visible';
+    });
 }
 
-/**
- * Add IDs to all share items to support removal and tracking
- */
-function addShareItemIds() {
-    document.querySelectorAll('.main-cont.share-item').forEach(function(item, index) {
-        const fileElement = item.querySelector('.file');
-        if (fileElement && !item.id) {
-            const shareId = fileElement.getAttribute('data-share-id');
-            if (shareId) {
-                item.id = 'share-item-' + shareId;
-            } else {
-                item.id = 'share-item-unknown-' + index;
+
+function setupEllipseMenus() {
+    console.log('Setting up ellipse menus');
+    
+    document.querySelectorAll('.elipse-menu').forEach(menu => {
+        // Remove any existing listeners by cloning the element
+        const newMenu = menu.cloneNode(true);
+        if (menu.parentNode) {
+            menu.parentNode.replaceChild(newMenu, menu);
+        }
+        
+        // Add fresh click handler
+        newMenu.addEventListener('click', function(e) {
+            e.stopPropagation();
+            console.log('Ellipse menu clicked');
+            
+            // Get the menu popup
+            const fileContainer = this.closest('.file');
+            if (!fileContainer) {
+                console.error('No parent file container found');
+                return;
             }
-        }
+            
+            const menuPopup = fileContainer.querySelector('.file-menu-popup');
+            if (!menuPopup) {
+                console.error('No menu popup found');
+                return;
+            }
+            
+            // Check if this popup is already visible
+            const isAlreadyOpen = (menuPopup.style.display === 'block');
+            
+            // Close all popups first
+            closeAllPopups();
+            
+            // Only open this one if it wasn't already open
+            if (!isAlreadyOpen) {
+                menuPopup.style.display = 'block';
+                console.log('Menu opened');
+            }
+        });
     });
 }
 
-/**
- * Apply the initial category filter when the page loads
- */
-function applyInitialCategory() {
-    // Get the "All" category element
-    const allCategory = document.querySelector('.categories li[data-category="All"]');
-    if (!allCategory) return;
+function setupLinkButtons() {
+    console.log('Setting up link buttons');
     
-    // Ensure it has the active-cat class
-    document.querySelectorAll('.categories li').forEach(li => {
-        li.classList.remove('active-cat');
-    });
-    allCategory.classList.add('active-cat');
-    
-    // Apply the filter to show all files initially
-    document.querySelectorAll('.file').forEach(file => {
-        const mainCont = file.closest('.main-cont');
-        if (mainCont) {
-            mainCont.style.display = 'block';
-        }
-    });
-}
-
-/**
- * Set up handlers for ellipsis menu items
- */
-function setupMenuItemActions() {
-    // Setup handlers for copy link buttons
+    // Setup copy link buttons
     document.querySelectorAll('.copy-link-btn').forEach(button => {
         button.addEventListener('click', function(e) {
             e.stopPropagation();
+            console.log('Copy link clicked');
+            
             const fileElement = this.closest('.file');
+            if (!fileElement) return;
+            
             const shareUrl = fileElement.getAttribute('data-share-url');
             const fileName = fileElement.querySelector('.file-title').textContent.trim();
             
-            // Open copy link popup
+            // Update popup content
             const popup = document.getElementById('copyShareLink');
-            popup.querySelector('h2').textContent = 'Copy Link: ' + fileName;
-            document.getElementById('shareLink').value = shareUrl;
-            
-            // Hide any existing copied message
-            document.getElementById('shareLink_copied').style.display = 'none';
-            
-            // Show the popup
-            if (typeof closeAllPopups === 'function') {
-                closeAllPopups();
+            if (!popup) {
+                console.error('Copy share link popup not found');
+                return;
             }
+            
+            const title = popup.querySelector('h2');
+            if (title) title.textContent = 'Copy Link: ' + fileName;
+            
+            const input = document.getElementById('shareLink');
+            if (input) input.value = shareUrl;
+            
+            // Hide any previous copied message
+            const copiedMsg = document.getElementById('shareLink_copied');
+            if (copiedMsg) copiedMsg.style.display = 'none';
+            
+            // Close all popups and show this one
+            closeAllPopups();
             popup.style.display = 'block';
         });
     });
     
-    // Setup handlers for revoke link buttons
+    // Setup revoke link buttons
     document.querySelectorAll('.revoke-link-btn').forEach(button => {
         button.addEventListener('click', function(e) {
             e.stopPropagation();
+            console.log('Revoke link clicked');
+            
             const fileElement = this.closest('.file');
+            if (!fileElement) return;
+            
             const shareId = fileElement.getAttribute('data-share-id');
             const fileName = fileElement.querySelector('.file-title').textContent.trim();
             
-            // Open revoke link popup
+            // Update popup content
             const popup = document.getElementById('deleteLink');
-            popup.querySelector('h2').textContent = 'Revoke Share: ' + fileName;
-            document.getElementById('revoke_share_id').value = shareId;
-            
-            // Show the popup
-            if (typeof closeAllPopups === 'function') {
-                closeAllPopups();
+            if (!popup) {
+                console.error('Delete link popup not found');
+                return;
             }
+            
+            const title = popup.querySelector('h2');
+            if (title) title.textContent = 'Revoke Share: ' + fileName;
+            
+            const input = document.getElementById('revoke_share_id');
+            if (input) input.value = shareId;
+            
+            // Close all popups and show this one
+            closeAllPopups();
             popup.style.display = 'block';
         });
     });
     
-    // Setup form submission for revoke link
+    // Setup revoke form submission
     const deleteLinkForm = document.getElementById('delete_link_form');
     if (deleteLinkForm) {
         deleteLinkForm.addEventListener('submit', function(e) {
             e.preventDefault();
             
-            // Get the share ID and file container reference
             const shareIdInput = document.getElementById('revoke_share_id');
+            if (!shareIdInput) return;
+            
             const shareId = shareIdInput.value;
-            const fileContainerId = shareIdInput.dataset.fileContainer;
             
             // Store the share ID in session storage for use after redirect
             sessionStorage.setItem('revokedShareId', shareId);
@@ -149,91 +187,45 @@ function setupMenuItemActions() {
                 deleteProgressBackdrop.style.display = 'block';
             }
             
-            // Submit the form normally
+            // Submit the form
             this.submit();
             
-            // Remove the share element from DOM if immediate feedback is preferred
-            if (fileContainerId) {
-                const fileContainer = document.getElementById(fileContainerId);
-                if (fileContainer) {
-                    // Use setTimeout to give visual feedback before removing
-                    setTimeout(() => {
-                        fileContainer.style.opacity = '0.5';
-                    }, 500);
-                }
+            // Provide visual feedback immediately
+            const fileContainer = document.getElementById('share-item-' + shareId);
+            if (fileContainer) {
+                fileContainer.style.opacity = '0.5';
             }
         });
     }
 }
 
-/**
- * Set up category filtering for the files display
- */
-function setupCategoryFiltering() {
-    document.querySelectorAll('.categories li').forEach(function(category) {
-        category.addEventListener('click', function() {
-            // Remove active class from all categories
-            document.querySelectorAll('.categories li').forEach(function(cat) {
-                cat.classList.remove('active-cat');
-            });
-            
-            // Add active class to clicked category
-            this.classList.add('active-cat');
-            
-            const categoryText = this.getAttribute('data-category') || this.textContent;
-            
-            // Show/hide files based on category
-            document.querySelectorAll('.file').forEach(function(file) {
-                const shareClass = file.getAttribute('data-share-class') || '';
-                const mainCont = file.closest('.main-cont');
-                
-                if (!mainCont) return;
-                
-                if (categoryText === 'All') {
-                    mainCont.style.display = 'block';
-                } else if (categoryText === 'Active' && shareClass.includes('active')) {
-                    mainCont.style.display = 'block';
-                } else if (categoryText === 'Expired' && shareClass.includes('expired')) {
-                    mainCont.style.display = 'block';
-                } else if (categoryText === 'Password Protected' && shareClass.includes('password-protected')) {
-                    mainCont.style.display = 'block';
-                } else {
-                    mainCont.style.display = 'none';
-                }
-            });
-        });
-    });
-}
-
-/**
- * Set up search functionality for files
- */
 function setupSearch() {
+    console.log('Setting up search');
+    
     const searchInput = document.getElementById('search_files');
     if (searchInput) {
         searchInput.addEventListener('input', function() {
             const searchTerm = this.value.toLowerCase();
             
-            document.querySelectorAll('.file').forEach(function(file) {
-                const fileName = file.querySelector('.file-title').textContent.toLowerCase();
-                const mainCont = file.closest('.main-cont');
+            document.querySelectorAll('.main-cont.share-item').forEach(function(container) {
+                const fileTitle = container.querySelector('.file-title');
+                if (!fileTitle) return;
                 
-                if (!mainCont) return;
+                const fileName = fileTitle.textContent.toLowerCase();
                 
                 if (fileName.includes(searchTerm)) {
-                    mainCont.style.display = 'block';
+                    container.style.display = 'block';
                 } else {
-                    mainCont.style.display = 'none';
+                    container.style.display = 'none';
                 }
             });
         });
     }
 }
 
-/**
- * Set up sorting functionality for files
- */
 function setupSorting() {
+    console.log('Setting up sorting');
+    
     const sortDropdown = document.getElementById('sort_files');
     if (sortDropdown) {
         sortDropdown.addEventListener('change', function() {
@@ -241,25 +233,22 @@ function setupSorting() {
         });
         
         // Initialize with default sort
-        if (sortDropdown.value) {
-            sortSharedFiles(sortDropdown.value);
-        }
+        sortSharedFiles(sortDropdown.value);
     }
 }
 
 function sortSharedFiles(sortBy) {
+    console.log('Sorting files by:', sortBy);
+    
     const filesContainer = document.querySelector('.uploaded-files');
     if (!filesContainer) return;
     
-    // Get all visible file elements 
-    const files = Array.from(filesContainer.querySelectorAll('.main-cont')).filter(file => 
-        window.getComputedStyle(file).display !== 'none'
-    );
+    // Get all file containers
+    const fileContainers = Array.from(filesContainer.querySelectorAll('.main-cont.share-item'));
+    if (fileContainers.length === 0) return;
     
-    if (files.length === 0) return;
-    
-    // Sort the files
-    files.sort((a, b) => {
+    // Sort the containers
+    fileContainers.sort((a, b) => {
         const fileA = a.querySelector('.file');
         const fileB = b.querySelector('.file');
         
@@ -300,27 +289,67 @@ function sortSharedFiles(sortBy) {
         }
     });
     
-    // Remove all sorted files from the container and re-add them in the new order
-    files.forEach(file => file.remove());
-    files.forEach(file => filesContainer.appendChild(file));
+    // Re-append all containers in the new order
+    fileContainers.forEach(container => container.remove());
+    fileContainers.forEach(container => filesContainer.appendChild(container));
 }
 
-function copyToClipboard(elementId) {
-    const element = document.getElementById(elementId);
-    if (!element) return;
+
+function checkRevokedShares() {
+    console.log('Checking for revoked shares');
     
-    element.select();
-    document.execCommand('copy');
-    
-    // Show copied message
-    const messageId = elementId + '_copied';
-    const message = document.getElementById(messageId);
-    if (message) {
-        message.style.display = 'inline';
-        setTimeout(() => {
-            message.style.display = 'none';
-        }, 2000);
+    // Check for shares revoked via form submission
+    const revokedShareId = sessionStorage.getItem('revokedShareId');
+    if (revokedShareId) {
+        console.log('Found revoked share ID in session storage:', revokedShareId);
+        removeShareFromUI('share-item-' + revokedShareId);
+        sessionStorage.removeItem('revokedShareId');
     }
+    
+    // Check for shares revoked via PHP redirect
+    const urlParams = new URLSearchParams(window.location.search);
+    const shareIdParam = urlParams.get('share_id');
+    if (shareIdParam && urlParams.get('message') === 'share_revoked') {
+        console.log('Found revoked share ID in URL:', shareIdParam);
+        removeShareFromUI('share-item-' + shareIdParam);
+        
+        // Clean up URL to prevent repeated removal on refresh
+        if (history.replaceState) {
+            const newUrl = window.location.pathname;
+            history.replaceState(null, document.title, newUrl);
+        }
+    }
+}
+
+function removeShareFromUI(shareContainerId) {
+    console.log('Removing share from UI:', shareContainerId);
+    
+    const shareContainer = document.getElementById(shareContainerId);
+    if (!shareContainer) {
+        console.error('Share container not found:', shareContainerId);
+        return;
+    }
+    
+    // Animate removal
+    shareContainer.style.transition = 'opacity 0.5s, height 0.5s, margin 0.5s';
+    shareContainer.style.opacity = '0';
+    shareContainer.style.height = '0';
+    shareContainer.style.margin = '0';
+    shareContainer.style.overflow = 'hidden';
+    
+    // Remove after animation
+    setTimeout(() => {
+        shareContainer.remove();
+        
+        // Check if there are no more shares
+        const remainingShares = document.querySelectorAll('.main-cont.share-item');
+        if (remainingShares.length === 0) {
+            const filesContainer = document.querySelector('.dash-files');
+            if (filesContainer) {
+                filesContainer.innerHTML = '<p class="empty-dash">You haven\'t shared any files yet</p>';
+            }
+        }
+    }, 500);
 }
 
 function hideMessages() {
@@ -348,241 +377,41 @@ function hideMessages() {
     }
 }
 
-function setupPopupBehavior() {
-    // Get popup elements
-    const copyLinkPopup = document.getElementById('copyShareLink');
-    const revokeLinkPopup = document.getElementById('deleteLink');
-    const allPopups = [copyLinkPopup, revokeLinkPopup];
-    
-    // Close popups when clicking outside
-    document.addEventListener('click', function(e) {
-        // If clicking on ellipsis menu, close all popups
-        if (e.target.closest('.elipse-menu')) {
-            allPopups.forEach(popup => {
-                if (popup) popup.style.display = 'none';
-            });
-            return;
-        }
-        
-        // Don't close if clicking inside popup or on specific buttons
-        if (e.target.closest('.file-ellipse-popup') || 
-            e.target.closest('.copy-link-btn') || 
-            e.target.closest('.revoke-link-btn')) {
-            return;
-        }
-        
-        // Close popups otherwise
-        allPopups.forEach(popup => {
-            if (popup && popup.style.display === 'block') {
-                popup.style.display = 'none';
-            }
-        });
-    });
-    
-    // Prevent propagation when clicking inside popups
-    allPopups.forEach(popup => {
-        if (popup) {
-            popup.addEventListener('click', function(e) {
-                e.stopPropagation();
-            });
-        }
-    });
-    
-    // Setup ellipsis menu to close all popups when clicked
-    document.querySelectorAll('.elipse-menu').forEach(menu => {
-        menu.addEventListener('click', function(e) {
-            // Close all popups when ellipsis menu is clicked
-            allPopups.forEach(popup => {
-                if (popup) popup.style.display = 'none';
-            });
-        });
-    });
-}
-
-function checkRevokedShares() {
-    // First check sessionStorage for shares revoked via form submission
-    const revokedShareId = sessionStorage.getItem('revokedShareId');
-    if (revokedShareId) {
-        removeShareFromUI('share-item-' + revokedShareId);
-        sessionStorage.removeItem('revokedShareId');
-    }
-    
-    // Also check URL parameters for shares revoked via PHP redirect
-    const urlParams = new URLSearchParams(window.location.search);
-    const shareIdParam = urlParams.get('share_id');
-    if (shareIdParam && urlParams.get('message') === 'share_revoked') {
-        removeShareFromUI('share-item-' + shareIdParam);
-        
-        // Clean up URL to prevent repeated removal on refresh
-        if (history.replaceState) {
-            const newUrl = window.location.pathname;
-            history.replaceState(null, document.title, newUrl);
-        }
-    }
-}
-
-function removeShareFromUI(shareContainerId) {
-    const shareContainer = document.getElementById(shareContainerId);
-    if (!shareContainer) return;
-    
-    // Animate removal for better UX
-    shareContainer.style.transition = 'opacity 0.5s, height 0.5s, margin 0.5s';
-    shareContainer.style.opacity = '0';
-    shareContainer.style.height = '0';
-    shareContainer.style.margin = '0';
-    shareContainer.style.overflow = 'hidden';
-    
-    // Remove from DOM after animation completes
-    setTimeout(() => {
-        shareContainer.remove();
-        
-        // Check if there are no more shares and show empty message if needed
-        const remainingShares = document.querySelectorAll('.main-cont.share-item');
-        if (remainingShares.length === 0) {
-            const filesContainer = document.querySelector('.dash-files');
-            if (filesContainer) {
-                filesContainer.innerHTML = '<p class="empty-dash">You haven\'t shared any files yet</p>';
-            }
-        }
-    }, 500);
-}
-
-function applyDefaultCategoryFilter() {
-    // Ensure the 'All' category has the active-cat class
-    const categories = document.querySelectorAll('.categories li');
-    categories.forEach(cat => {
-        cat.classList.remove('active-cat');
-    });
-    
-    const allCategory = document.querySelector('.categories li:first-child');
-    if (allCategory) {
-        allCategory.classList.add('active-cat');
-        
-        // Apply the filter to show all files
-        const files = document.querySelectorAll('.file');
-        files.forEach(file => {
-            const mainCont = file.closest('.main-cont');
-            if (mainCont) {
-                mainCont.style.display = 'block';
-            }
-        });
-    }
-}
-
-function setupEllipsisMenuHandlers() {
-    document.querySelectorAll('.elipse-menu').forEach(menu => {
-        menu.addEventListener('click', function(e) {
-            e.stopPropagation();
-            
-            // First, close any open file-ellipse-popup elements
-            closeAllPopups();
-            
-            // Then find the menu popup associated with this ellipsis
-            const fileContainer = this.closest('.file');
-            const menuPopup = fileContainer.querySelector('.file-menu-popup');
-            
-            // Check if this menu is already open
-            const isMenuOpen = (menuPopup.style.display === 'block');
-            
-            // Close all menu popups first
-            document.querySelectorAll('.file-menu-popup').forEach(popup => {
-                popup.style.display = 'none';
-            });
-            
-            // Toggle this menu (only open if it was closed before)
-            if (!isMenuOpen) {
-                menuPopup.style.display = 'block';
-            }
-        });
-    });
-}
-
-function setupLinkActionHandlers() {
-    // Copy link button handlers
-    document.querySelectorAll('.copy-link-btn').forEach(button => {
-        button.addEventListener('click', handleCopyLinkClick);
-    });
-    
-    // Revoke link button handlers
-    document.querySelectorAll('.revoke-link-btn').forEach(button => {
-        button.addEventListener('click', handleRevokeLinkClick);
-    });
-}
-
-function handleCopyLinkClick(e) {
-    e.stopPropagation();
-    
-    // First, close all popups to prevent overlap
-    closeAllPopups();
-    
-    const fileElement = this.closest('.file');
-    const shareUrl = fileElement.getAttribute('data-share-url');
-    const fileName = fileElement.querySelector('.file-title').textContent.trim();
-    
-    // Open copy link popup
-    const popup = document.getElementById('copyShareLink');
-    if (!popup) return;
-    
-    popup.querySelector('h2').textContent = 'Copy Link: ' + fileName;
-    document.getElementById('shareLink').value = shareUrl;
-    
-    // Hide any existing copied message
-    const copiedMsg = document.getElementById('shareLink_copied');
-    if (copiedMsg) copiedMsg.style.display = 'none';
-    
-    // Display the popup
-    popup.style.display = 'block';
-}
-
-function handleRevokeLinkClick(e) {
-    e.stopPropagation();
-    
-    // First, close all popups to prevent overlap
-    closeAllPopups();
-    
-    const fileElement = this.closest('.file');
-    const shareId = fileElement.getAttribute('data-share-id');
-    const fileName = fileElement.querySelector('.file-title').textContent.trim();
-    
-    // Store reference to file container for removal after revocation
-    const fileContainer = fileElement.closest('.main-cont');
-    
-    // Open revoke link popup
-    const popup = document.getElementById('deleteLink');
-    if (!popup) return;
-    
-    popup.querySelector('h2').textContent = 'Revoke Share: ' + fileName;
-    
-    // Set the share ID and store file container reference
-    const revokeShareIdInput = document.getElementById('revoke_share_id');
-    revokeShareIdInput.value = shareId;
-    
-    // Add ID to container if needed for easy removal later
-    if (fileContainer && !fileContainer.id) {
-        fileContainer.id = 'share-item-' + shareId;
-    }
-    
-    // Display the popup
-    popup.style.display = 'block';
-}
-
 function closeAllPopups() {
-    // Close file operation popups (copy link, revoke link)
-    const filePopups = document.querySelectorAll('#copyShareLink, #deleteLink');
-    filePopups.forEach(popup => {
-        if (popup) popup.style.display = 'none';
+    console.log('Closing all popups');
+    
+    // Close file menus
+    document.querySelectorAll('.file-menu-popup').forEach(popup => {
+        popup.style.display = 'none';
     });
     
-    // Close all file menu popups
-    document.querySelectorAll('.file-menu-popup').forEach(popup => {
+    // Close action popups
+    document.querySelectorAll('.file-ellipse-popup').forEach(popup => {
         popup.style.display = 'none';
     });
 }
 
+function copyToClipboard(elementId) {
+    console.log('Copying to clipboard:', elementId);
+    
+    const element = document.getElementById(elementId);
+    if (!element) return;
+    
+    element.select();
+    document.execCommand('copy');
+    
+    // Show success message
+    const messageId = elementId + '_copied';
+    const message = document.getElementById(messageId);
+    if (message) {
+        message.style.display = 'inline';
+        setTimeout(() => {
+            message.style.display = 'none';
+        }, 2000);
+    }
+}
 
 // Make functions globally available
 window.copyToClipboard = copyToClipboard;
+window.closeAllPopups = closeAllPopups;
 window.sortSharedFiles = sortSharedFiles;
-window.hideMessages = hideMessages;
-window.setupPopupBehavior = setupPopupBehavior;
-window.checkRevokedShares = checkRevokedShares;
