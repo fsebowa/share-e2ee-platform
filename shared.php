@@ -30,6 +30,7 @@
     <script src="/js/form-encryption.js"></script>
     <script src="/js/dashboard_func.js"></script>
     <script src="/js/share.js"></script>
+    <script src="/js/shared.js"></script>
     <script>
         // Make error/success flags available to JavaScript
         window.hasRevokeErrors = <?php echo $hasRevokeErrors ? 'true' : 'false'; ?>;
