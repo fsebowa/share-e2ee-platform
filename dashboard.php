@@ -53,34 +53,19 @@
 <body class="dashboard">
     <?php include __DIR__ . "/includes/templates/dashboard_nav.php"; ?>
     <div class="container dash-flex">
-        <div class="left-menu">
+        <div class="left-menu" style="justify-content: flex-start;">
             <button id="add_file"><span style="font-size: 18px;">+</span> New</button>
-            <div class="left-menu-top">
+            <div class="left-menu-top"  style="top: 55px;">
                 <div class="action-buttons">
                     <div class="btn-container">
                         <button class="action-btn active-btn"><a href="/dashboard.php"><i class="fa-regular fa-folder-open"></i> Files</a></button>
-                        <button class="action-btn"><i class="fa-regular fa-clock"></i>Recent</button>
-                        <button class="action-btn"><i class="fa-solid fa-share-nodes"></i><a href="/dashboard/shared.php" target="_blank" rel="noopener noreferrer">Shared</a></button>
+                        <button class="action-btn"><i class="fa-solid fa-share-nodes"></i><a href="/shared.php">Shared</a></button>
                     </div>
                 </div>
                 <div class="action-buttons">
                     <div class="btn-container">   
                         <button class="action-btn"><i class="fa-solid fa-user-lock"></i><a href="/encrypt-decrypt.php">Encrypt/ Decrypt</a></button>
                         <button class="action-btn"><i class="fa-solid fa-code-compare"></i>Calculate hashes</button>
-                    </div>
-                </div>
-            </div>
-            <div class="left-menu-bottom">
-                <div class="action-buttons">
-                    <div class="btn-container">
-                        <button class="action-btn"><i class="fa-regular fa-trash-can"></i>Recycle bin</button>
-                        <div class="storage-btn"> 
-                            <button class="action-btn"><i class="fa-solid fa-cloud"></i>Storage <span>(22% Full)</span></button>
-                            <div class="percent">
-                                <div class="percent1" style="width:22%;"></div>
-                                <div class="percent2" style="width:78%;"></div>
-                            </div>
-                        </div>
                     </div>
                 </div>
             </div>

@@ -93,31 +93,88 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 }
             } else {
                 // Decrypt the file
+                
+                // Check if this is a file with metadata header from the dashboard
+                $hasDashboardHeader = false;
+                $tempInputFile = $temp_dir . '/' . uniqid() . '_input_file.enc';
+                
+                // Read the first 100 bytes to check for header
+                $fileContent = file_get_contents($_FILES['file']['tmp_name'], false, null, 0, 100);
+                if (strpos($fileContent, 'SHARE-ENCRYPTED-FILE-V1') === 0) {
+                    // This is a file from the dashboard with metadata header
+                    $hasDashboardHeader = true;
+                    
+                    // Read the entire file
+                    $fullContent = file_get_contents($_FILES['file']['tmp_name']);
+                    
+                    // Find where the encrypted data begins
+                    $headerEndPos = strpos($fullContent, "---BEGIN-ENCRYPTED-DATA---\n");
+                    if ($headerEndPos !== false) {
+                        // Extract just the encrypted data, skipping the header
+                        $encryptedData = substr($fullContent, $headerEndPos + strlen("---BEGIN-ENCRYPTED-DATA---\n"));
+                        
+                        // Write the encrypted data to a temporary file
+                        file_put_contents($tempInputFile, $encryptedData);
+                        
+                        // Use this temporary file for decryption
+                        $inputFile = $tempInputFile;
+                    } else {
+                        // Couldn't find end of header marker
+                        $hasDashboardHeader = false;
+                        $inputFile = $_FILES['file']['tmp_name'];
+                    }
+                } else {
+                    // Regular encrypted file
+                    $inputFile = $_FILES['file']['tmp_name'];
+                }
+                
                 $result = $encryption_service->decrypt_file(
-                    $_FILES['file']['tmp_name'],
+                    $inputFile,
                     $binary_key,
                     $temp_output_file
                 );
                 
+                // Clean up temp input file if used
+                if ($hasDashboardHeader && file_exists($tempInputFile)) {
+                    @unlink($tempInputFile);
+                }
+                
                 if (!$result || !isset($result['success']) || $result['success'] !== true) {
                     $errors["decryption_failed"] = "Failed to decrypt file: " . ($result['message'] ?? "Unknown error");
+                    
+                    // Clean up temp files
+                    if ($hasDashboardHeader && file_exists($tempInputFile)) {
+                        @unlink($tempInputFile);
+                    }
                 } else {
                     // If we get here, decryption was successful
                     $download_file = $result['path'];
                     
-                    // Clean up the filename - remove .enc extension if present
+                    // Extract the original filename from file header if available
                     $original_filename = basename($_FILES['file']['name']);
+                    
+                    // If this was a dashboard file, try to get original filename from metadata
+                    if ($hasDashboardHeader) {
+                        // Check file content for Original-Filename field
+                        $headerContent = substr($fullContent, 0, $headerEndPos);
+                        if (preg_match('/Original-Filename:\s*([^\r\n]+)/', $headerContent, $matches)) {
+                            $original_filename = trim($matches[1]);
+                        }
+                    }
+                    // Clean up any extra extensions from encrypted files
+                    // Remove .enc extension if present
                     if (substr($original_filename, -4) === ".enc") {
                         $original_filename = substr($original_filename, 0, strlen($original_filename) - 4);
                     }
-                    
-                    // Remove any "encrypted_" prefix if present
+                    // Remove .share extension if present
+                    if (substr($original_filename, -6) === ".share") {
+                        $original_filename = substr($original_filename, 0, strlen($original_filename) - 6);
+                    }
+                    // Remove encrypted_ prefix if present
                     if (substr($original_filename, 0, 10) === "encrypted_") {
                         $original_filename = substr($original_filename, 10);
                     }
-                    
                     $download_filename = "decrypted_" . $original_filename;
-                    
                     // Try to determine the actual mime type of the decrypted file
                     $finfo = finfo_open(FILEINFO_MIME_TYPE);
                     $mime_type = finfo_file($finfo, $download_file);
@@ -156,7 +213,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         $errors["system_error"] = "An error occurred: " . $e->getMessage();
         error_log("Exception in file_encrypt_decrypt.inc.php: " . $e->getMessage());
     }
-
     // If we reach here, there were errors or no file to download
     if (!empty($errors)) {
         $_SESSION["errors_encrypt_decrypt"] = $errors;
@@ -164,8 +220,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         header("Location: /encrypt-decrypt.php");
         exit();
     }
-    
-    // This code should only be reached if something went wrong but no error was set
+    // if something went wrong but no error was set
     $_SESSION["errors_encrypt_decrypt"] = ["An unknown error occurred while processing your file"];
     header("Location: /encrypt-decrypt.php");
     exit();

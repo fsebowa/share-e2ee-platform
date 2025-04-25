@@ -6,7 +6,6 @@ require_once __DIR__ . '/../encryption/encryption_service.inc.php';
 require_once __DIR__ . '/../config/dbh.inc.php';
 require_once __DIR__ .'/../file_management/file_model.inc.php';
 require_once __DIR__ . '/share_model.inc.php';
-// require_once __DIR__ . '/share_contr.inc.php';
 
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;

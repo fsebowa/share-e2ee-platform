@@ -29,8 +29,7 @@
                 <div class="action-buttons">
                     <div class="btn-container">
                         <button class="action-btn"><a href="/dashboard.php"><i class="fa-regular fa-folder-open"></i> Files</a></button>
-                        <button class="action-btn"><i class="fa-regular fa-clock"></i>Recent</button>
-                        <button class="action-btn"><i class="fa-solid fa-share-nodes"></i><a href="/dashboard/shared.php" target="_blank" rel="noopener noreferrer">Shared</a></button>
+                        <button class="action-btn"><i class="fa-solid fa-share-nodes"></i><a href="/shared.php">Shared</a></button>
                     </div>
                 </div>
                 <div class="action-buttons">
@@ -93,7 +92,6 @@
                     <span class="caption-text" style="font-size: 14px;">Your files are end-to-end encrypted</span>
                 </div>
             </div>
-            
             <?php
                 // Display error messages if any
                 if (isset($_SESSION['errors_encrypt_decrypt'])) {
