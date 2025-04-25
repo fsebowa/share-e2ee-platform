@@ -153,7 +153,8 @@ footer .footer-links a:hover{
 .signin-form ,
 .otp-form,
 .upload-form,
-.encrypt-decrypt-form {
+.encrypt-decrypt-form,
+.hash-form {
     text-align: center;
 }
 
@@ -163,7 +164,8 @@ footer .footer-links a:hover{
 .upload-form,
 .file-ellipse-popup,
 .shared-file-container,
-.encrypt-decrypt-form {
+.encrypt-decrypt-form,
+.hash-form {
     width: 420px;
     margin: 0 auto;
     padding: 40px 10px;
@@ -172,7 +174,8 @@ footer .footer-links a:hover{
     box-shadow: 0px 0px 7px -3px rgba(0,0,0,0.75);
 }
 
-.encrypt-decrypt-form {
+.encrypt-decrypt-form,
+.hash-form {
     width: 450px;
 }
 
@@ -1117,5 +1120,12 @@ nav button,
     align-items: flex-start;
 }
 
+/* Hash page */
+.hash-text {
+    text-align: left;
+}
 
+.hash-text span {
+    color: #006AFF;
+}
 
